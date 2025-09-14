@@ -123,7 +123,6 @@ class Gungi:
                     self.switch_turn_god()
                 self.will_move = 0
                 continue
-
             elif self.gamestate.game_state == "start" and place_type in {"board", "tegoma"}:
                 x, y = pos
                 # === クリック1回目：駒の選択 ===

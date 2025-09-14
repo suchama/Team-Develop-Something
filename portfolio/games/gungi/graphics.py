@@ -70,11 +70,11 @@ class Graphics(pygame.sprite.Sprite):
 
     def __init__(self):
         #描画するための見本となる画像用意
-        self.image = [[],[0 for _ in range(15)], [0 for _ in range(15)]]
+        self.image = [[],[[0 for _ in range(4)] for _ in range(15)], [[0 for _ in range(4)] for _ in range(15)]]
         self.image_toosi = {-1:"None"}
         self.image_toosi[1] = {-1:"None"}
         self.image_toosi[2] = {-1:"None"}#相手側のlist用(つまり１８０度回転させたもの)
-        self.image_blight = [[],[0 for _ in range(15)], [0 for _ in range(15)]]
+        self.image_blight = [[],[[0 for _ in range(4)] for _ in range(15)], [[0 for _ in range(4)] for _ in range(15)]]
 
         #フォントとサイズ
         pygame.font.init()
@@ -127,24 +127,29 @@ class Graphics(pygame.sprite.Sprite):
     
     def koma_set(self):
         for i in range(1, 15, 1):
-            url1 = os.path.join("駒画像", "siro", str(i)+".png")
-            url2 = os.path.join("駒画像", "kuro", str(i+100)+".png")
-            self.image[1][i] = pygame.image.load(url1).convert_alpha()
-            self.image[2][i] = pygame.image.load(url2).convert_alpha()
-            self.image[1][i] = pygame.transform.scale(self.image[1][i], (Graphics.cell - 4, Graphics.cell - 4))
-            self.image_toosi[1][i] = self.image[1][i]
-            self.image_toosi[2][i] = pygame.transform.rotate(self.image_toosi[1][i], 180)
-            self.image_blight[1][i] = pygame.image.load(url1).convert_alpha()#self.image[1][i].copy#駒を光らせる用の画像
-            self.image_blight[1][i] = pygame.transform.scale(self.image_blight[1][i], (Graphics.cell - 4, Graphics.cell - 4))
-            self.image_blight[1][i].set_alpha(128)#半透明にする
-            self.image[2][i] = pygame.transform.scale(self.image[2][i], (Graphics.cell - 4, Graphics.cell - 4))
-            self.image_toosi[1][100+i] = self.image[2][i]
-            self.image[2][i] = pygame.transform.rotate(self.image[2][i], 180)
-            self.image_toosi[2][100+i] = self.image[2][i]
-            self.image_blight[2][i] = pygame.image.load(url2).convert_alpha()#self.image[2][i].copy#駒を光らせる用の画像
-            self.image_blight[2][i] = pygame.transform.scale(self.image_blight[2][i], (Graphics.cell - 4, Graphics.cell - 4))
-            self.image_blight[2][i] = pygame.transform.rotate(self.image_blight[2][i], 180)
-            self.image_blight[2][i].set_alpha(128)#半透明にする
+            self.image_toosi[1][i] = { -1:"None"}
+            self.image_toosi[2][i] = { -1:"None"}
+            self.image_toosi[1][100+i] = { -1:"None"}
+            self.image_toosi[2][100+i] = { -1:"None"}
+            for j in range(1,4):
+                url1 = os.path.join("駒画像", "siro", str(i)+"_"+str(j)+".png")
+                url2 = os.path.join("駒画像", "kuro", str(i+100)+"_"+str(j)+".png")
+                self.image[1][i][j] = pygame.image.load(url1).convert_alpha()
+                self.image[2][i][j] = pygame.image.load(url2).convert_alpha()
+                self.image[1][i][j] = pygame.transform.scale(self.image[1][i][j], (Graphics.cell - 4, Graphics.cell - 4))
+                self.image_toosi[1][i][j] = self.image[1][i][j]
+                self.image_toosi[2][i][j] = pygame.transform.rotate(self.image_toosi[1][i][j], 180)
+                self.image_blight[1][i][j] = pygame.image.load(url1).convert_alpha()#self.image[1][i].copy#駒を光らせる用の画像
+                self.image_blight[1][i][j] = pygame.transform.scale(self.image_blight[1][i][j], (Graphics.cell - 4, Graphics.cell - 4))
+                self.image_blight[1][i][j].set_alpha(128)#半透明にする
+                self.image[2][i][j] = pygame.transform.scale(self.image[2][i][j], (Graphics.cell - 4, Graphics.cell - 4))
+                self.image_toosi[1][100+i][j] = self.image[2][i][j]
+                self.image[2][i][j] = pygame.transform.rotate(self.image[2][i][j], 180)
+                self.image_toosi[2][100+i] = self.image[2][i][j]
+                self.image_blight[2][i][j] = pygame.image.load(url2).convert_alpha()#self.image[2][i].copy#駒を光らせる用の画像
+                self.image_blight[2][i][j] = pygame.transform.scale(self.image_blight[2][i][j], (Graphics.cell - 4, Graphics.cell - 4))
+                self.image_blight[2][i][j] = pygame.transform.rotate(self.image_blight[2][i][j], 180)
+                self.image_blight[2][i][j].set_alpha(128)#半透明にする
 
     
     def opposite(self, a): #a=((x,y), (z,w))
@@ -194,11 +199,11 @@ class Graphics(pygame.sprite.Sprite):
                 for floor in range(3):
                     if grid[row][column][floor] != 0 and grid[row][column][floor] <=14:
                         self.image_rect = ((Graphics.board_rect["board"][0][0]+column)*Graphics.cell+2, -floor*5+(Graphics.board_rect["board"][0][1]+row)*Graphics.cell+2, Graphics.cell-4, Graphics.cell-4)
-                        self.screen.blit(self.image[1][grid[row][column][floor]], pygame.Rect(self.image_rect))#駒を描画
+                        self.screen.blit(self.image[1][grid[row][column][floor]][floor + 1], pygame.Rect(self.image_rect))#駒を描画
                     
                     if grid[row][column][floor] != 0 and grid[row][column][floor] >=101:
                         self.image_rect = ((Graphics.board_rect["board"][0][0]+column)*Graphics.cell+2, -floor*5+(Graphics.board_rect["board"][0][1]+row)*Graphics.cell+2, Graphics.cell-4, Graphics.cell-4)
-                        self.screen.blit(self.image[2][grid[row][column][floor]-100], pygame.Rect(self.image_rect))#駒を描画
+                        self.screen.blit(self.image[2][grid[row][column][floor]-100][floor + 1], pygame.Rect(self.image_rect))#駒を描画
 
         
         #持駒を描画
@@ -233,10 +238,10 @@ class Graphics(pygame.sprite.Sprite):
                     for m in range(hands[j].get(self.info_mochi[j][4*i+l]+100*(j-1),0)):
                         if j == 1:
                             self.rectt.center = (self.rect(Graphics.tegoma_rect["slf"]).left+Graphics.cell/2+Graphics.cell*l, 5+i*15-m*5 + self.rect(Graphics.tegoma_rect["slf"]).top+Graphics.cell/2+Graphics.cell*i)
-                            self.screen.blit(self.image[j][self.info_mochi[j][4*i+l]], self.rectt)
+                            self.screen.blit(self.image[j][self.info_mochi[j][4*i+l]][1], self.rectt)
                         if j == 2:
                             self.rectt.center = (self.rect(Graphics.tegoma_rect["opp"]).right-Graphics.cell/2-Graphics.cell*l, -5-i*15+m*5 + self.rect(Graphics.tegoma_rect["opp"]).bottom-Graphics.cell/2-Graphics.cell*i)
-                            self.screen.blit(self.image[j][self.info_mochi[j][4*i+l]], self.rectt)
+                            self.screen.blit(self.image[j][self.info_mochi[j][4*i+l]][1], self.rectt)
         
     def list(self, selected_pos):
         #list(0)と入力されたらlistを消す
@@ -260,9 +265,9 @@ class Graphics(pygame.sprite.Sprite):
 
         for flr in range(floor+1):#flr=0,1,...
             if self.turn_copy == 1:
-                self.screen.blit(self.image_toosi[1][self.grid_copy[row][column][flr]], pygame.Rect(42+960+(cell-10)*flr,222-10*flr,cell,cell))
+                self.screen.blit(self.image_toosi[1][self.grid_copy[row][column][flr]][flr + 1], pygame.Rect(42+960+(cell-10)*flr,222-10*flr,cell,cell))
             if self.turn_copy == 2:
-                self.screen.blit(self.image_toosi[2][self.grid_copy[row][column][flr]], pygame.Rect(42+960+(cell-10)*flr,202+10*flr,cell,cell))
+                self.screen.blit(self.image_toosi[2][self.grid_copy[row][column][flr]][flr + 1], pygame.Rect(42+960+(cell-10)*flr,202+10*flr,cell,cell))
         pygame.display.update()
 
     def glory(self, glgrid):
@@ -291,7 +296,7 @@ class Graphics(pygame.sprite.Sprite):
                 hikarukomanojita = 2
             else:
                 hikarukomanojita = 1
-            self.screen.blit(self.image_blight[hikarukomanojita][self.grid_copy[row][column][floor] % 100], pygame.Rect(self.image_rect))#駒を描画
+            self.screen.blit(self.image_blight[hikarukomanojita][self.grid_copy[row][column][floor] % 100][floor + 1], pygame.Rect(self.image_rect))#駒を描画
         
         if where1 == "tegoma":
             self.rectt = pygame.Rect(0,0, Graphics.cell-4, Graphics.cell-4)
@@ -299,13 +304,13 @@ class Graphics(pygame.sprite.Sprite):
                 m = hands[current_turn].get(self.info_mochi[current_turn][4*row+column],0) -1
                 self.rectt.center = (self.rect(Graphics.tegoma_rect["slf"]).left+Graphics.cell/2+Graphics.cell*column, 5+row*15-m*5 + self.rect(Graphics.tegoma_rect["slf"]).top+Graphics.cell/2+Graphics.cell*row)
                 pygame.draw.rect(self.screen, (200,200,0), self.rectt)
-                self.screen.blit(self.image_blight[current_turn][self.info_mochi[current_turn][4*row+column]], self.rectt)
+                self.screen.blit(self.image_blight[current_turn][self.info_mochi[current_turn][4*row+column]][1], self.rectt)
             
             if current_turn == 2:
                 m = hands[current_turn].get(self.info_mochi[current_turn][4*row+column]+100,0) -1
                 self.rectt.center = (self.rect(Graphics.tegoma_rect["opp"]).right-Graphics.cell/2-Graphics.cell*column, -5-row*15+m*5 + self.rect(Graphics.tegoma_rect["opp"]).bottom-Graphics.cell/2-Graphics.cell*row)
                 pygame.draw.rect(self.screen, (200,200,0), self.rectt)
-                self.screen.blit(self.image_blight[current_turn][self.info_mochi[current_turn][4*row+column]], self.rectt)
+                self.screen.blit(self.image_blight[current_turn][self.info_mochi[current_turn][4*row+column]][1], self.rectt)
         
         self.kiroku = (grid, hands, current_turn, where1, where2)
         
@@ -325,19 +330,19 @@ class Graphics(pygame.sprite.Sprite):
             else:
                 hikarukomanojita = 1
             self.image_rect = ((Graphics.board_rect["board"][0][0]+column)*Graphics.cell+2, floor*5+(Graphics.board_rect["board"][0][1]+row)*Graphics.cell+2, Graphics.cell-4, Graphics.cell-4)
-            self.screen.blit(self.image[hikarukomanojita][grid[row][column][floor] % 100], pygame.Rect(self.image_rect))#駒を描画
+            self.screen.blit(self.image[hikarukomanojita][grid[row][column][floor] % 100][floor + 1], pygame.Rect(self.image_rect))#駒を描画
         
         if where1 == "tegoma":
             self.rectt = pygame.Rect(0,0, Graphics.cell-4, Graphics.cell-4)
             if current_turn == 1:
                 m = hands[current_turn].get(self.info_mochi[current_turn][4*row+column] % 100,0) -1
                 self.rectt.center = (self.rect(Graphics.tegoma_rect["slf"]).left+Graphics.cell/2+Graphics.cell*column, 5+row*15-m*5 + self.rect(Graphics.tegoma_rect["slf"]).top+Graphics.cell/2+Graphics.cell*row)
-                self.screen.blit(self.image[current_turn][self.info_mochi[current_turn][4*row+column]], self.rectt)
+                self.screen.blit(self.image[current_turn][self.info_mochi[current_turn][4*row+column]][1], self.rectt)
             
             if current_turn == 2:
                 m = hands[current_turn].get(self.info_mochi[current_turn][4*row+column] % 100,0) +1
                 self.rectt.center = (self.rect(Graphics.tegoma_rect["opp"]).right-Graphics.cell/2-Graphics.cell*column, -5-row*15+m*5 + self.rect(Graphics.tegoma_rect["opp"]).bottom-Graphics.cell/2-Graphics.cell*row)
-                self.screen.blit(self.image[current_turn][self.info_mochi[current_turn][4*row+column]], self.rectt)
+                self.screen.blit(self.image[current_turn][self.info_mochi[current_turn][4*row+column]][1], self.rectt)
 
     #ポップの作成text:popの内容、left:popの左ボタン
     def make_pop(self, situ, text, left, right):
