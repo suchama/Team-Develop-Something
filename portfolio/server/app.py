@@ -255,7 +255,7 @@ def handle_make_move(data):
                 return
             if [x,y] in gamestate[key]["move_check"]:
             # 動ける場所リストの中に選択した場所がある場合
-                outcome = game_name[game].handle_player_move(board, tegoma, player, gamestate[key]["selected_place"], gamestate[f"{game}_{mode}_{match}"]["selected_pos"], [x,y])
+                outcome = game_name[game].handle_player_move(board, tegoma, player, gamestate[key]["selected_place"], gamestate[key]["selected_pos"], [x,y])
                 # 動ける前提で勝敗判定、(将棋:成定),(軍議:ツケ,謀の能力)の発生判定と移動判定(ターン切り替えは含まない。)を行う。
                 # outcome = {"winner": None or 1 or 2,"nari_check": True or False,"tuke_check": True or False,"bou_check": True or False, "board_grid": board.grid,"tegoma": tegoma}
                 gamestate[key]["board"] = outcome["board_grid"]
@@ -314,7 +314,7 @@ def swich_turn_god(game, mode, match):
         # outcome = {"pass": True or False}
         if outcome["pass"]:
             # パスする場合、手番交代
-            gamestate[f"{game}_{mode}_{match}"]["current_turn"] = gamestate[f"{game}_{mode}_{match}"]["current_turn"] % 2 + 1
+            gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
             gamestate[key]["pass_count"] += 1
             if mode == "pvp":
                 emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
@@ -356,7 +356,6 @@ def swich_turn_god(game, mode, match):
             # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
             swich_turn_god(game, mode, match)
             return
-
     # 現在の手番の送信
     send_signal(key, "turn")
 
@@ -393,10 +392,13 @@ def timer(game, mode, match):
             break
 
         if gamestate[key]["remaining_time"][gamestate[key]["current_turn"]] <= 0:
+            # 時間切れ(相手の手番に)
+            gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
             if mode == "pvp":
-                emit("time_up", {}, room=key)
+                emit("time_out", {}, room=key)
             else:
-                emit("time_up", {})
+                emit("time_out", {})
+            swich_turn_god(game, mode, match)
 
         # 1秒ごとに更新情報を送る
         if mode == "pvp":
@@ -413,8 +415,6 @@ def timer(game, mode, match):
         gamestate[key]["remaining_time"][gamestate[key]["current_turn"]] -= 1
 
         time.sleep(1)
-
-
 
 @socketio.on("check")
 def handle_check(data):
@@ -467,6 +467,28 @@ def handle_check(data):
         gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
         swich_turn_god(game, mode, match)
         return
+
+@socketio.on("finish")
+def handle_finish(data):
+    global gamestate
+    # data = {game: "othello", mode:"pvp", count_match: 数字, "end_or_continue": "end" or "continue"}
+    game = data["game"]
+    mode = data["mode"]
+    match = data["count_match"]
+    key = f"{game}_{mode}_{match}"
+    choose = data["end_or_continue"]
+    if mode == "pvp":
+        room = key
+        leave_room(room, sid=gamestate[key]["player_1"])
+        leave_room(room, sid=gamestate[key]["player_2"])
+    if choose == "end":
+        emit("game_end", {})
+        return
+    elif choose == "continue":
+        emit("game_continue", {})
+        # html側はリロードして最初の画面に戻る
+        return
+    
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=8000)
