@@ -103,26 +103,27 @@ def handle_pvc(data):
     make_match_gamestate(game, "pvc")
     # 試合のデータを初期化
     match = count_matches[f"{game}_pvc"]
+    key = f"{game}_pvc_{match}"
 
     player = hash(time.time()) % 2 + 1
     # hash(time.time()) → 現在の時間を整数に変換してハッシュ化
-    gamestate[f"{game}_pvc_{match}"][f"player_{player}"] = request.sid
-    gamestate[f"{game}_pvc_{match}"][f"player_{player % 2 + 1}"] = "AI"
+    gamestate[key][f"player_{player}"] = request.sid
+    gamestate[key][f"player_{player % 2 + 1}"] = "AI"
     
     game_data = game_name[game].game_start()
     # 各ゲームのlogicファイル内で定義されているgame_start()関数を呼び出して初期盤面を取得
     # game_data = {"board": board, "remaining_time": {1: 300, 2: 300}, "current_turn": 1,(将棋 or 軍議ならば→ "tegoma": {1: [], 2: []})}のような形
-    gamestate[f"{game}_pvc_{match}"]["board"] = game_data["board"]
-    gamestate[f"{game}_pvc_{match}"]["remaining_time"] = game_data["remaining_time"]
-    gamestate[f"{game}_pvc_{match}"]["current_turn"] = game_data["current_turn"]
+    gamestate[key]["board"] = game_data["board"]
+    gamestate[key]["remaining_time"] = game_data["remaining_time"]
+    gamestate[key]["current_turn"] = game_data["current_turn"]
      
     if game != "othello":
-        gamestate[f"{game}_pvc_{match}"]["tegoma"] = game_data["tegoma"]
+        gamestate[key]["tegoma"] = game_data["tegoma"]
         # 将棋、軍議の場合は手駒の情報も追加
-    emit("start_game", {"gamestate": gamestate[f"{game}_pvc_{match}"], count_matches: count_matches})
+    emit("start_game", {"gamestate": gamestate[key], count_matches: count_matches})
 
     socketio.start_background_task(timer, game, "pvc", match)
-    # バックグラウンドのタイマーを開始
+    # バックグラウンドでtimer関数を実行(非同期処理)
     return
 
 # プレイヤーが対人戦を選択してゲームに参加したとき
@@ -138,41 +139,38 @@ def handle_join(data):
         # まだ待機者がいない → この人を待機させる
         waiting_players[game] = player_id
         emit("waiting", {"msg": "相手を待っています..."})
-
     else:
         # 待機者がいた → ペアを作ってルームを作成
         count_matches[f"{game}_pvp"] += 1
         make_match_gamestate(game, "pvp")
         match = count_matches[f"{game}_pvp"]
+        key = f"{game}_pvp_{match}"
 
         opponent_id = waiting_players[game]
         # 待機者リセット
         waiting_players[game] = None
-        room = f"{game}_pvp_{match}_{opponent_id}_{player_id}"
+        room = f"{game}_pvp_{match}"
         join_room(room, sid=opponent_id)
         join_room(room, sid=player_id)
 
         player = hash(time.time()) % 2 + 1
-        gamestate[f"{game}_pvp_{match}"][f"player_{player}"] = request.sid
-        gamestate[f"{game}_pvp_{match}"][f"player_{player % 2 + 1}"] = opponent_id
+        gamestate[key][f"player_{player}"] = request.sid
+        gamestate[key][f"player_{player % 2 + 1}"] = opponent_id
 
         game_data = game_name[game].game_start()            
         # ルームごとに盤面を保存
-        gamestate[f"{game}_pvp_{match}"]["board"] = game_data["board"]
-        gamestate[f"{game}_pvp_{match}"]["remaining_time"] = game_data["remaining_time"]
-        gamestate[f"{game}_pvp_{match}"]["current_turn"] = game_data["current_turn"]
+        gamestate[key]["board"] = game_data["board"]
+        gamestate[key]["remaining_time"] = game_data["remaining_time"]
+        gamestate[key]["current_turn"] = game_data["current_turn"]
 
         if game != "othello":
-            gamestate[f"{game}_pvc_{match}"]["tegoma"] = game_data["tegoma"]
+            gamestate[key]["tegoma"] = game_data["tegoma"]
         # 両方にゲーム開始を通知
-        gamestate[f"{game}_pvc_{match}"]["main_update_time"] = game_data["remaining_time"][gamestate[f"{game}_pvp_{match}"]["current_turn"]]
-        emit("start_game", {"gamestate": gamestate[f"{game}_pvp_{match}"], count_matches: count_matches})
+        gamestate[key]["main_update_time"] = game_data["remaining_time"][gamestate[key]["current_turn"]]
+        emit("start_game", {"gamestate": gamestate[key], count_matches: count_matches}, room = room)
 
-        gamestate[f"{game}_pvp_{match}"]["last_update_time"] = time.time()
-
-        emit("your_turn", to = gamestate[f"{game}_pvp_{match}"][f"player_{gamestate[f'{game}_pvp_{match}']['current_turn']}"])
-        # 現在の手番のプレイヤーに通知
-        emit("opponent_turn", to = gamestate[f"{game}_pvp_{match}"][f"player_{gamestate[f'{game}_pvp_{match}']['current_turn'] % 2 + 1}"])
+        # 現在の手番を通知
+        send_signal(key, "turn")
 
         socketio.start_background_task(timer, game, "pvp", match)
         # バックグラウンドのタイマーを開始
@@ -221,13 +219,10 @@ def handle_make_move(data):
                 # 勝者が決定している場合
                 gamestate[key]["winner"] = outcome["winner"]
                 if mode == "pvp":
-                    emit("game_over", {"board": board, "scores": outcome["scores"]}, room = f"{game}_{mode}_{match}_{gamestate[f'{game}_{mode}_{match}']['player_1']}_{gamestate[f'{game}_{mode}_{match}']['player_2']}")
+                    emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key)
                 else:
                     emit("game_over", {"board": board, "scores": outcome["scores"]})
-                if gamestate[key][f"player_{outcome['winner']}"] != "AI":
-                    emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                if gamestate[key][f"player_{outcome['winner'] % 2 + 1}"] != "AI":
-                    emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                send_signal(key, "game_over")
                 return
             else:
                 # 勝者が決定していないのであればターン交代(パスの確認を挟む)
@@ -271,26 +266,22 @@ def handle_make_move(data):
                 if outcome["winner"] is not None:
                     gamestate[key]["winner"] = outcome["winner"]
                     if mode == "pvp":
-                        emit("game_over", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]}, room = f"{game}_{mode}_{match}_{gamestate[f'{game}_{mode}_{match}']['player_1']}_{gamestate[f'{game}_{mode}_{match}']['player_2']}")
-                        emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                        emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                        emit("game_over", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]}, room = key)
+                        send_signal(key, "game_over")
                     else:
                         emit("game_over", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]})
-                        if gamestate[key][f"player_{outcome['winner']}"] != "AI":
-                            emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                        if gamestate[key][f"player_{outcome['winner'] % 2 + 1}"] != "AI":
-                            emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                        send_signal(key, "game_over")
                     return
                 else:
                     if game == "shogi" and outcome["nari_check"]:
                         # 将棋の成りが発生する場合、htmlにcheckを送るとともにselected_posに該当座標を保存しておく。
-                        emit("blight", {"blight_list": [x,y], "place": place}, to = request.sid)
+                        emit("blight", {"blight_list": [[x,y]], "place": place}, to = request.sid)
                         # わかりやすいように成る駒を光らせる
                         gamestate[key]["selected_pos"] = [x,y]
                         emit("nari_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
                     elif game == "gungi" and (outcome["tuke_check"]):
                         # 軍議のツケが発生する場合、selected_posに該当座標を保存しておく。
-                        emit("blight", {"blight_list": [x,y], "place": place}, to = request.sid)
+                        emit("blight", {"blight_list": [[x,y]], "place": place}, to = request.sid)
                         # わかりやすいようにツケる駒を光らせる
                         gamestate[key]["selected_pos"] = [x,y]
                         emit("tuke_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
@@ -299,7 +290,7 @@ def handle_make_move(data):
                         # ツケ+謀があった場合、htmlはツケの処理　→　emitでapp.pyに送る → 謀の処理 → emitでapp.pyに送る の順番で行う
                     elif game == "gungi" and (outcome["bou_check"]):
                         # 軍議の謀が発生する場合、selected_posに該当座標を保存しておく。
-                        emit("blight", {"blight_list": [x,y], "place": place}, to = request.sid)
+                        emit("blight", {"blight_list": [[x,y]], "place": place}, to = request.sid)
                         # わかりやすいように謀駒を光らせる
                         gamestate[key]["selected_pos"] = [x,y]
                         emit("bou_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
@@ -326,7 +317,7 @@ def swich_turn_god(game, mode, match):
             gamestate[f"{game}_{mode}_{match}"]["current_turn"] = gamestate[f"{game}_{mode}_{match}"]["current_turn"] % 2 + 1
             gamestate[key]["pass_count"] += 1
             if mode == "pvp":
-                emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = f"{game}_{mode}_{match}_{gamestate[f'{game}_{mode}_{match}']['player_1']}_{gamestate[f'{game}_{mode}_{match}']['player_2']}")
+                emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
             else:
                 emit("pass", {"current_turn": gamestate[key]["current_turn"]})
             outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
@@ -334,15 +325,11 @@ def swich_turn_god(game, mode, match):
             if outcome["pass"]:
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
-                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = f"{game}_{mode}_{match}_{gamestate[f'{game}_{mode}_{match}']['player_1']}_{gamestate[f'{game}_{mode}_{match}']['player_2']}")
-                    emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                    emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
+                    send_signal(key, "game_over")
                 else:
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
-                    if gamestate[key][f"player_{ gamestate[key]["current_turn"]}"] is not "AI":
-                        emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                    if gamestate[key][f"player_{ gamestate[key]["current_turn"] % 2 + 1}"] is not "AI":
-                        emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                    send_signal(key, "game_over")
                 return
     if gamestate[key][f"player_{ gamestate[key]["current_turn"]}"] == "AI":
         # AIの手を実行
@@ -351,27 +338,19 @@ def swich_turn_god(game, mode, match):
         #オセロならスコア、将棋、軍議なら手駒も更新される。
         if "winner" in gamestate[key] and game == "othello":
             if mode == "pvp":
-                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = f"{game}_{mode}_{match}_{gamestate[f'{game}_{mode}_{match}']['player_1']}_{gamestate[f'{game}_{mode}_{match}']['player_2']}")
-                emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
+                send_signal(key, "game_over")
             else:
                 emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
-                if gamestate[key][f"player_{ gamestate[key]["current_turn"]}"] != "AI":
-                    emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                if gamestate[key][f"player_{ gamestate[key]["current_turn"] % 2 + 1}"] != "AI":
-                    emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                send_signal(key, "game_over")
             return
         elif "winner" in gamestate[key] and (game == "shogi" or game == "gungi"):
             if mode == "pvp":
-                emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]}, room = f"{game}_{mode}_{match}_{gamestate[f'{game}_{mode}_{match}']['player_1']}_{gamestate[f'{game}_{mode}_{match}']['player_2']}")
-                emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]}, room = key)
+                send_signal(key, "game_over")
             else:
                 emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]})
-                if gamestate[key][f"player_{ gamestate[key]["current_turn"]}"] != "AI":
-                    emit("game_over_win", to = gamestate[key][f"player_{outcome['winner']}"])
-                if gamestate[key][f"player_{ gamestate[key]["current_turn"] % 2 + 1}"] != "AI":
-                    emit("game_over_lose", to = gamestate[key][f"player_{outcome['winner'] % 2 + 1}"])
+                send_signal(key, "game_over")
             return
         else:
             # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
@@ -379,10 +358,31 @@ def swich_turn_god(game, mode, match):
             return
 
     # 現在の手番の送信
-    if gamestate[key][f"player_{ gamestate[key]["current_turn"]}"] != "AI":
-        emit("your_turn", {}, to = gamestate[key][f"player_{gamestate[key]['current_turn']}"])
-    if gamestate[key][f"player_{ gamestate[key]["current_turn"] % 2 + 1}"] != "AI":
-        emit("opponent_turn", {}, to = gamestate[key][f"player_{gamestate[key]['current_turn'] % 2 + 1}"])
+    send_signal(key, "turn")
+
+# 勝敗が決まったとき、または手番が変わったときに相手に通知する用(対人戦でも対AI戦でもok)
+def send_signal(key, event):
+    # event = "game_over" or "turn"
+    # key = f"{game}_{mode}_{match}"
+    global gamestate
+    if event == "game_over":
+        winner = gamestate[key]["winner"]
+        players = {
+            "game_over_win":gamestate[key][f"player_{winner}"],
+            "game_over_lose":gamestate[key][f"player_{winner % 2 + 1}"]
+        }
+    elif  event == "turn":
+        current_turn = gamestate[key]["current_turn"]
+        players = {
+            "your_turn":gamestate[key][f"player_{current_turn}"],
+            "opponent_turn":gamestate[key][f"player_{current_turn % 2 + 1}"]
+        }
+    else:
+        return
+    for event, player in players.items():
+        if player != "AI":
+            emit(event, {}, to = player)
+    return
 
 def timer(game, mode, match):
     global gamestate
@@ -394,7 +394,7 @@ def timer(game, mode, match):
 
         if gamestate[key]["remaining_time"][gamestate[key]["current_turn"]] <= 0:
             if mode == "pvp":
-                emit("time_up", {}, room=f"{key}_{gamestate[key]['player_1']}_{gamestate[key]['player_2']}")
+                emit("time_up", {}, room=key)
             else:
                 emit("time_up", {})
 
@@ -403,7 +403,7 @@ def timer(game, mode, match):
             socketio.emit("time_update", {
                 "remaining_time": gamestate[key]["remaining_time"][gamestate[key]["current_turn"]],
                 "current_turn": gamestate[key]["current_turn"]
-            }, room=f"{key}_{gamestate[key]['player_1']}_{gamestate[key]['player_2']}")
+            }, room=key)
         else:
             socketio.emit("time_update", {
                 "remaining_time": gamestate[key]["remaining_time"][gamestate[key]["current_turn"]],
@@ -423,49 +423,50 @@ def handle_check(data):
     game = data["game"]
     mode = data["mode"]
     match = data["count_match"]
+    key = f"{game}_{mode}_{match}"
     check = data["check"]
-    x, y = gamestate[f"{game}_{mode}_{match}"]["selected_pos"]
+    x, y = gamestate[key]["selected_pos"]
     player = data["current_turn"]
-    board = gamestate[f"{game}_{mode}_{match}"]["board"]
-    tegoma = gamestate[f"{game}_{mode}_{match}"]["tegoma"]
+    board = gamestate[key]["board"]
+    tegoma = gamestate[key]["tegoma"]
 
     emit("cansel_bright", {}, to = request.sid)
     # 光らせている場所を消す
 
-    if request.sid != gamestate[f"{game}_{mode}_{match}"][f"player_{player}"]:
+    if request.sid != gamestate[key][f"player_{player}"]:
         emit("error", {"msg": "おけないよん"}, to = request.sid)
         return
 
     if check == "cancel":
-        gamestate[f"{game}_{mode}_{match}"]["selected_pos"] = None
+        gamestate[key]["selected_pos"] = None
         return
 
     if game == "shogi" and check == "nari":
-        outcome = game_name[game].handle_nari(board, player, gamestate[f"{game}_{mode}_{match}"]["selected_pos"], [x,y])
+        outcome = game_name[game].handle_nari(board, player, gamestate[key]["selected_pos"], [x,y])
         # outcome = {"board_grid": board.grid,"current_turn": current_turn}
-        gamestate[f"{game}_{mode}_{match}"]["board"] = outcome["board_grid"]
-        gamestate[f"{game}_{mode}_{match}"]["selected_pos"] = None
+        gamestate[key]["board"] = outcome["board_grid"]
+        gamestate[key]["selected_pos"] = None
     elif game == "gungi" and check == "tuke":
-        outcome = game_name[game].handle_tuke(board, player, gamestate[f"{game}_{mode}_{match}"]["selected_pos"], [x,y])
+        outcome = game_name[game].handle_tuke(board, player, gamestate[key]["selected_pos"], [x,y])
         # outcome = {"board_grid": board.grid,"current_turn": current_turn}
-        gamestate[f"{game}_{mode}_{match}"]["board"] = outcome["board_grid"]
-        gamestate[f"{game}_{mode}_{match}"]["selected_pos"] = None
+        gamestate[key]["board"] = outcome["board_grid"]
+        gamestate[key]["selected_pos"] = None
     elif game == "gungi" and check == "bou":
-        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[f"{game}_{mode}_{match}"]["selected_pos"], [x,y])
+        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"], [x,y])
         # 謀は手駒の更新がある
         # outcome = {"board_grid": board.grid,"tegoma": tegoma,"current_turn": current_turn}
-        gamestate[f"{game}_{mode}_{match}"]["board"] = outcome["board_grid"]
-        gamestate[f"{game}_{mode}_{match}"]["tegoma"] = outcome["tegoma"]
-        gamestate[f"{game}_{mode}_{match}"]["selected_pos"] = None
+        gamestate[key]["board"] = outcome["board_grid"]
+        gamestate[key]["tegoma"] = outcome["tegoma"]
+        gamestate[key]["selected_pos"] = None
     
-    if (game == "gungi" and check == "tuke") and ("bou_check_after_tuke" in gamestate[f"{game}_{mode}_{match}"]):
-        remove = gamestate[f"{game}_{mode}_{match}"].pop("bou_check_after_tuke")
+    if (game == "gungi" and check == "tuke") and ("bou_check_after_tuke" in gamestate[key]):
+        remove = gamestate[key].pop("bou_check_after_tuke")
+        # 削除するためなので、remove変数は使わなくてok
         return
     else:
-        gamestate[f"{game}_{mode}_{match}"]["current_turn"] = gamestate[f"{game}_{mode}_{match}"]["current_turn"] % 2 + 1
+        gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
         swich_turn_god(game, mode, match)
         return
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=8000)
-
