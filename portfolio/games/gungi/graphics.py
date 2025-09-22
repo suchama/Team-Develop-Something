@@ -145,7 +145,7 @@ class Graphics(pygame.sprite.Sprite):
                 self.image[2][i][j] = pygame.transform.scale(self.image[2][i][j], (Graphics.cell - 4, Graphics.cell - 4))
                 self.image_toosi[1][100+i][j] = self.image[2][i][j]
                 self.image[2][i][j] = pygame.transform.rotate(self.image[2][i][j], 180)
-                self.image_toosi[2][100+i] = self.image[2][i][j]
+                self.image_toosi[2][100+i][j] = self.image[2][i][j]
                 self.image_blight[2][i][j] = pygame.image.load(url2).convert_alpha()#self.image[2][i].copy#駒を光らせる用の画像
                 self.image_blight[2][i][j] = pygame.transform.scale(self.image_blight[2][i][j], (Graphics.cell - 4, Graphics.cell - 4))
                 self.image_blight[2][i][j] = pygame.transform.rotate(self.image_blight[2][i][j], 180)
@@ -497,4 +497,5 @@ class Graphics(pygame.sprite.Sprite):
                 else:#入りきってた場合
                     self.text_dvd.append(text[(l-i):])#リストに文字列追加
                 break
+
 
