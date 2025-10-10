@@ -1,4 +1,4 @@
-#logic_shogi
+# logic_shogi.py
 """
 将棋ロジック
 Board と GameState を利用して、サーバー(app.py)から呼び出される関数群を提供
@@ -34,7 +34,7 @@ def get_valid_moves(board: List[List[int]],
                     pos: List[int]
                     ) -> List[List[int]]:
     """
-    クリック1回目の手の取得
+    クリック1回目の処理
     """
     b = Board()
     b.grid = [row[:] for row in board]
@@ -56,7 +56,7 @@ def get_valid_moves(board: List[List[int]],
                     continue
                 moves.append([x, y])
         return moves
-    return []
+    return [[]]
 
 
 def handle_player_move(board: List[List[int]], 
@@ -174,6 +174,13 @@ def handle_ai_move(gamestate_dict: Dict,
     piece = b.grid[y0][x0]
     b.grid[y1][x1] = piece
     b.grid[y0][x0] = 0
+
+    # 駒を取ったときの処理（AI側）
+    captured = b.grid[y1][x1]
+    if captured != 0 and b.is_enemy(captured, turn):
+        base = b.unpromote(captured) % 10
+        gs.hands[turn][base] = gs.hands[turn].get(base, 0) + 1
+
 
     gs = GameState()
     gs.current_turn = turn
