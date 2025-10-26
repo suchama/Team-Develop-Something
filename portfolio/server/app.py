@@ -186,14 +186,19 @@ def handle_join(data):
 # player = 1 or 2
 def handle_make_move(data):
     global gamestate, game_name
-    # data = {game: "othello", mode:"pvp", count_match: 数字, place:"board", x: x, y: y, current_player: 1}
-
+    # data = {game: "othello", mode:"pvp", count_match: 数字, place:"board" or "tegoma", koma:数字, x: x, y: y, current_player: 1}
+    # placeがboard→
     game = data["game"]
     mode = data["mode"]
     match = data["count_match"]
     key = f"{game}_{mode}_{match}"
     place = data["place"]
-    x, y = data["x"], data["y"]
+    if place == "tegoma":
+        x, y = None, None
+        koma = data["koma"]
+    elif place == "board":
+        x, y = data["x"], data["y"]
+        koma = None
     player = data["current_player"]
     board = gamestate[key]["board"]
 
@@ -230,15 +235,19 @@ def handle_make_move(data):
                 return
     else:
     # 将棋、軍議の場合
-        tegoma = gamestate[key]["tegoma"]
+        tegoma = gamestate[key]["tegoma"][player]
         if gamestate[key]["move_check"] == []:
         # 1回目の選択ができていない場合
-            valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y])
+            valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y], koma)
+            #[x,y] もしくは koma が None
             if valid_moves != []:
             # 選択した駒が動ける場合
                 gamestate[key]["move_check"] = valid_moves
                 gamestate[key]["selected_place"] = place
-                gamestate[key]["selected_pos"] = [x,y]
+                if place == "tegoma":
+                    gamestate[key]["selected_pos"] = koma
+                else:
+                    gamestate[key]["selected_pos"] = [x,y]
                 emit("blight", {"blight_list": valid_moves, "place": place}, to = request.sid)
                 return
             else:
@@ -256,6 +265,7 @@ def handle_make_move(data):
             if [x,y] in gamestate[key]["move_check"]:
             # 動ける場所リストの中に選択した場所がある場合
                 outcome = game_name[game].handle_player_move(board, tegoma, player, gamestate[key]["selected_place"], gamestate[key]["selected_pos"], [x,y])
+                # gamestate[key]["selected_pos"]には、tegomaなら数字、boardなら[x,y]が入る。注意
                 # 動ける前提で勝敗判定、(将棋:成定),(軍議:ツケ,謀の能力)の発生判定と移動判定(ターン切り替えは含まない。)を行う。
                 # outcome = {"winner": None or 1 or 2,"nari_check": True or False,"tuke_check": True or False,"bou_check": True or False, "board_grid": board.grid,"tegoma": tegoma}
                 gamestate[key]["board"] = outcome["board_grid"]
