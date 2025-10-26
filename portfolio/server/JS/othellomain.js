@@ -26,7 +26,7 @@ socket.on('waiting', (data) => {/* emit("waiting", {"msg": "相手を待って�
 // startさせる
 const count_matches = 0/* 起動してから何試合したか */
 const gamestate = 0
-socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate[key], count_matches: count_matches}) */
+socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate[key], "count_matche"s: count_matches}) */
     count_matches = data["count_matches"];/* 受け取ったデータをこっち側にも保存 */
     gamestate = data["gamestate"];//gamestate["othello"]は"board","current_turn","remaining_time"(→1,2のキーに残り秒数が入っている)
     //currentturnが自分か相手か？
@@ -97,6 +97,11 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
     }, 1500); // 単位はミリ秒（1000ms = 1秒）
 });
 
+socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
+    board_update(data["gamestate"]["board"]);
+}
+
+
 socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key) */
     activate_pop(["ゲームオーバー","black"+str(data["scores"]["black"])+"-"+str(data["scores"]["white"]+"white")], ["もう一度","止める"])
 });
@@ -109,7 +114,7 @@ socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["cu
     }, 1000); // 単位はミリ秒（1000ms = 1秒）
 });
 
-socket.on('time_out', (data) => {/* emit("time_out", {}, room=key) */
+socket.on('time_out', (data) => {// emit("time_out", {}, room=key)
     activate_pop(["＜タイムアウトしました＞"],[])
     // setTimeoutで1000ミリ秒（1秒）の遅延を設定
     setTimeout(() => {
@@ -164,7 +169,7 @@ socket.on("game_end",()=>{
 })
 
 socket.on("game_continue",()=>{//もう一度遊ぶ場合はpop表示一秒後にスタート画面に戻る
-    activate_pop(["Thank You For Playing!"],[])
+    activate_pop(["Thank You For Playing!","1秒後に自動で画面遷移します"],[])
     setTimeout(()=>{
         window.location.href = "../index.html"
     },1000)
@@ -215,10 +220,10 @@ function activate_pop(text,buttonText){//buttonText=["a","b","c"]
 
 function button_Push(situation,button_text){
     if((situation.includes("ゲームオーバー")) && button_text == "もう一度"){
-        emit("finiish",{game: "othello", mode:game_mode, count_match: count_matches, "end_or_continue": "continue"})
+        emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "continue"})
     }
     if((situation.includes("ゲームオーバー")) && button_text == "止める"){
-        emit("finiish",{game: "othello", mode:game_mode, count_match: count_matches, "end_or_continue": "end"})
+        emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"})
     }
 }
 
@@ -227,14 +232,14 @@ function board_update(grid){// grid[row][column]
         for(let c = 1 ; c <= 8 ; c ++){/* r:row(行)　c:column(列) */
             if(grid[r][c] == 1){
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
-                img.src = "画像１.jpg";
-                img.alt = "黒石";
+                img.src = "othello_img/画像１.jpg";
+                img.alt = "オセロ黒石";
                 img.style.display = "block";//オセロでは表示をhideすることはないので、blockになったら最後までblock
             }
             if(grid[r][c] == 2){
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
-                img.src = "画像2.jpg";
-                img.alt = "白石";
+                img.src = "othello_img/画像2.jpg";
+                img.alt = "オセロ白石";
                 img.style.display = "block";
             }
         }
@@ -260,4 +265,5 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
+
 
