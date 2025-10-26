@@ -313,7 +313,12 @@ def handle_make_move(data):
 def swich_turn_god(game, mode, match):
     global gamestate, game_name
     key = f"{game}_{mode}_{match}"
-    #オセロのパス確認、現在の手番かどうかをそれぞれに送信する
+    # 現在の盤面データを送信
+    if  mode == "pvc":
+        emit("game_data", {"gamestate": gamestate[key], count_matches: count_matches})
+    else:
+        emit("game_data", {"gamestate": gamestate[key], count_matches: count_matches}, room = key)
+    #オセロのパス確認、AIの手番、現在の手番かどうかをそれぞれに送信する
     if gamestate[key][f"remaining_time"][gamestate[key]["current_turn"]] < 60:
     # 残り時間が60秒未満の場合、60秒にする
         gamestate[key]["remaining_time"][gamestate[key]["current_turn"]] = 60
