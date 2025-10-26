@@ -1,1 +1,0 @@
-#logic_shogi.py
