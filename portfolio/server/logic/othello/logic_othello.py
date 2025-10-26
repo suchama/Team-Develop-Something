@@ -3,9 +3,9 @@
 サーバー(app.py)からのリクエストを処理し、オセロのロジック全体を管理
 """
 from typing import Dict, List, Tuple
-from board import Board
-from gamestate import GameState
-from ai import AI
+from .board import Board
+from .gamestate import GameState
+from .ai import AI
 
 
 def game_start() -> Dict:
@@ -152,5 +152,6 @@ def handle_ai_move(game_state_dict: dict, current_turn: int) -> dict:
         "winner": winner,
         "scores": {"black": black, "white": white},
     }
+
 
 
