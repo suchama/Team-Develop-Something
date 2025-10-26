@@ -6,7 +6,7 @@ from flask_socketio import SocketIO, emit, join_room
 # emit→　サーバーからクライアントに情報を送るための関数
 # join_room→　特定のルームにクライアントを参加させるための関数
 
-app = Flask(__name__, template_folder='htmlのフォルダ名')
+app = Flask(__name__, template_folder='html')
 # app→ Flaskアプリケーションのインスタンス
 # app.pyと同じ階層にhtmlフォルダを置く
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -15,7 +15,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # cors_allowed_origins="*" → 別ドメインからの接続を許可
 # socketio.run()でサーバーを起動できるようになる
 
-game_name = {"othello": othello, "shogi": shogi, "gungi": gungi}
+game_name = {}
 # 各ゲームのロジックファイルを辞書型で管理
 gamestate = {}
 # 各ゲームの盤面を管理する辞書
@@ -32,10 +32,10 @@ def make_match_gamestate(game, mode):
     global count_matches, gamestate
     count_matches[f"{game}_{mode}"] += 1
     if game == "othello":
-        gamestate[f"{game}_{mode}_{count_matches[f"{game}_{mode}"]}"] = {"board": None, "current_turn": None, "move_check": [], "remaining_time": {1: None, 2: None}, "pass_count": 0, "player_1": None, "player_2": None}
+        gamestate[f"{game}_{mode}_{count_matches[f'{game}_{mode}']}"] = {"board": None, "current_turn": None, "move_check": [], "remaining_time": {1: None, 2: None}, "pass_count": 0, "player_1": None, "player_2": None}
         #オセロの試合中にapp.pyで管理するデータの初期化(盤面、現在の手番、残り時間、連続パス数、プレイヤー1、プレイヤー2, 最後に更新した時間)
     else:
-        gamestate[f"{game}_{mode}_{count_matches[f"{game}_{mode}"]}"] = {"board": None, "current_turn": None, "tegoma": {1:[], 2:[]}, "move_check": [], "selected_place": None, "selected_pos": None, "remaining_time": {1: None, 2: None}, "player_1": None, "player_2": None}
+        gamestate[f"{game}_{mode}_{count_matches[f'{game}_{mode}']}"] = {"board": None, "current_turn": None, "tegoma": {1:[], 2:[]}, "move_check": [], "selected_place": None, "selected_pos": None, "remaining_time": {1: None, 2: None}, "player_1": None, "player_2": None}
         #将棋、軍議の試合中にapp.pyで管理するデータの初期化(盤面、現在の手番、手駒、残り時間、駒の選択ができているかどうか、選択した駒の場所(tegoma or board)、選択した駒の位置([x,y])、プレイヤー1、プレイヤー2, 最後に更新した時間)
     # 対局中に保存しておくデータの初期化()
 
@@ -47,8 +47,8 @@ def index():
     # global → 外の変数を使うよ〜〜
     connected_users += 1
     print("あなたは", connected_users, "人目の来訪者です！キリ番なら記念カキコ！")
-    return "サーバー動いてるんだが？"
-    # return render_template('index.html')
+    #return "サーバー動いてるんだが？"
+    return render_template('start_index.html')
     # html内でsocket.ioに接続する
 
 # クライアント接続時(htmlファイルを読み込むときに実行される)
@@ -70,26 +70,30 @@ def handle_disconnect():
 @app.route('/othello')
 #URL末尾に/othelloがついたときに実行される。例)http://13.231.31.181:8000/othello
 def othello_page():
-    global count_matches
+    global count_matches, game_name
     import logic.othello.logic_othello as othello  # ゲームのロジックファイルを読み込む
+    # logic_othello.py内でインポートするときはファイル名の前に'.'をつけること！注意
     mode = request.args.get("mode", "pvc")  # URLパラメータからmodeを受け取る。 デフォルトはpvc
+    game_name["othello"] = othello
     return render_template("othello.html", game = "othello", mode = mode, count_matches = count_matches[f"othello_{mode}"])
     # modeをhtmlに渡す。html内でmodeによって処理を変える。
     # html内では、{{ mode }} が "pvp" または "pvc" に置き換えられる。
 
 @app.route('/shogi')
 def shogi_page():
-    global count_matches
+    global count_matches, game_name
     import logic.shogi.logic_shogi as shogi
     mode = request.args.get("mode", "pvc")
+    game_name["shogi"] = shogi
     return render_template("shogi.html", game = "shogi", mode = mode, count_matches = count_matches[f"shogi_{mode}"])
     # htmlには、試合の識別子としてmodeとcount_matches を渡す。
 
 @app.route('/gungi')
 def gungi_page():
-    global count_matches
+    global count_matches, game_name
     import logic.gungi.logic_gungi as gungi
     mode = request.args.get("mode", "pvc")
+    game_name["gungi"] = gungi
     return render_template("gungi.html", game = "gungi", mode = mode, count_matches = count_matches[f"gungi_{mode}"])
 
 # プレイヤーが対AI戦を選択してゲームに参加したとき
@@ -130,7 +134,7 @@ def handle_pvc(data):
 @socketio.on("pvp")
 def handle_join(data):
     #data = {game: "othello"}
-    global waiting_players, count_matches, gamestate, game_name
+    global waiting_players, count_matches, gamestate
     game = data["game"]  # "othello", "shogi", "gungi"
     player_id = request.sid
     # request.sid → 接続しているクライアントの一意のID(名前みたいなもの)
@@ -185,7 +189,7 @@ def handle_join(data):
 # x, y = プレイヤーが打った座標
 # player = 1 or 2
 def handle_make_move(data):
-    global gamestate, game_name
+    global gamestate
     # data = {game: "othello", mode:"pvp", count_match: 数字, place:"board" or "tegoma", koma:数字, x: x, y: y, current_player: 1}
     # placeがboard→
     game = data["game"]
@@ -311,7 +315,7 @@ def handle_make_move(data):
 
 
 def swich_turn_god(game, mode, match):
-    global gamestate, game_name
+    global gamestate
     key = f"{game}_{mode}_{match}"
     # 現在の盤面情報を送信
     if  mode == "pvc":
@@ -346,7 +350,7 @@ def swich_turn_god(game, mode, match):
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
                     send_signal(key, "game_over")
                 return
-    if gamestate[key][f"player_{ gamestate[key]["current_turn"]}"] == "AI":
+    if gamestate[key][f"player_{ gamestate[key]['current_turn']}"] == "AI":
         # AIの手を実行
         game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
         #outcome = {"board_grid": board.grid,"current_turn": current_turn, "winner": gamestate.winner,"scores": {"black": black_count, "white": white_count}}
@@ -433,7 +437,7 @@ def timer(game, mode, match):
 
 @socketio.on("check")
 def handle_check(data):
-    global gamestate, game_name
+    global gamestate
     # data = {game: "shogi", mode:"pvp", count_match: 数字, check: "nari" or "tuke" or "bou" or "cancel", current_turn: current_turn}
     game = data["game"]
     mode = data["mode"]
