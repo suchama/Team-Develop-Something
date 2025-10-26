@@ -120,7 +120,7 @@ def handle_pvc(data):
     if game != "othello":
         gamestate[key]["tegoma"] = game_data["tegoma"]
         # 将棋、軍議の場合は手駒の情報も追加
-    emit("start_game", {"gamestate": gamestate[key], count_matches: count_matches})
+    emit("start_game", {"gamestate": gamestate[key], "count_matches": count_matches})
 
     socketio.start_background_task(timer, game, "pvc", match)
     # バックグラウンドでtimer関数を実行(非同期処理)
@@ -167,7 +167,7 @@ def handle_join(data):
             gamestate[key]["tegoma"] = game_data["tegoma"]
         # 両方にゲーム開始を通知
         gamestate[key]["main_update_time"] = game_data["remaining_time"][gamestate[key]["current_turn"]]
-        emit("start_game", {"gamestate": gamestate[key], count_matches: count_matches}, room = room)
+        emit("start_game", {"gamestate": gamestate[key], "count_matches": count_matches}, room = room)
 
         # 現在の手番を通知
         send_signal(key, "turn")
@@ -313,11 +313,11 @@ def handle_make_move(data):
 def swich_turn_god(game, mode, match):
     global gamestate, game_name
     key = f"{game}_{mode}_{match}"
-    # 現在の盤面データを送信
+    # 現在の盤面情報を送信
     if  mode == "pvc":
-        emit("game_data", {"gamestate": gamestate[key], count_matches: count_matches})
+        emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     else:
-        emit("game_data", {"gamestate": gamestate[key], count_matches: count_matches}, room = key)
+        emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches}, room = key)
     #オセロのパス確認、AIの手番、現在の手番かどうかをそれぞれに送信する
     if gamestate[key][f"remaining_time"][gamestate[key]["current_turn"]] < 60:
     # 残り時間が60秒未満の場合、60秒にする
