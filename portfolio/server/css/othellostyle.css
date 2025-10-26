@@ -73,7 +73,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    background-color: rgb(255, 0, 0);
+    background-color: rgba(73, 197, 7, 0.500);
     z-index: 1000;
 }
 
@@ -90,7 +90,7 @@
     left: 50%;
     font-size: 5vw;
     transform: translate(-50%,-50%);
-    background-color: rgb(255, 199, 125);
+    background-color: rgba(73, 197, 7, 0.500);
 }
 
 .button{/* 親はpopBG */
@@ -217,4 +217,5 @@
 /*カスケード順に読み込むのでこれは最後に置いておく*/
 .hide{
     display: none;
+
 }
