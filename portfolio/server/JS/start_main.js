@@ -56,4 +56,9 @@ btn4.addEventListener('click', () => {
     window.location.href = gamemodeurl;/* これで次のurlに遷移できる？ */
 });
 
+btn5.addEventListener('click', () => {
+    gamemodeurl = gamemodeurl +"?"+"mode='pvc'"/* 例えばurlは　/othello?mode='pvp'　 */
+    window.location.href = gamemodeurl;/* これで次のurlに遷移できる？ */
+});
+
 /* これでオセロのpvpが起動できたら他も同じように実装する */
