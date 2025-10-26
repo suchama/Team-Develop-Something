@@ -171,7 +171,7 @@ socket.on("game_end",()=>{
 socket.on("game_continue",()=>{//もう一度遊ぶ場合はpop表示一秒後にスタート画面に戻る
     activate_pop(["Thank You For Playing!","1秒後に自動で画面遷移します"],[])
     setTimeout(()=>{
-        window.location.href = "../index.html"
+        window.location.href = "../html/start_index.html"
     },1000)
 })
 
@@ -265,5 +265,6 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
+
 
 
