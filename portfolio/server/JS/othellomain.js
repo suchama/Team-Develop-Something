@@ -99,7 +99,7 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
 
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     board_update(data["gamestate"]["board"]);
-}
+});
 
 
 socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key) */
@@ -265,6 +265,7 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
+
 
 
 
