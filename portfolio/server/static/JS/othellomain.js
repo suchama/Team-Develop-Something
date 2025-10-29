@@ -232,13 +232,13 @@ function board_update(grid){// grid[row][column]
         for(let c = 1 ; c <= 8 ; c ++){/* r:row(行)　c:column(列) */
             if(grid[r-1][c-1] == 1){
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
-                img.src = "othello_img/画像1.jpg";
+                img.src = "othello_image/white_1.png";
                 img.alt = "オセロ黒石";
                 img.style.display = "inline";//オセロでは表示をhideすることはないので、blockになったら最後までblock
             }
             if(grid[r-1][c-1] == 2){
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
-                img.src = "othello_img/画像2.jpg";
+                img.src = "othello_image/black_2.png";
                 img.alt = "オセロ白石";
                 img.style.display = "inline";
             }
@@ -265,6 +265,7 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
+
 
 
 
