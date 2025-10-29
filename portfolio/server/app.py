@@ -126,6 +126,9 @@ def handle_pvc(data):
         # 将棋、軍議の場合は手駒の情報も追加
     emit("start_game", {"gamestate": gamestate[key], "count_matches": count_matches})
 
+    # 現在の手番を通知
+    send_signal(key, "turn")
+
     socketio.start_background_task(timer, game, "pvc", match)
     # バックグラウンドでtimer関数を実行(非同期処理)
     return
