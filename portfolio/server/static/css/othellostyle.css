@@ -165,7 +165,7 @@
     padding: 0px;
     position: absolute;
     place-items: center;
-    text-aligh: center;
+    text-align: center;
     width: 49%;
     aspect-ratio: 1/1;
     background-color: rgb(20, 158, 55);
@@ -177,7 +177,7 @@
     padding: 0px;
     position: absolute;
     place-items: center;
-    text-aligh: center;
+    text-align: center;
     width: 49%;
     aspect-ratio: 1/1;
     background-color: rgb(141, 230, 52);
@@ -221,5 +221,6 @@
     display: none;
 
 }
+
 
 
