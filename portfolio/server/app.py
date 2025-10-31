@@ -194,10 +194,10 @@ def handle_join(data):
 def handle_make_move(data):
     global gamestate
     # data = {game: "othello", mode:"pvp", count_match: 数字, place:"board" or "tegoma", koma:数字, x: x, y: y, current_player: 1}
-    # placeがboard→
+    # placeがboard→駒の座標で判別、tegoma→駒の種類で判別
     game = data["game"]
     mode = data["mode"]
-    match = data["count_match"]
+    match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     place = data["place"]
     if place == "tegoma":
@@ -222,11 +222,13 @@ def handle_make_move(data):
         if outcome["status"] == "error":
             # 打てない場合
             emit("error", {"msg": "おけないよん"}, to = request.sid)
+            print(outcome)
             return
         else:
             # 打てた場合
             gamestate[key]["board"] = outcome["board_grid"]
             gamestate[key]["current_turn"] = outcome["current_turn"]
+            print(11)
             if outcome["winner"] is not None:
                 # 勝者が決定している場合
                 gamestate[key]["winner"] = outcome["winner"]
@@ -318,6 +320,7 @@ def handle_make_move(data):
 
 
 def swich_turn_god(game, mode, match):
+    print("switch")
     global gamestate
     key = f"{game}_{mode}_{match}"
     # 現在の盤面情報を送信
@@ -441,10 +444,10 @@ def timer(game, mode, match):
 @socketio.on("check")
 def handle_check(data):
     global gamestate
-    # data = {game: "shogi", mode:"pvp", count_match: 数字, check: "nari" or "tuke" or "bou" or "cancel", current_turn: current_turn}
+    # data = {game: "shogi", mode:"pvp", count_match: 辞書, check: "nari" or "tuke" or "bou" or "cancel", current_turn: current_turn}
     game = data["game"]
     mode = data["mode"]
-    match = data["count_match"]
+    match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     check = data["check"]
     x, y = gamestate[key]["selected_pos"]
@@ -493,10 +496,10 @@ def handle_check(data):
 @socketio.on("finish")
 def handle_finish(data):
     global gamestate
-    # data = {game: "othello", mode:"pvp", count_match: 数字, "end_or_continue": "end" or "continue"}
+    # data = {game: "othello", mode:"pvp", count_match: 辞書, "end_or_continue": "end" or "continue"}
     game = data["game"]
     mode = data["mode"]
-    match = data["count_match"]
+    match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     choose = data["end_or_continue"]
     if mode == "pvp":
