@@ -90,13 +90,17 @@ socket.on('cansel_bright', () => {/* dataなし。brightをblightに直しても
     cancel_blight(now_blight)
 });
 
+let timerID_hidaripop = 0
 socket.on('error', (data) => {// emit("error", {"msg": "おけないよん"}, to = request.sid) 
+    if(hidaripop.classList.contains("is_active")){//既にポップが表示されていたら、非表示になるまでの時間を上書きする
+        clearTimeout(timerID_hidaripop)
+    }
     hidaripop.textContent = "＜"+data["msg"]+"＞";
     hidaripop.classList.add("is_active");
     console.log("error受信")
-    setTimeout(() => {
-    // 1秒後に実行される非表示処理
-    hidaripop.classList.remove("is_active");
+    timerID_hidaripop = setTimeout(() => {
+        // 1秒後に実行される非表示処理
+        hidaripop.classList.remove("is_active");
     }, 1500); // 単位はミリ秒（1000ms = 1秒）
 });
 
@@ -282,6 +286,7 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
+
 
 
 
