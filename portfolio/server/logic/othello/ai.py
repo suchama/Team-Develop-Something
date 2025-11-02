@@ -1,6 +1,7 @@
 # ai.py — Reversi AI (x, y) coordinate convention
 import random
 from typing import List, Tuple, Iterable, Optional
+from .board import Board
 
 Coord = Tuple[int, int]  # (x, y)
 Grid = List[List[int]]   # 8x8, 0=empty, 1=black, 2=white
@@ -40,8 +41,13 @@ class AI:
         返り値: (x, y) または None（パス）
         """
         # board.get_valid は (x, y) のリスト/集合を返す想定
+        b = Board()
+        b.update_valid(1)
+        b.update_valid(2)
+        
         valid_moves: Iterable[Coord] = board.get_valid(player)
         valid_moves = list(valid_moves)
+        print(f"AI valid moves : {valid_moves}")
 
         if not valid_moves:
             return None
