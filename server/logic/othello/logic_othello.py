@@ -3,9 +3,9 @@
 サーバー(app.py)からのリクエストを処理し、オセロのロジック全体を管理
 """
 from typing import Dict, List, Tuple
-from board import Board
-from gamestate import GameState
-from ai import AI
+from .board import Board
+from .gamestate import GameState
+from .ai import AI
 
 
 def game_start() -> Dict:
@@ -52,13 +52,13 @@ def handle_player_move(current_grid: List[List[int]], player: int, pos: List[int
     board.update_valid(gs.current_turn)
     valid_moves = set(board.get_valid(gs.current_turn))
 
+    print(f"valid_moves : {valid_moves}")
+    print(f"x, y : {x, y}")
+
     if (x, y) not in valid_moves:
         b, w = board.count_piece()
         return {
             "status": "error",
-            "message": "無効な手です。",
-            # app.py は status のみ参照だが、デバッグに便利なのでスコアも同梱
-            "scores": {"black": b, "white": w},
         }
 
     # 反転を含めて着手
@@ -152,5 +152,6 @@ def handle_ai_move(game_state_dict: dict, current_turn: int) -> dict:
         "winner": winner,
         "scores": {"black": black, "white": white},
     }
+
 
 
