@@ -2,7 +2,7 @@
 #先手後手をランダムで決めるためにrandomモジュールをインポート
 import random
 #駒を数える際にboardの関数を使っているのでインポート
-from board import Board
+from .board import Board
  
 class GameState:
     #ゲーム状態の初期化

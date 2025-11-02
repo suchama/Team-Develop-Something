@@ -1,0 +1,226 @@
+/*
+*...すべての要素
+#...要素をidで指定。基本は一つしかない要素に対して用いる
+. ...要素をクラス名で指定。複数ある要素に対して用いる
+*/
+
+*{
+    box-sizing: border-box;/*omamori*//*widthを、marginとpadding含めて計算するようになるらしい*/
+}
+
+
+/* waitポップのアニメーションの定義 */
+
+/*@keyframes my-color-change {
+    0% {
+        background-color: rgb(194, 194, 255);
+    }
+    50% {
+        background-color: rgb(255, 208, 194); /* 途中のスタイル */
+    /*}
+    100% {
+        background-color: rgb(194, 194, 255); /* 終了時のスタイル（最初に戻る） */
+    /*}
+}
+*/
+/* 📌 2. 要素への適用 */
+/*
+#popWait{
+    /* animation: 名前 実行時間 変化の仕方 繰り返し回数 */
+    /*animation: my-color-change 4s ease-in-out infinite;
+}
+*/
+.uesita{/*上下のヘッダーとフッター*/
+    display: block;/*blockはデフォルトで横幅いっぱい*/
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    background-color: rgb(0, 0, 0);
+}
+
+#center{
+    display: block;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 0px;
+    position: relative;/* すべての画面の最初の基準はcenterの左上 */
+    aspect-ratio: 2/1;
+    background-color: rgb(0, 0, 0);
+}
+/* 左に小さく表示するpopのスタイル */
+#hidaripopBG{
+    display: none;/*最初はnone（jsの方で表示と非表示を切り替える） */
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    width: 20%;
+    aspect-ratio: 2/1;
+    top: 50%;
+    background-color: rgb(176, 33, 33);
+    z-index: 1000;
+}
+
+/* 真ん中に大きく表示するpopのスタイル */
+#popBG{
+    display: none;/*最初はnone（jsの方で表示と非表示を切り替える） */
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: rgba(73, 197, 7, 0.500);
+    z-index: 1000;
+}
+
+#popUpper{
+    display: grid;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    text-align: center;
+    width: 80%;
+    height: 40%;
+    top: 25%;
+    left: 50%;
+    font-size: 5vw;
+    transform: translate(-50%,-50%);
+    background-color: rgba(73, 197, 7, 0.500);
+}
+
+.button{/* 親はpopBG */
+    display: none;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    height: 40%;
+    aspect-ratio: 1/1;
+    top: 60%;/* 左右位置はｊｓで指定 */
+    font-size: 2vw;
+    transform: translate(-50%,-50%);
+    background-color: rgb(255, 199, 125);
+}
+
+
+#mainB{
+    display: block;
+    margin: 0px;
+    padding: 5px;
+    position: absolute;
+    height: 95%;
+    aspect-ratio: 1/1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: rgb(33, 154, 0);
+}
+
+.komablock{
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    height: 12%;
+    aspect-ratio: 1/1;
+    transform: translate(-50%,-50%);
+    background-color: rgb(33, 154, 0);
+    border: 0.1vw solid;
+    border-color: none rgb(16, 75, 0) rgb(16, 75, 0) none;
+}
+
+.komaimg{
+    display: none;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    height: 12%;
+    aspect-ratio: 1/1;
+    transform: translate(-50%,-50%);
+}
+
+
+
+/* タイマーの背景(relative)と時間(absolute)、現在のターン(absolute */
+#timerBG{
+    display: block;
+    margin: 0px;
+    padding: 5px;
+    position: absolute;
+    width: 20%;
+    aspect-ratio: 1/1;
+    top: 8%;
+    left: 78%;
+    background-color: rgb(20, 158, 114);
+}
+
+.time{
+    display: grid;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    text-align: center;
+    width: 49%;
+    aspect-ratio: 1/1;
+    background-color: rgb(20, 158, 55);
+    font-size: 2vw;
+}
+.turn{
+    display: grid;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    text-align: center;
+    width: 49%;
+    aspect-ratio: 1/1;
+    background-color: rgb(141, 230, 52);
+    font-size: 2vw;
+}
+#time_1{
+    top: 0px;
+    right: 0px;
+}
+#time_2{
+    bottom: 0px;
+    right: 0px;
+}
+#turn_1{
+    top: 0px;
+    left: 0px;
+}
+#turn_2{
+    bottom: 0px;
+    left: 0px;
+}
+
+.now{
+    filter: brightness(150%)
+}
+
+
+/* JavaScriptで付与する「表示中」のクラス */
+.is-active {
+  display: block; /* 表示に切り替える */
+}
+
+#hidaripopBG.is-active{
+    display: grid;
+}
+
+
+
+/*カスケード順に読み込むのでこれは最後に置いておく*/
+.hide{
+    display: none;
+
+}
+
+
+
