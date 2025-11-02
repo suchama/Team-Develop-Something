@@ -16,7 +16,6 @@ def game_start() -> Dict:
     """
     board = Board()                 # Board() 側で初期配置が入る想定
     gs = GameState()
-    gs.current_turn = 1             # 先手=黒から開始
     remaining = {1: 300, 2: 300}    # 必要に応じて変更可
 
     return {
@@ -26,7 +25,7 @@ def game_start() -> Dict:
     }
 
 
-def handle_player_move(current_grid: List[List[int]], player: int, pos: List[int]) -> Dict:
+def handle_player_move(current_grid: List[List[int]], player: int, selected_pos: List[int]) -> Dict:
     """
     プレイヤーの1手を処理
     出力:
@@ -40,7 +39,7 @@ def handle_player_move(current_grid: List[List[int]], player: int, pos: List[int
       }
     """
 
-    x, y = pos
+    x, y = selected_pos
     board = Board()
     # 盤面はディープコピーして安全に適用
     board.grid = [row[:] for row in current_grid]
@@ -51,9 +50,6 @@ def handle_player_move(current_grid: List[List[int]], player: int, pos: List[int
     # 有効手更新＆判定
     board.update_valid(gs.current_turn)
     valid_moves = set(board.get_valid(gs.current_turn))
-
-    print(f"valid_moves : {valid_moves}")
-    print(f"x, y : {x, y}")
 
     if (x, y) not in valid_moves:
         b, w = board.count_piece()
@@ -115,17 +111,19 @@ def handle_ai_move(game_state_dict: dict, current_turn: int) -> dict:
     b.grid = [row[:] for row in game_state_dict["board"]]
     turn = int(current_turn)
 
+    b.update_valid(1)
+    b.update_valid(2)
+
     # AIの指し手を決定。難易度はhard
     difficulty = game_state_dict.get("ai_difficulty", "hard")
     ai = AI(difficulty=difficulty)
     move_x, move_y = ai.get_move(b, turn)  # None は返らない前提
+    print(f"AIの手 : {move_x, move_y}")
 
     # 着手を適用
     b.reversi(move_x, move_y, turn)
 
     # 終局判定
-    b.update_valid(1)
-    b.update_valid(2)
     is_over = (not b.get_valid(1) and not b.get_valid(2)) or b.full_gameover()
 
     gs = GameState()
