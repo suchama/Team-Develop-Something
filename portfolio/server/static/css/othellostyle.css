@@ -55,6 +55,8 @@
     margin: 0px;
     padding: 0px;
     position: absolute;
+    place-items: center;
+    text-align: center;
     width: 20%;
     aspect-ratio: 2/1;
     top: 50%;
@@ -221,6 +223,7 @@
     display: none;
 
 }
+
 
 
 
