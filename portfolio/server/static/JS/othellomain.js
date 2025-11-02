@@ -72,7 +72,7 @@ for(let r = 1 ; r <= 8 ; r ++){
                 now_click = (r,c)
                 block.style.transition = "background-color 0s ease";
                 block.style.backgroundColor = "rgba(125, 255, 130, 1)";/* ここはblightの受信の方で処理する? */
-                socket.emit("make_move", {"game": "othello", "mode": game_mode, "count_match": count_matches, "place":"board", x: c, y: r, "current_player": player_index});
+                socket.emit("make_move", {"game": "othello", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                 console.log("make_move送信")
             }
         });
@@ -281,6 +281,7 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
+
 
 
 
