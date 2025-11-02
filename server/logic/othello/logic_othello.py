@@ -42,13 +42,12 @@ def handle_player_move(current_grid: List[List[int]], player: int, pos: List[int
 
     x, y = pos
     board = Board()
-    # 盤面はディープコピーして安全に適用
     board.grid = [row[:] for row in current_grid]
 
     gs = GameState()
     gs.current_turn = int(player)
 
-    # 有効手更新＆判定
+    # 有効手判定
     board.update_valid(gs.current_turn)
     valid_moves = set(board.get_valid(gs.current_turn))
 
