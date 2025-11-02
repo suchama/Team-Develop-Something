@@ -210,7 +210,7 @@
   display: block; /* 表示に切り替える */
 }
 
-#hidaripopBG.is-active{
+#hidaripopBG.is_active{
     display: grid;
 }
 
@@ -221,6 +221,7 @@
     display: none;
 
 }
+
 
 
 
