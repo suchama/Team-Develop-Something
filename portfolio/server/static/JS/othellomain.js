@@ -90,9 +90,10 @@ socket.on('cansel_bright', () => {/* dataなし。brightをblightに直しても
     cancel_blight(now_blight)
 });
 
-socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to = request.sid) */
+socket.on('error', (data) => {// emit("error", {"msg": "おけないよん"}, to = request.sid) 
     hidaripop.textContent = "＜"+data["msg"]+"＞";
     hidaripop.classList.add("is_active");
+    console.log("error受信")
     setTimeout(() => {
     // 1秒後に実行される非表示処理
     hidaripop.classList.remove("is_active");
@@ -138,7 +139,7 @@ const turn_2 = document.getElementById(`turn_2`);
 socket.on("your_turn",()=>{//データなし。ターンが切り替わっただけ
     if(player_index_detect == false){//最初のターンが自分か相手か判明したタイミングで、自分の番号が１か２か確定する
         player_index = gamestate["current_turn"];
-        player_index_detect == true;
+        player_index_detect = true;
         turn_1.innerHTML = "YOU<br>(black)"
         turn_2.innerHTML = "対戦相手<br>(white)"
         console.log("初手＝こちら")
@@ -152,7 +153,7 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
 socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっただけ
     if(player_index_detect == false){
         player_index = (gamestate["current_turn"] + 1) % 2;
-        player_index_detect == true;
+        player_index_detect = true;
         turn_1.innerHTML = "YOU<br>(white)";
         turn_2.innerHTML = "対戦相手<br>(black)";
         console.log("初手＝相手")
@@ -281,6 +282,7 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
+
 
 
 
