@@ -3,33 +3,13 @@
 #...要素をidで指定。基本は一つしかない要素に対して用いる
 . ...要素をクラス名で指定。複数ある要素に対して用いる
 */
-
+/*すべての要素の初期設定--------------------------------------------------------------------*/
 *{
     box-sizing: border-box;/*omamori*//*widthを、marginとpadding含めて計算するようになるらしい*/
 }
 
+/*それぞれの初期スタイル指定-------------------------------------------------------------------*/
 
-/* waitポップのアニメーションの定義 */
-
-/*@keyframes my-color-change {
-    0% {
-        background-color: rgb(194, 194, 255);
-    }
-    50% {
-        background-color: rgb(255, 208, 194); /* 途中のスタイル */
-    /*}
-    100% {
-        background-color: rgb(194, 194, 255); /* 終了時のスタイル（最初に戻る） */
-    /*}
-}
-*/
-/* 📌 2. 要素への適用 */
-/*
-#popWait{
-    /* animation: 名前 実行時間 変化の仕方 繰り返し回数 */
-    /*animation: my-color-change 4s ease-in-out infinite;
-}
-*/
 .uesita{/*上下のヘッダーとフッター*/
     display: block;/*blockはデフォルトで横幅いっぱい*/
     margin: 0px;
@@ -55,11 +35,17 @@
     margin: 0px;
     padding: 0px;
     position: absolute;
+    place-items: center;
+    text-align: center;
     width: 20%;
     aspect-ratio: 2/1;
     top: 50%;
-    background-color: rgb(176, 33, 33);
+    left: 13%;
+    background-color: rgba(176, 33, 33, 0.644);
+    color: rgb(255, 210, 210);
+    transform: translate(-50%,-50%);
     z-index: 1000;
+    font-size: 2vw;
 }
 
 /* 真ん中に大きく表示するpopのスタイル */
@@ -131,7 +117,8 @@
     transform: translate(-50%,-50%);
     background-color: rgb(33, 154, 0);
     border: 0.1vw solid;
-    border-color: none rgb(16, 75, 0) rgb(16, 75, 0) none;
+    /*border-color: none rgb(255, 255, 255) rgb(255, 255, 255) none;*/
+    border-color: rgb(193, 221, 188)
 }
 
 .komaimg{
@@ -168,7 +155,7 @@
     text-align: center;
     width: 49%;
     aspect-ratio: 1/1;
-    background-color: rgb(20, 158, 55);
+    background-color: rgb(1, 119, 43);
     font-size: 2vw;
 }
 .turn{
@@ -180,8 +167,8 @@
     text-align: center;
     width: 49%;
     aspect-ratio: 1/1;
-    background-color: rgb(141, 230, 52);
-    font-size: 2vw;
+    background-color: rgb(1, 119, 43);
+    font-size: 1.5vw;
 }
 #time_1{
     top: 0px;
@@ -200,26 +187,80 @@
     left: 0px;
 }
 
-.now{
-    filter: brightness(150%)
+#thinking_time_CPU{
+    display: none;/*最初はnone（jsの方で表示と非表示を切り替える） */
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    text-align: center;
+    width: 20%;
+    aspect-ratio: 2/1;
+    top: 50%;
+    left: 50%;
+    background-color: rgba(0, 115, 88, 0.901);
+    color: rgb(255, 255, 255);
+    transform: translate(-50%,-50%);
+    z-index: 1000;
+    font-size: 3vw;
 }
 
 
-/* JavaScriptで付与する「表示中」のクラス */
-.is-active {
+/*あとからつけたりはずしたりするクラス属性-----------------------------------------------------------------------*/
+.turn.now{/*自分と相手のうち手番の方を光らせる*/
+    background-color: rgb(141, 230, 52);
+    animation: capital_size 2.0s linear infinite;
+}
+
+.time.now{/*持ち時間を明るくする*/
+    background-color: rgb(141, 230, 52);
+}
+
+
+.is_active {/* JavaScriptで付与する「表示中」のクラス*/
   display: block; /* 表示に切り替える */
 }
 
-#hidaripopBG.is-active{
+#hidaripopBG.is_active{
     display: grid;
 }
 
+#thinking_time_CPU.is_active{
+    display: grid;
+}
 
+.blight_to_normal{
+    animation: blight-to-normal 1.0s linear;
+}
 
-/*カスケード順に読み込むのでこれは最後に置いておく*/
+/*カスケード順(コードの上から順）に読み込むのでこれは最後に置いておく*/
 .hide{
     display: none;
+}
 
+/*アニメーション用の用意-----------------------------------------------------------------------------------------*/
+@keyframes blight-to-normal{/*明るい状態から元の色に戻る*/
+    0%{
+        filter:brightness(100%);
+    }
+    10%{
+        filter: brightness(150%);
+    }
+    30%{
+        filter: brightness(100%);
+    }
+}
+
+@keyframes capital_size{
+    0%{
+        font-size: 2vw;
+    }
+    50%{
+        font-size: 2.2vw;
+    }
+    100%{
+        font-size: 2vw;
+    }
 }
 
 

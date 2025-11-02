@@ -71,13 +71,17 @@ for(let r = 1 ; r <= 8 ; r ++){
             if(current_turn == "slf"){
                 now_click = (r,c)
                 block.style.transition = "background-color 0s ease";
-                block.style.backgroundColor = "rgba(125, 255, 130, 1)";/* ここはblightの受信の方で処理する? */
                 socket.emit("make_move", {"game": "othello", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                 console.log("make_move送信")
             }
         });
     };
 };
+//CPUが考えているときの。。。表示
+const thinking_time = document.createElement("div");
+thinking_time.id = "thinking_time_CPU";//pvpの時は常に非表示のまま
+document.getElementById("mainB").appendChild(thinking_time)
+thinking_time.textContent = "......."
 
 
 //プレイ中の、受け取ったデータへの反応--------------------------------------------
@@ -90,18 +94,39 @@ socket.on('cansel_bright', () => {/* dataなし。brightをblightに直しても
     cancel_blight(now_blight)
 });
 
+let timerID_hidaripop = 0
 socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to = request.sid) */
+    if(hidaripop.classList.contains("is_active")){//既にポップが表示されていたら、非表示になるまでの時間を上書きする
+        clearTimeout(timerID_hidaripop)
+        hidaripop.classList.remove("blight_to_normal")
+        void hidaripop.offsetWidth;
+    }
     hidaripop.textContent = "＜"+data["msg"]+"＞";
     hidaripop.classList.add("is_active");
-    setTimeout(() => {
-    // 1秒後に実行される非表示処理
-    hidaripop.classList.remove("is_active");
+    hidaripop.classList.add("blight_to_normal");
+    console.log("error受信");
+    timerID_hidaripop = setTimeout(() => {
+    // 1.5秒後に実行される非表示処理
+        hidaripop.classList.remove("is_active");
+        hidaripop.classList.remove("blight_to_normal");
+        console.log("errorpop消去");
     }, 1500); // 単位はミリ秒（1000ms = 1秒）
 });
 
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
-    board_update(data["gamestate"]["board"]);
-    console.log("game_data受信")
+    if((game_mode == "pvc") && (data["gamestate"]["current_turn"] == player_index)){
+        thinking_time.classList.add("is_active");
+        console.log("game_data受信(敵がCPUかつ、自分のターンになるタイミング）")
+        setTimeout(()=>{
+            thinking_time.classList.remove("is_active");
+            board_update(data["gamestate"]["board"]);
+        },200+100*getRandomInt(1,8));
+    }
+    else{
+        board_update(data["gamestate"]["board"]);
+        console.log("game_data受信")
+    }
+
 });
 
 
@@ -138,28 +163,33 @@ const turn_2 = document.getElementById(`turn_2`);
 socket.on("your_turn",()=>{//データなし。ターンが切り替わっただけ
     if(player_index_detect == false){//最初のターンが自分か相手か判明したタイミングで、自分の番号が１か２か確定する
         player_index = gamestate["current_turn"];
-        player_index_detect == true;
+        player_index_detect = true;
         turn_1.innerHTML = "YOU<br>(black)"
         turn_2.innerHTML = "対戦相手<br>(white)"
         console.log("初手＝こちら")
     }
     current_turn = "slf";
     turn_1.classList.add("now");
+    time_1.classList.add("now");
     turn_2.classList.remove("now");
+    time_2.classList.remove("now");
+
     console.log("your_turn受信")
 })
 
 socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっただけ
     if(player_index_detect == false){
         player_index = (gamestate["current_turn"] + 1) % 2;
-        player_index_detect == true;
+        player_index_detect = true;
         turn_1.innerHTML = "YOU<br>(white)";
         turn_2.innerHTML = "対戦相手<br>(black)";
         console.log("初手＝相手")
     }
     current_turn = "opp";
     turn_1.classList.remove("now");
+    time_1.classList.remove("now");
     turn_2.classList.add("now");
+    time_2.classList.add("now");
     console.log("opponent_turn受信")
 })
 
@@ -173,8 +203,6 @@ socket.on('timer_update', (data)=>{/* socketio.emit("time_update", {
     if (not (player_index == data["current_turn"])){
         time_2.textContent = str(data["remaining_time"]);
     }
-    time.classList.add("now");/* クラス名に、明るさをつかさどるものを追加 */
-    turn.classList.add("now");
 
 })
 
@@ -193,6 +221,21 @@ socket.on("game_continue",()=>{//もう一度遊ぶ場合はpop表示一秒後�
 
 
 // 関数用意-----------------------------------------------------
+/**
+ * min (含む) から max (含む) までのランダムな整数を生成する関数
+ * @param {number} min 最小値
+ * @param {number} max 最大値
+ * @returns {number} 乱数
+ */
+function getRandomInt(min, max) {
+    // 最小値と最大値を整数に変換（念のため）
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    
+    // (max - min + 1) で範囲の大きさを求め、min を足す
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function activate_pop(text,buttonText){//buttonText=["a","b","c"]
     number_of_button = buttonText.length;
     number_of_text = text.length;
