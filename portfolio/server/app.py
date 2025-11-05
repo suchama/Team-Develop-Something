@@ -131,6 +131,11 @@ def handle_pvc(data):
 
     socketio.start_background_task(timer, game, "pvc", match)
     # バックグラウンドでtimer関数を実行(非同期処理)
+
+    # もし最初のターンがAIだったとき、swich_turn_god関数を呼び出してAIに手を打たせる
+    if gamestate[key][f"player_{gamestate[key]['current_turn']}"] == "AI":
+        print(gamestate[key])
+        swich_turn_god(game, "pvc", match)
     return
 
 # プレイヤーが対人戦を選択してゲームに参加したとき
@@ -209,10 +214,16 @@ def handle_make_move(data):
     player = data["current_player"]
     board = gamestate[key]["board"]
 
-    if (place != "board" and place != "tegoma") or request.sid != gamestate[key][f"player_{player}"]:
-        # placeがboardでもtegomaでもない場合、または、手を打とうとしたプレイヤーが現在の手番のプレイヤーではない場合
+    if (place != "board" and place != "tegoma"):
+        # placeがboardでもtegomaでもない場合、エラー
         emit("error", {"msg": "おけないよん"}, to = request.sid)
         return
+    
+    if mode == "pvp" :
+        if request.sid != gamestate[key][f"player_{player}"]:
+            #pvpで、手を打とうとしたプレイヤーが現在の手番のプレイヤーではない場合
+            emit("error", {"msg": "おけないよん"}, to = request.sid)
+            return
 
     if game == "othello":
     # オセロの場合
@@ -228,7 +239,6 @@ def handle_make_move(data):
             # 打てた場合
             gamestate[key]["board"] = outcome["board_grid"]
             gamestate[key]["current_turn"] = outcome["current_turn"]
-            print(11)
             if outcome["winner"] is not None:
                 # 勝者が決定している場合
                 gamestate[key]["winner"] = outcome["winner"]
@@ -328,6 +338,9 @@ def swich_turn_god(game, mode, match):
         emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     else:
         emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches}, room = key)
+
+    print(gamestate[key]["board"])
+
     #オセロのパス確認、AIの手番、現在の手番かどうかをそれぞれに送信する
     if gamestate[key][f"remaining_time"][gamestate[key]["current_turn"]] < 60:
     # 残り時間が60秒未満の場合、60秒にする
@@ -437,6 +450,7 @@ def timer(game, mode, match):
                 "current_turn": gamestate[key]["current_turn"]
             })
 
+        print(gamestate[key]["current_turn"])
         gamestate[key]["remaining_time"][gamestate[key]["current_turn"]] -= 1
 
         time.sleep(1)
