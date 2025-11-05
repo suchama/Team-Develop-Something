@@ -14,7 +14,7 @@ const game = document.getElementById("game").textContent.trim();
 socket.emit(game_mode, { "game": game })
 
 //相手探し中
-let current_turn = 1/*  */
+let current_turn = false;//"slf"/"opp"...主に自分が入力可能な状態かを判定する。game_data受信のところで処理。
 const pop = document.getElementById("popBG");
 const hidaripop = document.getElementById("hidaripopBG");
 const popuptext = document.getElementById("popUpper");
@@ -61,10 +61,8 @@ for(let r = 1 ; r <= 8 ; r ++){
             }
         });
         block.addEventListener('mouseleave', () =>{
-            if(current_turn == "slf"){
-                block.style.transition = "background-color 0s ease";
-                block.style.backgroundColor = "rgb(33, 154, 0)";
-            }
+            block.style.transition = "background-color 0s ease";
+            block.style.backgroundColor = "rgb(33, 154, 0)";
         });
         /* クリックされたら送信する */
         block.addEventListener('click', () =>{
@@ -85,6 +83,8 @@ thinking_time.textContent = "......."
 
 
 //プレイ中の、受け取ったデータへの反応--------------------------------------------
+let click_ok = false;//入力できる状態かそうでないかを判定
+
 let now_blight = 0
 socket.on('blight', (data) => {// emit("blight", {"blight_list": valid_moves, "place": place}, to = request.sid) placeはblightに関してはboardのみ？だから使わなくてOK？
     now_blight = data["blight_list"];// javascript側で今光らせているところを保存しておく（特にcansel_brightで用いる）
@@ -118,16 +118,23 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     if((game_mode == "pvc") && (data["gamestate"]["current_turn"] == player_index)){
         thinking_time.classList.add("is_active");
-        console.log("game_data受信(敵がCPUかつ、自分のターンになるタイミング）")
+        console.log("game_data受信(敵がCPUかつ、自分のターンになるタイミング=ラグ処理有り）")
         setTimeout(()=>{
             thinking_time.classList.remove("is_active");
             board_update(data["gamestate"]["board"]);
+            current_turn = "slf";
         },200+100*getRandomInt(1,8));
-    }
-    else{
+    }else if(data["gamestate"]["current_turn"] == player_index){
         board_update(data["gamestate"]["board"]);
+        current_turn = "slf";
         console.log("game_data受信")
     }
+    else if(!(data["gamestate"]["current_turn"] == player_index)){
+        board_update(data["gamestate"]["board"]);
+        current_turn = "opp";
+        console.log("game_data受信")
+    }
+
 
 });
 
@@ -166,6 +173,7 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
     if(player_index_detect == false){//最初のターンが自分か相手か判明したタイミングで、自分の番号が１か２か確定する
         player_index = gamestate["current_turn"];
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
+        current_turn = "slf";
         if (player_index == 1){
             turn_1.innerHTML = "YOU<br>(black)"
             turn_2.innerHTML = "対戦相手<br>(white)"
@@ -176,7 +184,6 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
         };
         console.log("初手＝こちら,自分のindex=",player_index)
     }
-    current_turn = "slf";
     turn_1.classList.add("now");
     time_1.classList.add("now");
     turn_2.classList.remove("now");
@@ -189,6 +196,7 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
     if(player_index_detect == false){
         player_index = gamestate["current_turn"] % 2 + 1;
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
+        current_turn = "opp";
         if (player_index == 1){
             turn_1.innerHTML = "YOU<br>(black)"
             turn_2.innerHTML = "対戦相手<br>(white)"
@@ -199,7 +207,6 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
         };
         console.log("初手＝相手,自分のindex=",player_index)
     }
-    current_turn = "opp";
     turn_1.classList.remove("now");
     time_1.classList.remove("now");
     turn_2.classList.add("now");
