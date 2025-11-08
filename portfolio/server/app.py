@@ -377,8 +377,6 @@ def swich_turn_god(game, mode, match):
     else:
         emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches}, room = key)
 
-    print(gamestate[key])
-
     #オセロのパス確認、AIの手番、現在の手番かどうかをそれぞれに送信する
     if gamestate[key][f"remaining_time"][gamestate[key]["current_turn"]] < 60:
     # 残り時間が60秒未満の場合、60秒にする
