@@ -70,7 +70,6 @@ def handle_disconnect():
 
         # どの試合のプレイヤーかを判定
         if sid == p1 or sid == p2:
-            print(f"{key} のプレイヤーが切断されました")
 
             # 試合のモードを取得（key形式: othello_pvp_1 など）
             parts = key.split("_")
@@ -80,8 +79,6 @@ def handle_disconnect():
             # AI戦
             if mode == "pvc":
                 state["disconnected"] = True
-                socketio.emit("game_end", {"reason": "disconnect"}, to=sid)
-                print(f"{key}: AI戦なので終了のみ")
 
             # 対人戦
             elif mode == "pvp":
