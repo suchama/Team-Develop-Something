@@ -52,15 +52,56 @@ def index():
     # html内でsocket.ioに接続する
 
 # クライアント接続時(htmlファイルを読み込むときに実行される)
-#@socketio.on('connect')
+@socketio.on('connect')
 # htmlでsocket.ioが接続されたときに実行される(htmlが開かれたら実行される)
 def handle_connect():
     print("接続")
 # クライアント切断時
-#@socketio.on('disconnect')
+@socketio.on('disconnect')
 def handle_disconnect():
-# 切断されたときに実行される。対人戦ならここで負けにするなどの処理を入れる。
-    print("切断")
+# 切断(リロード)された場合にタイマーとか試合が終了するようにする。しないと二重で送られてバグる
+    global gamestate
+    sid = request.sid
+    print(f"切断検知: {sid}")
+
+    for key, state in list(gamestate.items()):
+        p1 = state.get("player_1")
+        p2 = state.get("player_2")
+
+        # どの試合のプレイヤーかを判定
+        if sid == p1 or sid == p2:
+            print(f"{key} のプレイヤーが切断されました")
+
+            # 試合のモードを取得（key形式: othello_pvp_1 など）
+            parts = key.split("_")
+            game = parts[0]
+            mode = parts[1]
+
+            # AI戦
+            if mode == "pvc":
+                state["disconnected"] = True
+                socketio.emit("game_end", {"reason": "disconnect"}, to=sid)
+                print(f"{key}: AI戦なので終了のみ")
+
+            # 対人戦
+            elif mode == "pvp":
+                state["disconnected"] = True
+                if sid == p1:
+                    winner_sid = p2
+                else:
+                    winner_sid = p1
+
+                # 勝者を確定して通知
+                state["winner"] = "player_1" if sid == p2 else "player_2"
+                print(f"{key}: 切断による勝敗確定 → {state['winner']} の勝ち")
+
+                if winner_sid != "AI":
+                    socketio.emit("game_over", {
+                        "reason": "opponent_disconnected",
+                        "winner": state["winner"]
+                    }, to=winner_sid)
+
+            break
 
 
 # index.html内でゲーム(オセロ、将棋、軍議)とモード(pvp,pvc)を選択する。
@@ -339,7 +380,7 @@ def swich_turn_god(game, mode, match):
     else:
         emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches}, room = key)
 
-    print(gamestate[key]["board"])
+    print(gamestate[key])
 
     #オセロのパス確認、AIの手番、現在の手番かどうかをそれぞれに送信する
     if gamestate[key][f"remaining_time"][gamestate[key]["current_turn"]] < 60:
@@ -426,7 +467,7 @@ def timer(game, mode, match):
     key = f"{game}_{mode}_{match}"
     while True:
         # すでに勝敗がついていたら終了
-        if "winner" in gamestate[key]:
+        if "winner" in gamestate[key] or gamestate[key].get("disconnected", False):
             break
 
         if gamestate[key]["remaining_time"][gamestate[key]["current_turn"]] <= 0:
