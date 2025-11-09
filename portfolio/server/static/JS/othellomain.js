@@ -136,6 +136,10 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
 
 const stone_color = { 1:"black", 2:"white"}
 socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key) */
+    if (game_mode == "pvc"){
+        thinking_time.classList.remove("is_active");
+    }
+    board_update(data["board"]);
     if (data["scores"] == null){
         activate_pop(["YOU WIN"], ["もう一度","止める"])
     }
