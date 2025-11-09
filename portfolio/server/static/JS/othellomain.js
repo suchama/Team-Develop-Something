@@ -1,5 +1,5 @@
 
-//変更合図新
+//aiueo
 //socket使うときに解放する
 const socket = io(); // Flask-SocketIOならこのURL
 
