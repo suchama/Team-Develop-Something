@@ -7,7 +7,7 @@ from .board import Board
 from .gamestate import GameState
 from .ai import AI
 
-# test
+# test2
 
 def game_start() -> Dict:
     """
