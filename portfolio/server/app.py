@@ -55,7 +55,6 @@ def index():
 @socketio.on('connect')
 # htmlでsocket.ioが接続されたときに実行される(htmlが開かれたら実行される)
 def handle_connect():
-    print("接続")
     sid = request.sid
     print(f"接続検知: {sid}")
 # クライアント切断時
@@ -65,6 +64,14 @@ def handle_disconnect():
     global gamestate
     sid = request.sid
     print(f"切断検知: {sid}")
+
+    if sid in waiting_players.values():
+        # 待機中のプレイヤーが切断した場合、待機リストから削除
+        for game, player_sid in waiting_players.items():
+            if player_sid == sid:
+                waiting_players[game] = None
+                break
+        return
 
     for key, state in list(gamestate.items()):
         p1 = state.get("player_1")
