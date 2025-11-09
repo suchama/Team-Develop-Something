@@ -142,12 +142,14 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
 
 socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key) */
     if (player_index == data["current_turn"]){
-        activate_pop(["＜YOUがパスしました＞"],[])
+        activate_pop(["＜対戦相手 がパスしました＞"],[]);
         console.log("pass受信","current_turn:自分");
+        current_turn = "slf";
     }
     if (!(player_index == data["current_turn"])){
-        activate_pop(["＜対戦相手がパスしました＞"],[])
+        activate_pop(["＜YOU がパスしました＞"],[])
         console.log("pass受信","current_turn:相手");
+        current_turn = "slf";
     }
     timerID_MainPop = setTimeout(() => {
     // 1秒後に実行される非表示処理
