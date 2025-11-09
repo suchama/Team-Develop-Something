@@ -134,9 +134,20 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
 
 });
 
-
+const stone_color = { 1:"black", 2:"white"}
 socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key) */
-    activate_pop(["ゲームオーバー","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+    if (data["scores"] == null){
+        activate_pop(["YOU WIN"], ["もう一度","止める"])
+    }
+    else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
+    activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+    }
+    else if (data["scores"][stone_color[player_index]] < data["scores"][stone_color[player_index % 2+1]]){
+    activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+    }
+    else {
+    activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+    }
     console.log("game_over受信")
 });
 
