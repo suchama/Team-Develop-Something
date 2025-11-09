@@ -141,13 +141,14 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
 
 socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key) */
     if (player_index == data["current_turn"]){
+        activate_pop(["＜YOUがパスしました＞"],[])
         console.log("pass受信","current_turn:自分");
     }
     if (!(player_index == data["current_turn"])){
+        activate_pop(["＜対戦相手がパスしました＞"],[])
         console.log("pass受信","current_turn:相手");
     }
-    activate_pop(["＜パスしました＞"],[])
-    setTimeout(() => {
+    timerID_MainPop = setTimeout(() => {
     // 1秒後に実行される非表示処理
         pop.classList.remove("is_active");
     }, 1000); // 単位はミリ秒（1000ms = 1秒）
@@ -267,6 +268,10 @@ function getRandomInt(min, max) {
 }
 
 function activate_pop(text,buttonText){//text=["一行目","二行目",...], buttonText=["a","b","c"]
+    if(pop.classList.contains("is_active")){//既にポップが表示されていたらリセットする
+    clearTimeout(timerID_MainPop)
+    void pop.offsetWidth;
+    }
     number_of_button = buttonText.length;
     number_of_text = text.length;
     ready_text = text[0];
