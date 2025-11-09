@@ -135,7 +135,7 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
 
 
 socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key) */
-    activate_pop(["ゲームオーバー","black"+str(data["scores"]["black"])+"-"+str(data["scores"]["white"]+"white")], ["もう一度","止める"])
+    activate_pop(["ゲームオーバー","black"+String(data["scores"]["black"])+"-"+String(data["scores"]["white"]+"white")], ["もう一度","止める"])
     console.log("game_over受信")
 });
 
