@@ -147,7 +147,6 @@ socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["cu
         console.log("pass受信","current_turn:相手");
     }
     activate_pop(["＜パスしました＞"],[])
-    console.log("pass受信")
     setTimeout(() => {
     // 1秒後に実行される非表示処理
         pop.classList.remove("is_active");
