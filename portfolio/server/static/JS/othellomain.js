@@ -142,7 +142,7 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
 
 socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key) */
     if (player_index == data["current_turn"]){
-        activate_pop(["＜対戦相手 がパスしました＞"],[]);
+        activate_pop(["＜相手 がパスしました＞"],[]);
         console.log("pass受信","current_turn:自分");
         current_turn = "slf";
     }
@@ -291,19 +291,19 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
         button.style.display = "grid";
         button.textContent = buttonText[i-1];
         if (number_of_button == 1){
-            button.style.left = `${i*50}`;
+            button.style.left = `${i*50}%`;
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 2){
-            button.style.left = `${i*50-25}`;
+            button.style.left = `${i*50-25}%`;
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 3){
-            button.style.left = `${i*33-16}`;
+            button.style.left = `${i*33-16}%`;
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
@@ -317,10 +317,12 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
 
 function button_Push(situation,button_text){
     if((situation.includes("ゲームオーバー")) && button_text == "もう一度"){
-        emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "continue"})
+        socket.emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "continue"})
+        console.log("finish(countinue)送信")
     }
     if((situation.includes("ゲームオーバー")) && button_text == "止める"){
-        emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"})
+        socket.emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"})
+        console.log("finish(end)送信")
     }
 }
 

@@ -59,7 +59,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    background-color: rgba(73, 197, 7, 0.500);
+    background-color: rgba(73, 197, 7, 0.8);
     z-index: 1000;
 }
 
@@ -76,7 +76,8 @@
     left: 50%;
     font-size: 5vw;
     transform: translate(-50%,-50%);
-    background-color: rgba(73, 197, 7, 0.500);
+    background-color: rgba(73, 197, 7, 0.8);
+    color: white;
 }
 
 .button{/* 親はpopBG */
@@ -87,10 +88,11 @@
     place-items: center;
     height: 40%;
     aspect-ratio: 1/1;
-    top: 60%;/* 左右位置はｊｓで指定 */
+    top: 70%;/* 左右位置はｊｓで指定 */
     font-size: 2vw;
     transform: translate(-50%,-50%);
-    background-color: rgb(255, 199, 125);
+    background-color: rgba(255, 199, 125, 0.8);
+    color: white;
 }
 
 
