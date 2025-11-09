@@ -164,7 +164,7 @@ socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["cu
     if (!(player_index == data["current_turn"])){
         activate_pop(["＜YOU がパスしました＞"],[])
         console.log("pass受信","current_turn:相手");
-        current_turn = "slf";
+        current_turn = "opp";
     }
     timerID_MainPop = setTimeout(() => {
     // 1秒後に実行される非表示処理
