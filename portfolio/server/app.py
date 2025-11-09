@@ -492,7 +492,6 @@ def timer(game, mode, match):
                 "current_turn": gamestate[key]["current_turn"]
             })
 
-        print(gamestate[key]["current_turn"])
         gamestate[key]["remaining_time"][gamestate[key]["current_turn"]] -= 1
 
         time.sleep(1)
