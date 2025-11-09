@@ -32,10 +32,10 @@ def make_match_gamestate(game, mode):
     global count_matches, gamestate
     count_matches[f"{game}_{mode}"] += 1
     if game == "othello":
-        gamestate[f"{game}_{mode}_{count_matches[f'{game}_{mode}']}"] = {"board": None, "current_turn": None, "move_check": [], "remaining_time": {1: None, 2: None}, "pass_count": 0, "player_1": None, "player_2": None}
+        gamestate[f"{game}_{mode}_{count_matches[f'{game}_{mode}']}"] = {"board": None, "current_turn": None, "move_check": [], "remaining_time": {1: None, 2: None}, "pass_count": 0, "player_1": None, "player_2": None, "turn_count": 1}
         #オセロの試合中にapp.pyで管理するデータの初期化(盤面、現在の手番、残り時間、連続パス数、プレイヤー1、プレイヤー2, 最後に更新した時間)
     else:
-        gamestate[f"{game}_{mode}_{count_matches[f'{game}_{mode}']}"] = {"board": None, "current_turn": None, "tegoma": {1:[], 2:[]}, "move_check": [], "selected_place": None, "selected_pos": None, "remaining_time": {1: None, 2: None}, "player_1": None, "player_2": None}
+        gamestate[f"{game}_{mode}_{count_matches[f'{game}_{mode}']}"] = {"board": None, "current_turn": None, "tegoma": {1:[], 2:[]}, "move_check": [], "selected_place": None, "selected_pos": None, "remaining_time": {1: None, 2: None}, "player_1": None, "player_2": None, "turn_count": 1}
         #将棋、軍議の試合中にapp.pyで管理するデータの初期化(盤面、現在の手番、手駒、残り時間、駒の選択ができているかどうか、選択した駒の場所(tegoma or board)、選択した駒の位置([x,y])、プレイヤー1、プレイヤー2, 最後に更新した時間)
     # 対局中に保存しておくデータの初期化()
 
@@ -421,11 +421,12 @@ def handle_make_AI_move(data):
 def swich_turn_god(game, mode, match):
     global gamestate
     key = f"{game}_{mode}_{match}"
-    # 現在の盤面情報を送信
+    # 現在の盤面情報とターン数を送信
+    gamestate[key]["turn_count"] += 1
     if  mode == "pvc":
-        emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
+        emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches, "turn_count": gamestate[key]["turn_count"]})
     else:
-        emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches}, room = key)
+        emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches, "turn_count": gamestate[key]["turn_count"]}, room = key)
     #オセロのパス確認、AIの手番、現在の手番かどうかをそれぞれに送信する
     if gamestate[key][f"remaining_time"][gamestate[key]["current_turn"]] < 60:
     # 残り時間が60秒未満の場合、60秒にする
