@@ -137,19 +137,21 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
     if (game_mode == "pvc"){
         thinking_time.classList.remove("is_active");
     }
-    board_update(data["board"]);
     setTimeout(() => {
         if (data["scores"] == null){
             activate_pop(["YOU WIN"], ["もう一度","止める"]);
         }
         else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
-        activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
+            board_update(data["board"])
+            activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
         else if (data["scores"][stone_color[player_index]] < data["scores"][stone_color[player_index % 2+1]]){
-        activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
+            board_update(data["board"])
+            activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
         else {
-        activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
+            board_update(data["board"])
+            activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
     },1000)
     console.log("game_over受信")
