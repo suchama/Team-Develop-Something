@@ -116,15 +116,10 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
 });
 
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
-    if((game_mode == "pvc") && (data["gamestate"]["current_turn"] == player_index)){
-        thinking_time.classList.add("is_active");
-        console.log("game_data受信(敵がCPUかつ、自分のターンになるタイミング=ラグ処理有り）")
-        setTimeout(()=>{
-            thinking_time.classList.remove("is_active");
-            board_update(data["gamestate"]["board"]);
-            current_turn = "slf";
-        },200+100*getRandomInt(1,8));
-    }else if(data["gamestate"]["current_turn"] == player_index){
+    if((game_mode == "pvc") && (data["gamestate"]["current_turn"] == player_index)){//CPUの一手が送られてくるまでにラグがあるので、その間表示していた「。。。」を、ここで消す
+        thinking_time.classList.remove("is_active");
+    }
+    if(data["gamestate"]["current_turn"] == player_index){
         board_update(data["gamestate"]["board"]);
         current_turn = "slf";
         console.log("game_data受信")
@@ -213,8 +208,12 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
     time_2.classList.add("now");
     console.log("opponent_turn受信")
     if (game_mode == "pvc"){
-        emit("a",{})
-        console.log("送信");
+        thinking_time.classlist.add("is_active");
+        setTimeout(() => {
+        // 1秒後に実行される非表示処理
+            emit("make_AI_move",{"game": game, "mode":game_mode, count_match: count_matches});
+        }, 200+100*getRandomInt(1,8)); // 単位はミリ秒（1000ms = 1秒）
+        console.log("make_AI_move送信");
     }
 })
 
