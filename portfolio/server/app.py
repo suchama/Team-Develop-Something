@@ -370,7 +370,7 @@ def handle_make_AI_move(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     # AIの手を実行
-    game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
+    outcome = game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
     #outcome = {"board_grid": board.grid,"current_turn": current_turn, "winner": gamestate.winner,"scores": {"black": black_count, "white": white_count}}
     #オセロならスコア、将棋、軍議なら手駒も更新される。
     if "winner" in gamestate[key] and game == "othello":
@@ -421,7 +421,7 @@ def swich_turn_god(game, mode, match):
                 emit("pass", {"current_turn": gamestate[key]["current_turn"]})
             outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
             # 連続パスかどうか確認
-            if outcome["pass"]:
+            if outcome["pass"] and gamestate[key]["pass_count"] == 2:
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
@@ -430,6 +430,7 @@ def swich_turn_god(game, mode, match):
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
                     send_signal(key, "game_over")
                 return
+        gamestate[key]["pass_count"] = 0
     # 現在の手番の送信
     send_signal(key, "turn")
 
