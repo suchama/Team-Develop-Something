@@ -331,11 +331,11 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
 }
 
 function button_Push(situation,button_text){
-    if((situation.includes("ゲームオーバー")) && button_text == "もう一度"){
+    if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "もう一度"){
         socket.emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "continue"})
         console.log("finish(countinue)送信")
     }
-    if((situation.includes("ゲームオーバー")) && button_text == "止める"){
+    if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "止める"){
         socket.emit("finiish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"})
         console.log("finish(end)送信")
     }
