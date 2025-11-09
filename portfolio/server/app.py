@@ -1,4 +1,3 @@
-#かかってこいや
 # ゲームの進行を管理するサーバーのコード
 from flask import Flask, render_template, request
 # flask→　HTTPサーバーを建てるためのフレームワーク
@@ -27,7 +26,6 @@ waiting_players = {"othello": None, "shogi": None, "gungi": None}
 connected_users = 0
 # 接続したユーザー数をカウントする変数
 
-print("kinakuso")
 import time
 
 def make_match_gamestate(game, mode):
