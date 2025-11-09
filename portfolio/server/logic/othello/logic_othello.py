@@ -53,8 +53,15 @@ def handle_player_move(current_grid: List[List[int]], player: int, selected_pos:
 
     if (x, y) not in valid_moves:
         b, w = board.count_piece()
+        gs.swich_turn()               
+        next_turn = gs.current_turn
+        
         return {
             "status": "error",
+            "board_grid": board.grid,
+            "current_turn": next_turn,
+            "winner": gs.winner,                  
+            "scores": {"black": b, "white": w},
         }
 
     # 反転を含めて着手
@@ -72,10 +79,10 @@ def handle_player_move(current_grid: List[List[int]], player: int, selected_pos:
         is_game_over = True
 
     if is_game_over:
-        gs.count_winner(board)        # gs.winner を設定
-        next_turn = gs.current_turn   # 終局時はそのままでも OK（app 側は winner を見て終了）
+        gs.count_winner(board)    
+        next_turn = gs.current_turn   
     else:
-        gs.swich_turn()               # 手番交代（※ swich_turn のスペルは既存に合わせる）
+        gs.swich_turn()               
         next_turn = gs.current_turn
 
     b, w = board.count_piece()
@@ -83,7 +90,7 @@ def handle_player_move(current_grid: List[List[int]], player: int, selected_pos:
         "status": "success",
         "board_grid": board.grid,
         "current_turn": next_turn,
-        "winner": gs.winner,                      # None / 1 / 2
+        "winner": gs.winner,                  
         "scores": {"black": b, "white": w},
     }
 
