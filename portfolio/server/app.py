@@ -191,6 +191,7 @@ def handle_join(data):
         key = f"{game}_pvp_{match}"
 
         opponent_id = waiting_players[game]
+        print(player_id, "vs", opponent_id)
         # 待機者リセット
         waiting_players[game] = None
         room = f"{game}_pvp_{match}"
