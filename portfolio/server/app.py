@@ -275,7 +275,6 @@ def handle_make_move(data):
         if outcome["status"] == "error":
             # 打てない場合
             emit("error", {"msg": "おけないよん"}, to = request.sid)
-            print(outcome)
             return
         else:
             # 打てた場合
@@ -393,7 +392,7 @@ def handle_make_AI_move(data):
                 emit("pass", {"current_turn": gamestate[key]["current_turn"]})
             outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
             # 連続パスかどうか確認
-            if outcome["pass"] and gamestate[key]["pass_count"] == 2:
+            if outcome["pass"]:
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
@@ -457,7 +456,7 @@ def swich_turn_god(game, mode, match):
                 emit("pass", {"current_turn": gamestate[key]["current_turn"]})
             outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
             # 連続パスかどうか確認
-            if outcome["pass"] and gamestate[key]["pass_count"] == 2:
+            if outcome["pass"]:
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
