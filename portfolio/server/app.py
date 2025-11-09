@@ -56,6 +56,8 @@ def index():
 # htmlでsocket.ioが接続されたときに実行される(htmlが開かれたら実行される)
 def handle_connect():
     print("接続")
+    sid = request.sid
+    print(f"接続検知: {sid}")
 # クライアント切断時
 @socketio.on('disconnect')
 def handle_disconnect():
