@@ -26,6 +26,7 @@ waiting_players = {"othello": None, "shogi": None, "gungi": None}
 connected_users = 0
 # 接続したユーザー数をカウントする変数
 
+print("kinakuso")
 import time
 
 def make_match_gamestate(game, mode):
