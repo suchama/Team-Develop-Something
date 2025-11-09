@@ -212,6 +212,10 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
     turn_2.classList.add("now");
     time_2.classList.add("now");
     console.log("opponent_turn受信")
+    if (game_mode == "pvc"){
+        emit("a",{})
+        console.log("送信");
+    }
 })
 
 socket.on('time_update', (data)=>{/* socketio.emit("time_update", {
@@ -259,7 +263,7 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function activate_pop(text,buttonText){//buttonText=["a","b","c"]
+function activate_pop(text,buttonText){//text=["一行目","二行目",...], buttonText=["a","b","c"]
     number_of_button = buttonText.length;
     number_of_text = text.length;
     ready_text = text[0];
@@ -296,7 +300,7 @@ function activate_pop(text,buttonText){//buttonText=["a","b","c"]
     }
     for(let i=3 ; i>=number_of_button+1 ; i --){
         const button = document.getElementById(`button${i}`);
-        button.style.dicplay = "none";//３つのうち使わなかったボタンは隠しておく
+        button.style.display = "none";//３つのうち使わなかったボタンは隠しておく
     }
 }
 
