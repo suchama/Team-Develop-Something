@@ -263,7 +263,7 @@ socket.on("game_end",()=>{
 })
 
 socket.on("game_continue",()=>{//もう一度遊ぶ場合はpop表示一秒後にスタート画面に戻る
-    activate_pop(["Thank You For Playing!","1秒後に自動で画面遷移します"],[])
+    activate_pop(["Thank You For Playing!","自動で画面遷移します"],[])
     console.log("game_continue受信")
     setTimeout(()=>{
         window.location.href = "../index.html"
@@ -286,11 +286,13 @@ function getRandomInt(min, max) {
     // (max - min + 1) で範囲の大きさを求め、min を足す
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
+let timerID_MainPop= false;
 function activate_pop(text,buttonText){//text=["一行目","二行目",...], buttonText=["a","b","c"]
     if(pop.classList.contains("is_active")){//既にポップが表示されていたらリセットする
-    clearTimeout(timerID_MainPop)
-    void pop.offsetWidth;
+        if (!(timerID_MainPop == false)){
+            clearTimeout(timerID_MainPop);
+            void pop.offsetWidth;
+        }
     }
     number_of_button = buttonText.length;
     number_of_text = text.length;
