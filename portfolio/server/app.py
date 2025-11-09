@@ -373,25 +373,25 @@ def handle_make_AI_move(data):
     outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
     # outcome = {"pass": True or False}
     if outcome["pass"]:
-                # パスする場合、手番交代
-                gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
-                gamestate[key]["pass_count"] += 1
-                if mode == "pvp":
-                    emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
-                else:
-                    emit("pass", {"current_turn": gamestate[key]["current_turn"]})
-                outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
-                # 連続パスかどうか確認
-                if outcome["pass"] and gamestate[key]["pass_count"] == 2:
-                    # 連続パスの場合、ゲーム終了
-                    if mode == "pvp":
-                        emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
-                        send_signal(key, "game_over")
-                    else:
-                        emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
-                        send_signal(key, "game_over")
-                    return
-                gamestate[key]["pass_count"] = 0
+        # パスする場合、手番交代
+        gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
+        gamestate[key]["pass_count"] += 1
+        if mode == "pvp":
+            emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
+        else:
+            emit("pass", {"current_turn": gamestate[key]["current_turn"]})
+        outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
+        # 連続パスかどうか確認
+        if outcome["pass"] and gamestate[key]["pass_count"] == 2:
+            # 連続パスの場合、ゲーム終了
+            if mode == "pvp":
+                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
+                send_signal(key, "game_over")
+            else:
+                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
+                send_signal(key, "game_over")
+            return
+        gamestate[key]["pass_count"] = 0
     
     # AIの手を実行
     outcome = game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
