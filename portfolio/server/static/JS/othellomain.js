@@ -1,5 +1,5 @@
 
-"test"
+//変更合図新
 //socket使うときに解放する
 const socket = io(); // Flask-SocketIOならこのURL
 
