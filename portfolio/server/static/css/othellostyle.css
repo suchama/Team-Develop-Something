@@ -221,6 +221,10 @@
   display: block; /* 表示に切り替える */
 }
 
+#popBG.is_active{
+    display: grid;
+}
+
 #hidaripopBG.is_active{
     display: grid;
 }
