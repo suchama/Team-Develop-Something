@@ -1,3 +1,4 @@
+#かかってこいや
 # ゲームの進行を管理するサーバーのコード
 from flask import Flask, render_template, request
 # flask→　HTTPサーバーを建てるためのフレームワーク
