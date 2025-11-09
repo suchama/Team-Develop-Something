@@ -126,7 +126,6 @@ def handle_ai_move(game_state_dict: dict, current_turn: int) -> dict:
     difficulty = game_state_dict.get("ai_difficulty", "hard")
     ai = AI(difficulty=difficulty)
     move_x, move_y = ai.get_move(b, turn)  # None は返らない前提
-    print(f"AIの手 : {move_x, move_y}")
 
     # 着手を適用
     b.reversi(move_x, move_y, turn)
