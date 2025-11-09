@@ -122,12 +122,12 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
     if(data["gamestate"]["current_turn"] == player_index){
         board_update(data["gamestate"]["board"]);
         current_turn = "slf";
-        console.log("game_data受信")
+        console.log("game_data受信","current_turn:自分")
     }
     else if(!(data["gamestate"]["current_turn"] == player_index)){
         board_update(data["gamestate"]["board"]);
         current_turn = "opp";
-        console.log("game_data受信")
+        console.log("game_data受信","current_turn:相手")
     }
 
 
@@ -140,6 +140,12 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
 });
 
 socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key) */
+    if (player_index == data["current_turn"]){
+        console.log("pass受信","current_turn:自分");
+    }
+    if (!(player_index == data["current_turn"])){
+        console.log("pass受信","current_turn:相手");
+    }
     activate_pop(["＜パスしました＞"],[])
     console.log("pass受信")
     setTimeout(() => {
@@ -223,13 +229,12 @@ socket.on('time_update', (data)=>{/* socketio.emit("time_update", {
                                   }, room=key) */
     if (player_index == data["current_turn"]){
         time_1.textContent = String(data["remaining_time"]);
-        console.log("playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
+        console.log("time_update受信","playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
     }
     if (!(player_index == data["current_turn"])){
         time_2.textContent = String(data["remaining_time"]);
-        console.log("playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
+        console.log("time_update受信","playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
     }
-    console.log("time_update受信")
 })
 
 socket.on("game_end",()=>{
