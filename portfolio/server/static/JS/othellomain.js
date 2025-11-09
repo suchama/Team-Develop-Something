@@ -130,8 +130,6 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
         current_turn = "opp";
         console.log("game_data受信","current_turn:相手")
     }
-
-
 });
 
 const stone_color = { 1:"black", 2:"white"}
@@ -140,18 +138,20 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
         thinking_time.classList.remove("is_active");
     }
     board_update(data["board"]);
-    if (data["scores"] == null){
-        activate_pop(["YOU WIN"], ["もう一度","止める"])
-    }
-    else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
-    activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
-    }
-    else if (data["scores"][stone_color[player_index]] < data["scores"][stone_color[player_index % 2+1]]){
-    activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
-    }
-    else {
-    activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
-    }
+    setTimeout(() => {
+        if (data["scores"] == null){
+            activate_pop(["YOU WIN"], ["もう一度","止める"])
+        }
+        else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
+        activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+        }
+        else if (data["scores"][stone_color[player_index]] < data["scores"][stone_color[player_index % 2+1]]){
+        activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+        }
+        else {
+        activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+        }
+    },1000)
     console.log("game_over受信")
 });
 

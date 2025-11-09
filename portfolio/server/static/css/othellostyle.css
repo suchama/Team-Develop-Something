@@ -89,7 +89,7 @@
     height: 40%;
     aspect-ratio: 1/1;
     top: 70%;/* 左右位置はｊｓで指定 */
-    font-size: 2vw;
+    font-size: 3vw;
     transform: translate(-50%,-50%);
     background-color: rgba(255, 199, 125, 0.8);
     color: white;
