@@ -366,6 +366,7 @@ def handle_make_move(data):
                         gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
                         swich_turn_god(game, mode, match)
 
+# AIの手を実行する。(時間だけ送られるので、JSはAIのターン受信→好きな時間空ける→emit送信 すればok)
 @socketio.on("make_AI_move")
 def handle_make_AI_move(data):
     # data = {game: "shogi", mode:"pvp", count_match: 数字}
