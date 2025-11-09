@@ -366,6 +366,38 @@ def handle_make_move(data):
                         gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
                         swich_turn_god(game, mode, match)
 
+@socketio.on("make_AI_move")
+def handle_make_AI_move(data):
+    # data = {game: "shogi", mode:"pvp", count_match: 数字}
+    global gamestate
+    game = data["game"]
+    mode = data["mode"]
+    match = data["count_match"][f"{game}_{mode}"]
+    key = f"{game}_{mode}_{match}"
+    # AIの手を実行
+    game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
+    #outcome = {"board_grid": board.grid,"current_turn": current_turn, "winner": gamestate.winner,"scores": {"black": black_count, "white": white_count}}
+    #オセロならスコア、将棋、軍議なら手駒も更新される。
+    if "winner" in gamestate[key] and game == "othello":
+        if mode == "pvp":
+            emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
+            send_signal(key, "game_over")
+        else:
+            emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
+            send_signal(key, "game_over")
+        return
+    elif "winner" in gamestate[key] and (game == "shogi" or game == "gungi"):
+        if mode == "pvp":
+            emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]}, room = key)
+            send_signal(key, "game_over")
+        else:
+            emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]})
+            send_signal(key, "game_over")
+        return
+    else:
+        # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
+        swich_turn_god(game, mode, match)
+        return
 
 def swich_turn_god(game, mode, match):
     global gamestate
@@ -375,8 +407,6 @@ def swich_turn_god(game, mode, match):
         emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     else:
         emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches}, room = key)
-    # 現在の手番の送信
-    send_signal(key, "turn")
     #オセロのパス確認、AIの手番、現在の手番かどうかをそれぞれに送信する
     if gamestate[key][f"remaining_time"][gamestate[key]["current_turn"]] < 60:
     # 残り時間が60秒未満の場合、60秒にする
@@ -405,31 +435,6 @@ def swich_turn_god(game, mode, match):
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
                     send_signal(key, "game_over")
                 return
-    if gamestate[key][f"player_{ gamestate[key]['current_turn']}"] == "AI":
-        # AIの手を実行
-        game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
-        #outcome = {"board_grid": board.grid,"current_turn": current_turn, "winner": gamestate.winner,"scores": {"black": black_count, "white": white_count}}
-        #オセロならスコア、将棋、軍議なら手駒も更新される。
-        if "winner" in gamestate[key] and game == "othello":
-            if mode == "pvp":
-                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
-                send_signal(key, "game_over")
-            else:
-                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
-                send_signal(key, "game_over")
-            return
-        elif "winner" in gamestate[key] and (game == "shogi" or game == "gungi"):
-            if mode == "pvp":
-                emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]}, room = key)
-                send_signal(key, "game_over")
-            else:
-                emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]})
-                send_signal(key, "game_over")
-            return
-        else:
-            # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
-            swich_turn_god(game, mode, match)
-            return
     # 現在の手番の送信
     send_signal(key, "turn")
 
