@@ -208,12 +208,12 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
     time_2.classList.add("now");
     console.log("opponent_turn受信")
     if (game_mode == "pvc"){
-        thinking_time.classlist.add("is_active");
+        thinking_time.classList.add("is_active");
         setTimeout(() => {
         // 1秒後に実行される非表示処理
             emit("make_AI_move",{"game": game, "mode":game_mode, count_match: count_matches});
+            console.log("make_AI_move送信");
         }, 200+100*getRandomInt(1,8)); // 単位はミリ秒（1000ms = 1秒）
-        console.log("make_AI_move送信");
     }
 })
 
