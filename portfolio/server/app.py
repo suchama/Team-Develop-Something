@@ -170,10 +170,9 @@ def handle_pvc(data):
     socketio.start_background_task(timer, game, "pvc", match)
     # バックグラウンドでtimer関数を実行(非同期処理)
 
-    # もし最初のターンがAIだったとき、swich_turn_god関数を呼び出してAIに手を打たせる
+    # もし最初のターンがAIだったとき、opponent_turnを送ってAIに手を打たせる
     if gamestate[key][f"player_{gamestate[key]['current_turn']}"] == "AI":
-        print(gamestate[key])
-        swich_turn_god(game, "pvc", match)
+        send_signal(key, "turn")
     return
 
 # プレイヤーが対人戦を選択してゲームに参加したとき
