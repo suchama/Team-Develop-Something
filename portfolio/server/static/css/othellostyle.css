@@ -119,7 +119,6 @@
     transform: translate(-50%,-50%);
     background-color: rgb(33, 154, 0);
     border: 0.1vw solid;
-    /*border-color: none rgb(255, 255, 255) rgb(255, 255, 255) none;*/
     border-color: rgb(193, 221, 188)
 }
 

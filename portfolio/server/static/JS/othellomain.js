@@ -100,8 +100,8 @@ socket.on('cansel_bright', () => {/* dataなし。brightをblightに直しても
 let timerID_hidaripop = 0
 socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to = request.sid) */
     if(hidaripop.classList.contains("is_active")){//既にポップが表示されていたら、非表示になるまでの時間を上書きする
-        clearTimeout(timerID_hidaripop)
-        hidaripop.classList.remove("blight_to_normal")
+        clearTimeout(timerID_hidaripop);
+        hidaripop.classList.remove("blight_to_normal");
         void hidaripop.offsetWidth;
     }
     hidaripop.textContent = "＜"+data["msg"]+"＞";
@@ -123,12 +123,12 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
     if(data["gamestate"]["current_turn"] == player_index){
         board_update(data["gamestate"]["board"]);
         current_turn = "slf";
-        console.log("game_data受信","current_turn:自分")
+        console.log("game_data受信","current_turn:自分");
     }
     else if(!(data["gamestate"]["current_turn"] == player_index)){
         board_update(data["gamestate"]["board"]);
         current_turn = "opp";
-        console.log("game_data受信","current_turn:相手")
+        console.log("game_data受信","current_turn:相手");
     }
 });
 
@@ -140,16 +140,16 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
     board_update(data["board"]);
     setTimeout(() => {
         if (data["scores"] == null){
-            activate_pop(["YOU WIN"], ["もう一度","止める"])
+            activate_pop(["YOU WIN"], ["もう一度","止める"]);
         }
         else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
-        activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+        activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
         else if (data["scores"][stone_color[player_index]] < data["scores"][stone_color[player_index % 2+1]]){
-        activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+        activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
         else {
-        activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"])
+        activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
     },1000)
     console.log("game_over受信")
@@ -379,11 +379,3 @@ function cansel_bright(blt){
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
     };
 }
-
-
-
-
-
-
-
-
