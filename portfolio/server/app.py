@@ -55,7 +55,8 @@ def index():
 @socketio.on('connect')
 # htmlでsocket.ioが接続されたときに実行される(htmlが開かれたら実行される)
 def handle_connect():
-    print("接続")
+    sid = request.sid
+    print(f"接続検知: {sid}")
 # クライアント切断時
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -63,6 +64,14 @@ def handle_disconnect():
     global gamestate
     sid = request.sid
     print(f"切断検知: {sid}")
+
+    if sid in waiting_players.values():
+        # 待機中のプレイヤーが切断した場合、待機リストから削除
+        for game, player_sid in waiting_players.items():
+            if player_sid == sid:
+                waiting_players[game] = None
+                break
+        return
 
     for key, state in list(gamestate.items()):
         p1 = state.get("player_1")
@@ -183,7 +192,7 @@ def handle_join(data):
         # まだ待機者がいない → この人を待機させる
         waiting_players[game] = player_id
         emit("waiting", {"msg": "相手を待っています..."})
-    else:
+    elif player_id != waiting_players[game]:
         # 待機者がいた → ペアを作ってルームを作成
         count_matches[f"{game}_pvp"] += 1
         make_match_gamestate(game, "pvp")
@@ -191,6 +200,7 @@ def handle_join(data):
         key = f"{game}_pvp_{match}"
 
         opponent_id = waiting_players[game]
+        print(player_id, "vs", opponent_id)
         # 待機者リセット
         waiting_players[game] = None
         room = f"{game}_pvp_{match}"
@@ -265,7 +275,6 @@ def handle_make_move(data):
         if outcome["status"] == "error":
             # 打てない場合
             emit("error", {"msg": "おけないよん"}, to = request.sid)
-            print(outcome)
             return
         else:
             # 打てた場合
@@ -370,28 +379,29 @@ def handle_make_AI_move(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     current_turn = gamestate[key]["current_turn"]
-    outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
-    # outcome = {"pass": True or False}
-    if outcome["pass"]:
-        # パスする場合、手番交代
-        gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
-        gamestate[key]["pass_count"] += 1
-        if mode == "pvp":
-            emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
-        else:
-            emit("pass", {"current_turn": gamestate[key]["current_turn"]})
+    if game == "othello":
         outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
-        # 連続パスかどうか確認
-        if outcome["pass"] and gamestate[key]["pass_count"] == 2:
-            # 連続パスの場合、ゲーム終了
+        # outcome = {"pass": True or False}
+        if outcome["pass"]:
+            # パスする場合、手番交代
+            gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
+            gamestate[key]["pass_count"] += 1
             if mode == "pvp":
-                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
-                send_signal(key, "game_over")
+                emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
             else:
-                emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
-                send_signal(key, "game_over")
-            return
-        gamestate[key]["pass_count"] = 0
+                emit("pass", {"current_turn": gamestate[key]["current_turn"]})
+            outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
+            # 連続パスかどうか確認
+            if outcome["pass"]:
+                # 連続パスの場合、ゲーム終了
+                if mode == "pvp":
+                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
+                    send_signal(key, "game_over")
+                else:
+                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
+                    send_signal(key, "game_over")
+                return
+            gamestate[key]["pass_count"] = 0
     
     # AIの手を実行
     outcome = game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
@@ -446,7 +456,7 @@ def swich_turn_god(game, mode, match):
                 emit("pass", {"current_turn": gamestate[key]["current_turn"]})
             outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
             # 連続パスかどうか確認
-            if outcome["pass"] and gamestate[key]["pass_count"] == 2:
+            if outcome["pass"]:
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
                     emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
@@ -577,6 +587,7 @@ def handle_finish(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     choose = data["end_or_continue"]
+    print(choose)
     if mode == "pvp":
         room = key
         leave_room(room, sid=gamestate[key]["player_1"])
