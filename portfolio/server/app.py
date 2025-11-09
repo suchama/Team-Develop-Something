@@ -183,7 +183,7 @@ def handle_join(data):
         # まだ待機者がいない → この人を待機させる
         waiting_players[game] = player_id
         emit("waiting", {"msg": "相手を待っています..."})
-    else:
+    elif request.sid != waiting_players[game]:
         # 待機者がいた → ペアを作ってルームを作成
         count_matches[f"{game}_pvp"] += 1
         make_match_gamestate(game, "pvp")
