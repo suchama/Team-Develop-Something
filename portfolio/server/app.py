@@ -1,7 +1,7 @@
 # ゲームの進行を管理するサーバーのコード
 from flask import Flask, render_template, request
 # flask→　HTTPサーバーを建てるためのフレームワーク
-from flask_socketio import SocketIO, emit, join_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 # flask_socketio→　WebSocket通信を簡単に実装するためのライブラリ
 # emit→　サーバーからクライアントに情報を送るための関数
 # join_room→　特定のルームにクライアントを参加させるための関数

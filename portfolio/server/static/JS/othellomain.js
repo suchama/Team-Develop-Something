@@ -266,7 +266,7 @@ socket.on("game_continue",()=>{//もう一度遊ぶ場合はpop表示一秒後�
     activate_pop(["Thank You For Playing!","自動で画面遷移します"],[])
     console.log("game_continue受信")
     setTimeout(()=>{
-        window.location.href = "../index.html"
+        window.location.href = "../"
     },1000)
 })
 
