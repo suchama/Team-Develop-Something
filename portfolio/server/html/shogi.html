@@ -1,1 +1,35 @@
+<!doctype html>
+<html lang="ja-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" href="../static/css/shogistyle.css" />
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <title>BoardGame</title>
+  </head>
+  <body>
+    <p class="hide" id="mode">{{mode}}</p>
+    <p class="hide" id="game">{{game}}</p>
+    <p class="hide" id="count_matches">{{count_matches}}</p>
+    <div id="header" class="uesita"></div>
+    <div id="center">
+        <div id="hidaripopBG"></div>
+        <div id="popBG">
+            <div class="popUpperTextBG" id="popUpper"></div>
+            <div class="button" id="button1" >ボタン１</div>
+            <div class="button" id="button2" >ボタン２</div>
+            <div class="button" id="button3" >ボタン３</div>
+        </div>
+        <div id="mainB"></div>
+        <div id="timerBG">
+          <div class="time" id="time_1">300</div>
+          <div class="turn" id="turn_1"></div>
+          <div class="time" id="time_2">300</div>
+          <div class="turn" id="turn_2"></div>
+        </div>
+    </div>
+    <div id="footer" class="uesita"></div>
+    <script src="../static/JS/shogimain.js"></script>
+  </body>
 
+</html>
