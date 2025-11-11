@@ -12,8 +12,8 @@
 
 .uesita{/*上下のヘッダーとフッター*/
     display: block;/*blockはデフォルトで横幅いっぱい*/
-    margin: 5px;
-    padding: 5px;
+    margin: 0px;
+    padding: 0px;
     position: relative;
     /*width: 90%;*/
     background-color: antiquewhite;
@@ -21,10 +21,10 @@
 
 #center{
     display: block;
-    margin: 5px;
-    padding: 5px;
+    margin: 0px;
+    padding: 0px;
     position: relative;
-    aspect-ratio: 1002/522;
+    aspect-ratio: 2/1;
     border: 1px solid;
     background-color: rgb(80, 0, 0);
 }
