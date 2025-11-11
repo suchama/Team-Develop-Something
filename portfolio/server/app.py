@@ -284,9 +284,9 @@ def handle_make_move(data):
                 # 勝者が決定している場合
                 gamestate[key]["winner"] = outcome["winner"]
                 if mode == "pvp":
-                    emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key)
+                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
                 else:
-                    emit("game_over", {"board": board, "scores": outcome["scores"]})
+                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
                 send_signal(key, "game_over")
                 return
             else:
@@ -336,10 +336,10 @@ def handle_make_move(data):
                 if outcome["winner"] is not None:
                     gamestate[key]["winner"] = outcome["winner"]
                     if mode == "pvp":
-                        emit("game_over", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]}, room = key)
+                        emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]}, room = key)
                         send_signal(key, "game_over")
                     else:
-                        emit("game_over", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]})
+                        emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]})
                         send_signal(key, "game_over")
                     return
                 else:
