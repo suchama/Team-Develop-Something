@@ -133,24 +133,29 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
 });
 
 const stone_color = { 1:"black", 2:"white"}
-socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key) */
-    if (game_mode == "pvc"){
+socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}または{"reason": "opponent_disconnected","winner": state["winner"], room = key) */
+    if (game_mode == "pvc"){//対AIの時は、「。。。」を消す
         thinking_time.classList.remove("is_active");
     }
+    if (!(data["reason"] == "opponent_disconnected")){
+        board_update(data["board"]);
+        console.log(data["board"]);
+        console.log("最後のboard_update（盤面更新）");
+    }
     setTimeout(() => {
-        if (data["scores"] == null){
+        if (data["reason"] == "opponent_disconnected"){
             activate_pop(["YOU WIN"], ["もう一度","止める"]);
         }
         else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
-            board_update(data["board"])
+            //board_update(data["board"])
             activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
         else if (data["scores"][stone_color[player_index]] < data["scores"][stone_color[player_index % 2+1]]){
-            board_update(data["board"])
+            //board_update(data["board"])
             activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
         else {
-            board_update(data["board"])
+            //board_update(data["board"])
             activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
         }
     },1000)
