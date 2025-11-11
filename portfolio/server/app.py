@@ -571,7 +571,7 @@ def handle_check(data):
     
     if (game == "gungi" and check == "tuke") and ("bou_check_after_tuke" in gamestate[key]):
         remove = gamestate[key].pop("bou_check_after_tuke")
-        # 削除するためなので、remove変数は使わなくてok
+        # 削除するためなのでremove変数は使わなくてok
         return
     else:
         gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
