@@ -202,7 +202,7 @@
     background-color: rgba(0, 115, 88, 0.901);
     color: rgb(255, 255, 255);
     transform: translate(-50%,-50%);
-    z-index: 1000;
+    z-index: 900;
     font-size: 3vw;
 }
 
