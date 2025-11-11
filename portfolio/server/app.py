@@ -226,8 +226,8 @@ def handle_join(data):
         # 現在の手番を通知
         send_signal(key, "turn")
 
-        socketio.start_background_task(timer, game, "pvp", match)
         # バックグラウンドのタイマーを開始
+        socketio.start_background_task(timer, game, "pvp", match)
         
         return
 
