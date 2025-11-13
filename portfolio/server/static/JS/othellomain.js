@@ -172,7 +172,7 @@ socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["cu
         activate_pop(["＜YOU がパスしました＞"],[])
         console.log("pass受信","current_turn:相手");
         current_turn = "opp";
-        if (game_mode == "pvc"){
+        if (game_mode == "pvc"){//passの時はopponent_turnが送られてこないので、そこでやっていた処理をここでも記述
             thinking_time.classList.add("is_active");
             setTimeout(() => {
             // 1秒後に実行される非表示処理

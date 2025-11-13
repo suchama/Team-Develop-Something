@@ -83,7 +83,41 @@
     background-color: rgb(138, 34, 34);
     border-color: rgb(129, 17, 17) rgb(198, 97, 97) rgb(198, 97, 97) rgb(129, 17, 17);
 }
-/*クリックしたあとにずっとスタイルを変更したままにする処理はjsでしかできないので、そっちで管理する*/
+
+#modoru{
+    display: none;
+    margin: 5px;
+    padding: 5px;
+    position: absolute;
+    place-items: center;
+    width: 25%;
+    height: 10%;
+    top: 35%;
+    transform: translate(-50%,0%);
+    font-size: 2vw;
+    color: rgb(103, 0, 0);
+    background-color: rgb(255, 199, 125);
+    border: 0.4vw solid;
+    border-color: rgb(255, 228, 193) rgb(164, 98, 11) rgb(164, 98, 11) rgb(255, 228, 193);
+    transition: color 0.3s ease;
+    transition: background-color 0.3s ease;
+    transition: border-color 0.3s ease;
+    z-index: 1000;
+}
+#modoru:hover{
+    color: rgb(87, 0, 0);
+    background-color: rgb(212, 146, 59);
+    border-color: rgb(164, 98, 11) rgb(255, 228, 193) rgb(255, 228, 193) rgb(164, 98, 11);
+}
+
+
+
+
+
+
+
+
+
 
 /*カスケード順に読み込むのでこれは最後に置いておく*/
 .hide{
