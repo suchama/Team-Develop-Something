@@ -21,7 +21,8 @@ const hidaripop = document.getElementById("hidaripopBG");
 const popuptext = document.getElementById("popUpper");
 /* waitは最初かくしておいてwaitがきたら出現させる 消すときどうしよう...*/
 socket.on('waiting', (data) => {/* emit("waiting", {"msg": "相手を待っています..."}) */
-    activate_pop([data["msg"]],[])
+    activate_pop([data["msg"]],["ゲーム選択画面に戻る"])
+
 });
 
 // startさせる
@@ -299,6 +300,7 @@ function getRandomInt(min, max) {
     // (max - min + 1) で範囲の大きさを求め、min を足す
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 let timerID_MainPop= false;
 function activate_pop(text,buttonText){//text=["一行目","二行目",...], buttonText=["a","b","c"]
     if(pop.classList.contains("is_active")){//既にポップが表示されていたらリセットする
@@ -324,18 +326,21 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
         button.textContent = buttonText[i-1];
         if (number_of_button == 1){
             button.style.left = `${i*50}%`;
+            button.style.aspectRatio = "2/1";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 2){
             button.style.left = `${i*50-25}%`;
+            button.style.aspectRatio = "3/2";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 3){
             button.style.left = `${i*33-16}%`;
+            button.style.aspectRatio = "1/1";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
@@ -355,6 +360,10 @@ function button_Push(situation,button_text){
     if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "止める"){
         socket.emit("finish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"})
         console.log("finish(end)送信")
+    }
+    if(button_text == "ゲーム選択画面に戻る"){
+        console.log("ゲーム選択画面に戻ります");
+        window.location.href = "../";//../でさっきまで開いていたhtmlに飛ぶっぽい
     }
 }
 
