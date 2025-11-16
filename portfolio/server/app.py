@@ -383,16 +383,17 @@ def handle_make_AI_move(data):
         outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
         # outcome = {"pass": True or False}
         if outcome["pass"]:
-            # パスする場合、手番交代
-            gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
-            gamestate[key]["pass_count"] += 1
-            if mode == "pvp":
-                socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
+                        # 連続パスかどうか確認
+            if not outcome["pass"]:
+                # パスする場合、手番交代
+                gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
+                gamestate[key]["pass_count"] += 1
+                if mode == "pvp":
+                    socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
+                else:
+                    socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]})
+                outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
             else:
-                socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]})
-            outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
-            # 連続パスかどうか確認
-            if outcome["pass"]:
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
                     socketio.emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
@@ -450,18 +451,23 @@ def swich_turn_god(game, mode, match):
             # パスする場合、手番交代
             gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
             gamestate[key]["pass_count"] += 1
-            if mode == "pvp":
-                socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
+            if not outcome["pass"]:
+                # 連続パスかどうか確認、連続パスでなければパス情報を送信
+                if mode == "pvp":
+                    socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key)
+                else:
+                    socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]})
+                outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
             else:
-                socketio.emit("pass", {"current_turn": gamestate[key]["current_turn"]})
-            outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
-            # 連続パスかどうか確認
-            if outcome["pass"]:
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
                     socketio.emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
+                    winner = "player_1" if outcome["scores"]["black"] > outcome["scores"]["white"] else "player_2" if outcome["scores"]["white"] > outcome["scores"]["black"] else "draw"
+                    send_signal(key, "game_over")
                 else:
                     socketio.emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
+                    winner = "player_1" if outcome["scores"]["black"] > outcome["scores"]["white"] else "player_2" if outcome["scores"]["white"] > outcome["scores"]["black"] else "draw"
+                    send_signal(key, "game_over")
                 return
             gamestate[key]["pass_count"] = 0
     # 現在の手番の送信
