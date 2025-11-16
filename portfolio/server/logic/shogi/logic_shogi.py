@@ -5,9 +5,9 @@ Board と GameState を利用して、サーバー(app.py)から呼び出され�
 """
 
 from typing import Dict, List, Tuple
-from board import Board
-from gamestate import GameState
-from utils import _can_drop_on_rank, _error_out
+from .board import Board
+from .gamestate import GameState
+#from .utils import _can_drop_on_rank, _error_out
 import random
 
 
