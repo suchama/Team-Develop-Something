@@ -125,8 +125,8 @@
     font-size: 2vw;
 }
 
-#play_pop_text{
-    display: grid;/*最初はnone（jsの方で表示と非表示を切り替える） */
+#play_pop_text{/* 親は#on_play_pop */
+    display: grid;
     margin: 0px;
     padding: 0px;
     position: absolute;
@@ -176,6 +176,7 @@
     left:80%;
 }
 
+/*将棋盤*/
 #mainB{
     display: block;
     margin: 0px;
@@ -186,29 +187,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    background-color: rgb(33, 154, 0);
-}
-
-.tegoma{
-    display: block;
-    margin: 0px;
-    padding: 5px;
-    position: absolute;
-    height: 40%;
-    aspect-ratio: 1/1;
-
-    transform: translate(-50%,-50%);
-    background-color: rgb(212, 204, 129);
-}
-
-#tegoma1{
-    top: 10%;
-    left: 10%;
-}
-
-#tegoma2{
-    bottom: 10%;
-    right: 10%;
+    background-color: rgb(208, 195, 70);
 }
 
 .komablock{
@@ -219,19 +198,42 @@
     height: 11%;
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
-    background-color: rgb(212, 204, 129);
+    background-color: rgb(208, 195, 70);
+    border: 1px solid;
     border: 0.1vw solid;
-    border-color: rgb(77, 74, 48);
+    border-color: rgb(0, 0, 0);
 }
 
 .komaimg{
-    display: none;
+    display: block;
     margin: 0px;
     padding: 0px;
     position: absolute;
     height: 11%;
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
+}
+
+/*手ごま*/
+.tegoma{
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    height: 40%;
+    aspect-ratio: 4/5;
+    transform: translate(-50%,-50%);
+    background-color: rgb(144, 27, 91);
+}
+
+#tegoma1{
+    top: 75%;
+    left: 87%;
+}
+
+#tegoma2{
+    top: 25%;
+    left: 13%;
 }
 
 .tegomablock{
@@ -246,17 +248,21 @@
 }
 
 .tegomaimg{
-    display: none;
+    display: block;
     margin: 0px;
     padding: 0px;
     position: absolute;
     width: 24%;
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
+    background-color: rgb(212, 204, 129);
 }
 
 
-/* タイマーの背景(relative)と時間(absolute)、現在のターン(absolute */
+
+
+
+/* タイマーの背景と時間、現在のターン */
 #timerBG{
     display: block;
     margin: 0px;
