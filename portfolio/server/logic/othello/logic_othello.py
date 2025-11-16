@@ -17,7 +17,7 @@ def game_start() -> Dict:
     """
     board = Board()                 # Board() 側で初期配置が入る想定
     gs = GameState()
-    remaining = {1: 20, 2: 20}    # 必要に応じて変更可
+    remaining = {1: 300, 2: 300}    # 必要に応じて変更可
 
     return {
         "board": board.grid,
