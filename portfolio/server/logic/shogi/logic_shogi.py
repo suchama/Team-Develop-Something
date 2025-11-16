@@ -22,6 +22,7 @@ def game_start() -> Dict:
         "board": b.grid,
         "tegoma": gs.hands,
         "remaining_time": {1: 300, 2: 300},
+        "current_turn": gs.current_turn,
     }
 
 def get_valid_moves(board: List[List[int]], 
