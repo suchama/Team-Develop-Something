@@ -508,7 +508,6 @@ def timer(game, mode, match):
                 socketio.emit("time_out", {}, room=key)
             else:
                 socketio.emit("time_out", {})
-            gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
             swich_turn_god(game, mode, match)
         else:
             # 時間切れじゃなければ1秒ごとに更新情報を送る
