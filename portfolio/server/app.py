@@ -505,9 +505,9 @@ def timer(game, mode, match):
             # 時間切れ(相手の手番に)
             gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
             if mode == "pvp":
-                emit("time_out", {}, room=key)
+                socketio.emit("time_out", {}, room=key)
             else:
-                emit("time_out", {})
+                socketio.emit("time_out", {})
             swich_turn_god(game, mode, match)
 
         # 1秒ごとに更新情報を送る
