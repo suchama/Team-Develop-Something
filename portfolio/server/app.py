@@ -587,7 +587,6 @@ def handle_finish(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     choose = data["end_or_continue"]
-    print(choose)
     if mode == "pvp":
         room = key
         leave_room(room, sid=gamestate[key]["player_1"])

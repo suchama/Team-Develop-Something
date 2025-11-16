@@ -47,7 +47,6 @@ class AI:
         
         valid_moves: Iterable[Coord] = board.get_valid(player)
         valid_moves = list(valid_moves)
-        print(f"AI valid moves : {valid_moves}")
 
         if not valid_moves:
             return None
