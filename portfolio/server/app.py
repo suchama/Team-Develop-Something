@@ -460,10 +460,8 @@ def swich_turn_god(game, mode, match):
                 # 連続パスの場合、ゲーム終了
                 if mode == "pvp":
                     socketio.emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
-                    send_signal(key, "game_over")
                 else:
                     socketio.emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
-                    send_signal(key, "game_over")
                 return
             gamestate[key]["pass_count"] = 0
     # 現在の手番の送信

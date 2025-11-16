@@ -17,7 +17,7 @@ def game_start() -> Dict:
     """
     board = Board()                 # Board() 側で初期配置が入る想定
     gs = GameState()
-    remaining = {1: 300, 2: 300}    # 必要に応じて変更可
+    remaining = {1: 20, 2: 20}    # 必要に応じて変更可
 
     return {
         "board": board.grid,
@@ -107,7 +107,8 @@ def check_pass(current_grid: list[list[int]], current_turn: int) -> dict:
 
     board.update_valid(current_turn)
     can_play_now = bool(board.get_valid(current_turn))
-    return {"pass": (not can_play_now)}
+    count_piece = board.count_piece()
+    return {"pass": (not can_play_now), "scores": {"black": count_piece[0], "white": count_piece[1]}}
 
 
 def handle_ai_move(game_state_dict: dict, current_turn: int) -> dict:
