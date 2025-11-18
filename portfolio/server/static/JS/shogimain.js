@@ -21,8 +21,7 @@ const hidaripop = document.getElementById("hidaripopBG");
 const popuptext = document.getElementById("popUpper");
 /* waitは最初かくしておいてwaitがきたら出現させる 消すときどうしよう...*/
 socket.on('waiting', (data) => {/* emit("waiting", {"msg": "相手を待っています..."}) */
-    activate_pop([data["msg"]],["ゲーム選択画面に戻る"])
-
+    activate_pop([data["msg"]],[])
 });
 
 // startさせる
@@ -31,29 +30,30 @@ let gamestate = 0
 socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate[key], "count_matche"s: count_matches}) */
     count_matches = data["count_matches"];/* 受け取ったデータをこっち側にも保存 */
     gamestate = data["gamestate"];//gamestate["othello"]は"board","current_turn","remaining_time"(→1,2のキーに残り秒数が入っている)
-    board_update(gamestate["board"]);
+    board_update(gamestate["board"],gamestate["tegoma"]);
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
 });
 
 
 //画面作成-----------------------------------------------------------
-let now_click = (0,0)//(row,column)
+let now_click = (0,(0,0))//(s,(row,column)) s...0:メイン 1:自分の手ごま　2:相手の手ごま
+let choose = (true,0)//0:board上のどこか 1:自分の手ごま 2:相手の手ごま
 /* メインのボード */
-for(let r = 1 ; r <= 8 ; r ++){
-    for(let c = 1 ; c <= 8 ; c ++){/* r:row(行)　c:column(列) */
+for(let r = 1 ; r <= 9 ; r ++){
+    for(let c = 1 ; c <= 9 ; c ++){/* r:row(行)　c:column(列) */
         const block = document.createElement("div");
         document.getElementById("mainB").appendChild(block);
         block.classList.add("komablock");
         block.id = `komablock_r${r}_c${c}`;
-        block.style.top = `${12*r-4}%`;
-        block.style.left = `${12*c-4}%`;
+        block.style.top = `${11*r-5}%`;
+        block.style.left = `${11*c-5}%`;
 
         const img = document.createElement("img");
         document.getElementById("mainB").appendChild(img);
         img.classList.add("komaimg");
         img.id = `komaimg_r${r}_c${c}`;
-        img.style.top = `${12*r-4}%`;
-        img.style.left = `${12*c-4}%`;
+        img.style.top = `${11*r-5}%`;
+        img.style.left = `${11*c-5}%`;
 
         /* マウスが駒の上に来た時とはずれたときの操作 */
         block.addEventListener('mouseenter', () =>{
@@ -64,19 +64,109 @@ for(let r = 1 ; r <= 8 ; r ++){
         });
         block.addEventListener('mouseleave', () =>{
             block.style.transition = "background-color 0s ease";
-            block.style.backgroundColor = "rgb(33, 154, 0)";
+            block.style.backgroundColor = "rgb(208, 195, 70)";
         });
         /* クリックされたら送信する */
         block.addEventListener('click', () =>{
-            if(current_turn == "slf"){
-                now_click = (r,c)
+            if (current_turn == "slf"){
+                block.style.backgroundColor = "rgb(249, 255, 167)";
+                now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
-                socket.emit("make_move", {"game": "othello", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                console.log("make_move送信")
+            }
+        });
+                /* マウスが駒の上に来た時とはずれたときの操作 */
+        img.addEventListener('mouseenter', () =>{
+            if(current_turn == "slf"){
+                block.style.transition = "background-color 0.3s ease";
+                block.style.backgroundColor = "rgb(249, 255, 167)";
+                img.style.filter = "brightness(200%)";
+            }
+        });
+        img.addEventListener('mouseleave', () =>{
+            if(current_turn == "slf"){
+                block.style.transition = "background-color 0s ease";
+                block.style.backgroundColor = "rgb(208, 195, 70)";
+                img.style.filter = "brightness(100%)";
+            }
+        });
+        /* クリックされたら送信する */
+        img.addEventListener('click', () =>{
+            if (current_turn == "slf"){
+                block.style.backgroundColor = "rgb(249, 255, 167)";
+                img.style.filter = "brightness(200%)";
+                now_click = (0,(r,c))
+                block.style.transition = "background-color 0s ease";
+                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                 console.log("make_move送信")
             }
         });
     };
 };
+//手ごま
+//手ごま_1(自分)
+for(let r = 1 ; r <= 5 ; r ++){
+    for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
+        const block = document.createElement("div");
+        document.getElementById("tegoma1").appendChild(block);
+        block.classList.add("tegomablock");
+        block.id = `tegoma1block_r${r}_c${c}`;
+        block.style.top = `${20*r-10}%`;
+        block.style.left = `${24*c-10}%`;
+
+        const img = document.createElement("img");
+        document.getElementById("tegoma1").appendChild(img);
+        img.classList.add("tegomaimg");
+        img.id = `tegoma1img_r${r}_c${c}`;
+        img.style.top = `${20*r-10}%`;
+        img.style.left = `${24*c-10}%`;
+
+        /* マウスが駒の上に来た時とはずれたときの操作 */
+        img.addEventListener('mouseenter', () =>{
+            if(current_turn == "slf"){
+                block.style.transition = "background-color 0.3s ease";
+                block.style.backgroundColor = "rgb(249, 255, 167)";
+            }
+        });
+        img.addEventListener('mouseleave', () =>{
+            if(current_turn == "slf"){
+                block.style.transition = "background-color 0s ease";
+                block.style.backgroundColor = "rgb(212, 204, 129)";
+            }
+        });
+        /* クリックされたら送信する */
+        img.addEventListener('click', () =>{
+            if (current_turn == "slf"){
+                block.style.backgroundColor = "rgb(249, 255, 167)";
+                now_click = (1,(r,c))
+                block.style.transition = "background-color 0s ease";
+                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][4*(c-1)+5*(r-1)]  , "current_player": player_index});
+                console.log("make_move送信")
+            }
+        });
+    };
+};
+//手ごま_2(相手)(クリックはできない)
+for(let r = 1 ; r <= 5 ; r ++){
+    for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
+        const block = document.createElement("div");
+        document.getElementById("tegoma2").appendChild(block);
+        block.classList.add("tegomablock");
+        block.id = `tegoma2block_r${r}_c${c}`;
+        block.style.bottom = `${20*r-29}%`;
+        block.style.right = `${24*c-34}%`;
+
+        const img = document.createElement("img");
+        document.getElementById("tegoma2").appendChild(img);
+        img.classList.add("tegomaimg");
+        img.id = `tegoma2img_r${r}_c${c}`;
+        img.style.bottom = `${20*r-29}%`;
+        img.style.right = `${24*c-34}%`;
+    };
+};
+
+
 //CPUが考えているときの。。。表示
 const thinking_time = document.createElement("div");
 thinking_time.id = "thinking_time_CPU";//pvpの時は常に非表示のまま
@@ -122,24 +212,23 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
         thinking_time.classList.remove("is_active");
     }
     if(data["gamestate"]["current_turn"] == player_index){
-        board_update(data["gamestate"]["board"]);
+        board_update(data["gamestate"]["board"],gamestate["tegoma"]);
         current_turn = "slf";
         console.log("game_data受信","current_turn:自分");
     }
     else if(!(data["gamestate"]["current_turn"] == player_index)){
-        board_update(data["gamestate"]["board"]);
+        board_update(data["gamestate"]["board"],gamestate["tegoma"]);
         current_turn = "opp";
         console.log("game_data受信","current_turn:相手");
     }
 });
 
-const stone_color = { 1:"black", 2:"white"}
-socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}または{"reason": "opponent_disconnected","winner": state["winner"], room = key) */
-    if (game_mode == "pvc"){//対AIの時は、「。。。」を消す
+socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}または{"reason": "opponent_disconnected","winner": state["winner"]}, room = key) */
+    if (game_mode == "pvc"){//相手がAIなら「。。。」の表示消す
         thinking_time.classList.remove("is_active");
     }
     if (!(data["reason"] == "opponent_disconnected")){
-        board_update(data["board"]);
+        board_update(data["board"],gamestate["tegoma"]);
         console.log(data["board"]);
         console.log("最後のboard_update（盤面更新）");
     }
@@ -147,21 +236,24 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
         if (data["reason"] == "opponent_disconnected"){
             activate_pop(["YOU WIN"], ["もう一度","止める"]);
         }
-        else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
-            //board_update(data["board"])
-            activate_pop(["YOU WIN","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
-        }
-        else if (data["scores"][stone_color[player_index]] < data["scores"][stone_color[player_index % 2+1]]){
-            //board_update(data["board"])
-            activate_pop(["YOU LOSE","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
-        }
-        else {
-            //board_update(data["board"])
-            activate_pop(["DRAW","black "+String(data["scores"]["black"])+" ー "+String(data["scores"]["white"]+" white")], ["もう一度","止める"]);
-        }
+////////////////////////どっちが勝者か判定してそれをもとにpop出す
     },1000)
     console.log("game_over受信")
 });
+
+socket.on("game_over_win",(data) => {
+    setTimeout(() => {
+            activate_pop(["YOU WIN"], ["もう一度","止める"]);
+    },1000)
+})
+
+socket.on("game_over_lose",(data) => {
+    setTimeout(() => {
+            activate_pop(["YOU LOSE"], ["もう一度","止める"]);
+    },1000)
+})
+
+
 
 socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["current_turn"]}, room = key) */
     if (player_index == data["current_turn"]){
@@ -173,14 +265,6 @@ socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["cu
         activate_pop(["＜YOU がパスしました＞"],[])
         console.log("pass受信","current_turn:相手");
         current_turn = "opp";
-        if (game_mode == "pvc"){//passの時はopponent_turnが送られてこないので、そこでやっていた処理をここでも記述
-            thinking_time.classList.add("is_active");
-            setTimeout(() => {
-            // 1秒後に実行される非表示処理
-                socket.emit("make_AI_move",{"game": game, "mode":game_mode, count_match: count_matches});
-                console.log("make_AI_move送信");
-            }, 1200+100*getRandomInt(1,8)); // 単位はミリ秒（1000ms = 1秒）
-        }
     }
     timerID_MainPop = setTimeout(() => {
     // 1秒後に実行される非表示処理
@@ -280,9 +364,10 @@ socket.on("game_continue",()=>{//もう一度遊ぶ場合はpop表示一秒後�
     activate_pop(["Thank You For Playing!","自動で画面遷移します"],[])
     console.log("game_continue受信")
     setTimeout(()=>{
-        window.location.href = "../"
+        window.location.href = "../index.html"
     },1000)
 })
+
 
 
 // 関数用意-----------------------------------------------------
@@ -326,21 +411,18 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
         button.textContent = buttonText[i-1];
         if (number_of_button == 1){
             button.style.left = `${i*50}%`;
-            button.style.aspectRatio = "2/1";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 2){
             button.style.left = `${i*50-25}%`;
-            button.style.aspectRatio = "3/2";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 3){
             button.style.left = `${i*33-16}%`;
-            button.style.aspectRatio = "1/1";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
@@ -352,36 +434,141 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
     }
 }
 
-function button_Push(situation,button_text){
-    if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "もう一度"){
-        socket.emit("finish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "continue"})
-        console.log("finish(countinue)送信")
-    }
-    if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "止める"){
-        socket.emit("finish",{"game": "othello", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"})
-        console.log("finish(end)送信")
-    }
-    if(button_text == "ゲーム選択画面に戻る"){
-        console.log("ゲーム選択画面に戻ります");
-        window.location.href = "../";//../でさっきまで開いていたhtmlに飛ぶっぽい
-    }
+const play_pop = document.getElementById("on_play_pop");
+const sbutton1 = document.getElementById("sbutton1");
+const sbutton2 = document.getElementById("sbutton2");
+function activate_play_pop(text){
+    play_pop.classList.add("is_active")//ポップ表示する
+    sbutton1.addEventListener("click",()=>{
+        play_pop.classList.remove("is_active");//ボタン押されたらすぐきえる
+        button_Push(text,"yes");
+    })
+    sbutton2.addEventListener("click",()=>{
+        play_pop.classList.remove("is_active");
+        button_Push(text,"no");
+    })
 }
 
-function board_update(grid){// grid[row][column]
-    for(let r = 1 ; r <= 8 ; r ++){
-        for(let c = 1 ; c <= 8 ; c ++){/* r:row(行)　c:column(列) */
-            if(grid[r-1][c-1] == 1){
+function button_Push(situation,button_text){
+    if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "もう一度"){
+        socket.emit("finish",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "end_or_continue": "continue"});
+        console.log("finish(countinue)送信");
+    }
+    if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "止める"){
+        socket.emit("finish",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"});
+        console.log("finish(end)送信");
+    }
+    if(((situation.includes("成り"))) && button_text == "yes"){
+        socket.emit("check",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "check":"nari", "current_turn":player_index});
+        console.log("check送信");
+    } 
+    if(((situation.includes("成り"))) && button_text == "no"){
+        //socket.emit("check",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "check":"nari", "current_turn":player_index});
+        //console.log("check送信");
+    } 
+}
+
+/*
+    # 1: 玉将（自分）
+    # 2: 飛車
+    # 3: 角行
+    # 4: 金将
+    # 5: 銀将
+    # 6: 桂馬
+    # 7: 香車
+    # 8: 歩兵 
+    # 11〜18: 相手の駒（+10）
+    # 22: 成飛（竜王）
+    # 23: 成角（竜馬）
+    # 25: 成銀
+    # 26: 成桂
+    # 27: 成香
+    # 28: と金
+    # 32〜38: 相手の成駒（+10）
+*/
+const img_index = {
+                    1:"osho",2:"hisha",3:"kaku",4:"kin",5:"gin",6:"keima",7:"kyosha",8:"hohei",
+                    22:"narihisha",23:"uma",25:"narigin",26:"narikeima",27:"narikyosha",28:"narihohei"
+                    }//画像path指定に使う辞書
+function board_update(grid,tegoma){// grid[row][column]
+    //将棋盤の盤面の更新
+    for(let r = 1 ; r <= 9 ; r ++){
+        for(let c = 1 ; c <= 9 ; c ++){/* r:row(行)　c:column(列) */
+            if(grid[r-1][c-1] >=1 && grid[r-1][c-1] <=8 ){
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
-                img.src = "../static/JS/othello_image/black_1.png";
-                img.alt = "オセロ黒石";
-                img.style.display = "block";//オセロでは表示をhideすることはないので、blockになったら最後までblock
-            }
-            if(grid[r-1][c-1] == 2){
-                const img = document.getElementById(`komaimg_r${r}_c${c}`);
-                img.src = "../static/JS/othello_image/white_2.png";
-                img.alt = "オセロ白石";
+                img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]]+".png";
                 img.style.display = "block";
+            }else if(grid[r-1][c-1] >=22 && grid[r-1][c-1] <=28 ){
+                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]]+".png";
+                img.style.display = "block";
+            }else if(grid[r-1][c-1] >=11 && grid[r-1][c-1] <=18 ){//相手の駒（つまり回転させる）
+                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]-10]+".png";
+                img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                img.style.display = "block";
+            }else if(grid[r-1][c-1] >=22 && grid[r-1][c-1] <=28 ){//相手の駒(つまり回転させる)
+                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]-10]+".png";
+                img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                img.style.display = "block";
+            }else{
+                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                img.style.display = "none";
             }
+        }
+    }
+    rearrange(tegoma);//ここで自分と相手の手ごまを、描画用に並べなおしてtegoma_gridに入れる
+    console.log(tegoma_grid);
+    //自分の手ごま描画　使うデータ：tegoma_grid[player_index] 表示する手ごま板:tegoma1
+    for(let r = 1 ; r <= 5 ; r ++){
+        for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
+            if (!(tegoma_grid[player_index][(c-1)+4*(r-1)] == 0)){
+                const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
+                img.src = "../static/JS/shogi_image/"+tegoma_grid[player_index][(c-1)+4*(r-1)]+".png";
+                img.style.display = "block";
+            }else{
+                const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
+                img.style.display = "none";
+            }
+        }
+    }
+    //相手の手ごま描画　使うデータ：tegoma_grid[player_index%2+1] 表示する手ごま板:tegoma2
+    for(let r = 1 ; r <= 5 ; r ++){
+        for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
+            if (!(tegoma_grid[player_index][(c-1)+4*(r-1)] == 0)){
+                const img = document.getElementById(`tegoma2img_r${r}_c${c}`);
+                img.src = "../static/JS/shogi_image/"+tegoma_grid[player_index %2 + 1][(c-1)+4*(r-1)]+".png";
+                img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                img.style.display = "block";
+            }else{
+                const img = document.getElementById(`tegoma2img_r${r}_c${c}`);
+                img.style.display = "none";
+            }
+        }
+    }
+
+}
+let tegoma_grid = {1:Array(20).fill(0),2:Array(20).fill(0)};//手ごま用のgrid
+/*例えば自分の駒だったら（相手なら１８０度回転）tegoma_gridの配列の要素は順に
+    0123
+    4567
+    8...
+    ...19
+と手ごま上の位置を対応*/
+//app.pyでもらったデータを、使いやすい形に並べなおす
+function rearrange(hands){//hands = {1:{},2:{}}//
+    for(let turn = 1; turn <= 2 ; turn ++){
+        const kinds_of_hands = Object.keys(hands[turn]);
+        let numbering = 0
+        for(const key in kinds_of_hands){//各種類
+            for(let i=1; i <= hands[turn][key] ; i++){//各種類の所持数分まわす
+                tegoma_grid[turn][numbering] = hands[turn][key];
+                numbering += 1
+            }
+        for(let i = numbering ; i <= 19 ;i ++){//こまおきの残りのところは空白
+            tegoma_grid[turn][i] = 0;
+        }
         }
     }
 }
@@ -391,8 +578,11 @@ function blight(blt){
         let c = blt[i][0];/* data["blight_list"]のi+1個目の要素のx座標 */
         let r = blt[i][1];
         const bltkoma = document.getElementById(`komablock_r${r}_c${c}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
-        block.style.transition = "background-color 0.1s ease";
+        const bltkoma_img = document.getElementById(`komaimg_r${r}_c${c}`);
+        bltkoma.style.transition = "background-color 0.1s ease";
         bltkoma.style.backgroundColor = "rgba(254, 255, 235, 1)";
+        bltkoma_img.style.filter = "brightness(200%)";
+
     }
 }
 
@@ -401,7 +591,11 @@ function cansel_bright(blt){
         let c = blt[i][0];/* data["blight_list"]のi+1個目の要素のx座標 */
         let r = blt[i][1];
         const bltkoma = document.getElementById(`komablock_r${r}_c${c}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
-        block.style.transition = "background-color 0s ease";
+        const bltkoma_img = document.getElementById(`komaimg_r${r}_c${c}`);
+        bltkoma.style.transition = "background-color 0s ease";
         bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
+        bltkoma_img.style.filter = "brightness(100%)";
+
     };
 }
+

@@ -107,7 +107,76 @@
     color: rgb(255, 252, 217);
 }
 
+#on_play_pop{
+    display: none;/*最初はnone（jsの方で表示と非表示を切り替える） */
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    text-align: center;
+    width: 25%;
+    aspect-ratio: 2/3;
+    top: 50%;
+    left: 13%;
+    background-color: rgba(176, 33, 33, 0.644);
+    color: rgb(255, 210, 210);
+    transform: translate(-50%,-50%);
+    z-index: 1010;
+    font-size: 2vw;
+}
 
+#play_pop_text{/* 親は#on_play_pop */
+    display: grid;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    text-align: center;
+    width: 100%;
+    aspect-ratio: 2/1;
+    top: 0%;
+    left: 50%;
+    background-color: rgba(176, 33, 33, 0.644);
+    color: rgb(255, 210, 210);
+    transform: translate(-50%,0%);
+    z-index: 1010;
+    font-size: 1vw;
+}
+
+.small_button{/* 親は#on_play_pop */
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    place-items: center;
+    width: 40%;
+    aspect-ratio: 1/1;
+    top: 70%;/* 左右位置は#個別で指定 */
+    font-size: 3vw;
+    background-color: rgba(255, 199, 125, 0.8);
+    border: 0.5vw solid;
+    border-color: rgba(255, 229, 194, 0.8) rgba(122, 69, 1, 0.8) rgba(122, 69, 1, 0.8) rgba(255, 229, 194, 0.8);
+    color: white;
+    transition: color 0.2s ease;
+    transition: background-color 0.2s ease;
+    transition: border-color 0.2s ease;
+}
+
+.small_button:hover{
+    background-color: rgba(225, 169, 95, 0.8);
+    border: 0.5vw solid;
+    border-color: rgba(122, 69, 1, 0.8) rgba(255, 229, 194, 0.8) rgba(255, 229, 194, 0.8) rgba(122, 69, 1, 0.8);
+    color: rgb(255, 252, 217);
+}
+
+#sbutton1{
+    left:20%;
+}
+#sbutton2{
+    left:80%;
+}
+
+/*将棋盤*/
 #mainB{
     display: block;
     margin: 0px;
@@ -118,7 +187,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    background-color: rgb(33, 154, 0);
+    background-color: rgb(208, 195, 70);
 }
 
 .komablock{
@@ -126,27 +195,74 @@
     margin: 0px;
     padding: 0px;
     position: absolute;
-    height: 12%;
+    height: 11%;
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
-    background-color: rgb(33, 154, 0);
+    background-color: rgb(208, 195, 70);
+    border: 1px solid;
     border: 0.1vw solid;
-    border-color: rgb(193, 221, 188)
+    border-color: rgb(0, 0, 0);
 }
 
 .komaimg{
-    display: none;
+    display: block;
     margin: 0px;
     padding: 0px;
     position: absolute;
-    height: 12%;
+    height: 11%;
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
 }
 
+/*手ごま*/
+.tegoma{
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    height: 40%;
+    aspect-ratio: 4/5;
+    transform: translate(-50%,-50%);
+    background-color: rgb(144, 27, 91);
+}
+
+#tegoma1{
+    top: 75%;
+    left: 87%;
+}
+
+#tegoma2{
+    top: 25%;
+    left: 13%;
+}
+
+.tegomablock{
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    width: 24%;
+    aspect-ratio: 1/1;
+    transform: translate(-50%,-50%);
+    background-color: rgb(212, 204, 129);
+}
+
+.tegomaimg{
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    width: 24%;
+    aspect-ratio: 1/1;
+    transform: translate(-50%,-50%);
+    background-color: rgb(212, 204, 129);
+}
 
 
-/* タイマーの背景(relative)と時間(absolute)、現在のターン(absolute */
+
+
+
+/* タイマーの背景と時間、現在のターン */
 #timerBG{
     display: block;
     margin: 0px;
@@ -214,7 +330,7 @@
     background-color: rgba(0, 115, 88, 0.901);
     color: rgb(255, 255, 255);
     transform: translate(-50%,-50%);
-    z-index: 900;
+    z-index: 1000;
     font-size: 3vw;
 }
 
@@ -279,6 +395,7 @@
         font-size: 2vw;
     }
 }
+
 
 
 

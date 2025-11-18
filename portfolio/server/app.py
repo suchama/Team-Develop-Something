@@ -1,7 +1,7 @@
 # ゲームの進行を管理するサーバーのコード
 from flask import Flask, render_template, request
 # flask→　HTTPサーバーを建てるためのフレームワーク
-from flask_socketio import SocketIO, emit, join_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 # flask_socketio→　WebSocket通信を簡単に実装するためのライブラリ
 # emit→　サーバーからクライアントに情報を送るための関数
 # join_room→　特定のルームにクライアントを参加させるための関数
@@ -226,8 +226,8 @@ def handle_join(data):
         # 現在の手番を通知
         send_signal(key, "turn")
 
-        socketio.start_background_task(timer, game, "pvp", match)
         # バックグラウンドのタイマーを開始
+        socketio.start_background_task(timer, game, "pvp", match)
         
         return
 
@@ -284,9 +284,9 @@ def handle_make_move(data):
                 # 勝者が決定している場合
                 gamestate[key]["winner"] = outcome["winner"]
                 if mode == "pvp":
-                    emit("game_over", {"board": board, "scores": outcome["scores"]}, room = key)
+                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
                 else:
-                    emit("game_over", {"board": board, "scores": outcome["scores"]})
+                    emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
                 send_signal(key, "game_over")
                 return
             else:
@@ -336,10 +336,10 @@ def handle_make_move(data):
                 if outcome["winner"] is not None:
                     gamestate[key]["winner"] = outcome["winner"]
                     if mode == "pvp":
-                        emit("game_over", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]}, room = key)
+                        emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]}, room = key)
                         send_signal(key, "game_over")
                     else:
-                        emit("game_over", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]})
+                        emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]})
                         send_signal(key, "game_over")
                     return
                 else:
@@ -571,7 +571,7 @@ def handle_check(data):
     
     if (game == "gungi" and check == "tuke") and ("bou_check_after_tuke" in gamestate[key]):
         remove = gamestate[key].pop("bou_check_after_tuke")
-        # 削除するためなので、remove変数は使わなくてok
+        # 削除するためなのでremove変数は使わなくてok
         return
     else:
         gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
@@ -587,7 +587,6 @@ def handle_finish(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     choose = data["end_or_continue"]
-    print(choose)
     if mode == "pvp":
         room = key
         leave_room(room, sid=gamestate[key]["player_1"])

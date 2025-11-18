@@ -5,9 +5,9 @@ Board と GameState を利用して、サーバー(app.py)から呼び出され�
 """
 
 from typing import Dict, List, Tuple
-from board import Board
-from gamestate import GameState
-from utils import _can_drop_on_rank, _error_out
+from .board import Board
+from .gamestate import GameState
+#from utils import _can_drop_on_rank, _error_out
 import random
 
 
@@ -22,6 +22,7 @@ def game_start() -> Dict:
         "board": b.grid,
         "tegoma": gs.hands,
         "remaining_time": {1: 300, 2: 300},
+        "current_turn": gs.current_turn,
     }
 
 def get_valid_moves(board: List[List[int]], 
