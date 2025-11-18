@@ -247,12 +247,10 @@ def handle_make_move(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     place = data["place"]
-    if place == "tegoma":
-        x, y = None, None
-        koma = data["koma"]
-    elif place == "board":
+    if place == "board":
         x, y = data["x"], data["y"]
-        koma = None
+    elif place == "tegoma":
+        koma = data["koma"]
     player = data["current_player"]
     board = gamestate[key]["board"]
 
@@ -298,7 +296,10 @@ def handle_make_move(data):
         tegoma = gamestate[key]["tegoma"][player]
         if gamestate[key]["move_check"] == []:
         # 1回目の選択ができていない場合
-            valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y], koma)
+            if place == "board":
+                valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y])
+            elif place == "tegoma":
+                valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [koma])
             #[x,y] もしくは koma が None
             if valid_moves != []:
             # 選択した駒が動ける場合

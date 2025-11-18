@@ -184,7 +184,7 @@ socket.on('blight', (data) => {// emit("blight", {"blight_list": valid_moves, "p
     console.log("blight受信");
 });
 socket.on('cansel_bright', () => {/* dataなし。brightをblightに直してもらうか問題 */
-    cancel_blight(now_blight);
+    cansel_bright(now_blight);
     console.log("cansel_blight受信");
 });
 

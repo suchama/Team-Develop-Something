@@ -1,8 +1,8 @@
 # ユーティリティ
 
 from typing import Dict
-from board import Board
-from gamestate import GameState
+from .board import Board
+from .gamestate import GameState
 
 def _can_drop_on_rank(piece: int, y: int, turn: int) -> bool:
     """行き所なし打ちを禁止"""
