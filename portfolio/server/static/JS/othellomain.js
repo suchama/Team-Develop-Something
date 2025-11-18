@@ -32,6 +32,8 @@ socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate
     count_matches = data["count_matches"];/* 受け取ったデータをこっち側にも保存 */
     gamestate = data["gamestate"];//gamestate["othello"]は"board","current_turn","remaining_time"(→1,2のキーに残り秒数が入っている)
     board_update(gamestate["board"]);
+    time_1.textContent = String(gamestate["remaining_time"][1]);//初期時間がそれぞれ異なる場合はそれを判別できないのできつい
+    time_2.textContent = String(gamestate["remaining_time"][2]);
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
 });
 
