@@ -254,17 +254,18 @@ def handle_make_move(data):
         koma = data["koma"]
     player = data["current_player"]
     board = gamestate[key]["board"]
-
-    if (place != "board" and place != "tegoma"):
-        # placeがboardでもtegomaでもない場合、エラー
-        emit("error", {"msg": "おけないよん"}, to = request.sid)
-        return
     
     if mode == "pvp" :
         if request.sid != gamestate[key][f"player_{player}"]:
             #pvpで、手を打とうとしたプレイヤーが現在の手番のプレイヤーではない場合
             emit("error", {"msg": "おけないよん"}, to = request.sid)
             return
+
+    if (request.sid == gamestate[key][f"player_{player}"]) and (place != "board" and place != "tegoma"):
+        # placeがboardでもtegomaでもない場合、エラー
+        gamestate[key]["move_check"] = []
+        emit("error", {"msg": "おけないよん"}, to = request.sid)
+        return
 
     if game == "othello":
     # オセロの場合
@@ -294,7 +295,7 @@ def handle_make_move(data):
                 return
     else:
     # 将棋、軍議の場合
-        tegoma = gamestate[key]["tegoma"][player]
+        tegoma = gamestate[key]["tegoma"]
         if gamestate[key]["move_check"] == []:
         # 1回目の選択ができていない場合
             if place == "board":
@@ -323,9 +324,10 @@ def handle_make_move(data):
             # 光らせている場所を消す
             if place == "tegoma":
             # 手駒には動かせないのでエラー
+                gamestate[key]["move_check"] = []
                 emit("error", {"msg": "おけないよん"}, to = request.sid)
                 return
-            if [x,y] in gamestate[key]["move_check"]:
+            if (x,y) in gamestate[key]["move_check"]:
             # 動ける場所リストの中に選択した場所がある場合
                 outcome = game_name[game].handle_player_move(board, tegoma, player, gamestate[key]["selected_place"], gamestate[key]["selected_pos"], [x,y])
                 # gamestate[key]["selected_pos"]には、tegomaなら数字、boardなら[x,y]が入る。注意
@@ -430,10 +432,10 @@ def handle_make_AI_move(data):
             send_signal(key, "game_over")
         return
     else:
+        gamestate[key]["board"] = outcome["board_grid"]
+        gamestate[key]["current_turn"] = outcome["current_turn"]
         if game == "shogi" or game == "gungi":
-            gamestate[key]["board"] = outcome["board_grid"]
             gamestate[key]["tegoma"] = outcome["tegoma"]
-            gamestate[key]["current_turn"] = outcome["current_turn"]
         # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
         swich_turn_god(game, mode, match)
         return
