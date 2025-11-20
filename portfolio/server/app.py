@@ -239,6 +239,7 @@ def handle_join(data):
 # x, y = プレイヤーが打った座標
 # player = 1 or 2
 def handle_make_move(data):
+    print("Player Move")
     global gamestate
     # data = {game: "othello", mode:"pvp", count_match: 数字, place:"board" or "tegoma", koma:数字, x: x, y: y, current_player: 1}
     # placeがboard→駒の座標で判別、tegoma→駒の種類で判別
@@ -300,6 +301,7 @@ def handle_make_move(data):
                 valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y])
             elif place == "tegoma":
                 valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [koma])
+            print("valid_moves:", valid_moves)
             #[x,y] もしくは koma が None
             if valid_moves != []:
             # 選択した駒が動ける場合
@@ -373,6 +375,7 @@ def handle_make_move(data):
 # AIの手を実行する。(時間だけ送られるので、JSはAIのターン受信→好きな時間空ける→emit送信 すればok)
 @socketio.on("make_AI_move")
 def handle_make_AI_move(data):
+    print("AI")
     # data = {game: "shogi", mode:"pvp", count_match: 数字}
     global gamestate
     game = data["game"]
@@ -380,6 +383,8 @@ def handle_make_AI_move(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     current_turn = gamestate[key]["current_turn"]
+    if gamestate[key][f"player_{current_turn}"] != "AI":
+        return
     if game == "othello":
         outcome = game_name[game].check_pass(gamestate[key]["board"], current_turn)
         # outcome = {"pass": True or False}
@@ -425,6 +430,10 @@ def handle_make_AI_move(data):
             send_signal(key, "game_over")
         return
     else:
+        if game == "shogi" or game == "gungi":
+            gamestate[key]["board"] = outcome["board_grid"]
+            gamestate[key]["tegoma"] = outcome["tegoma"]
+            gamestate[key]["current_turn"] = outcome["current_turn"]
         # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
         swich_turn_god(game, mode, match)
         return
