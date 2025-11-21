@@ -34,7 +34,7 @@ socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
 });
 
-
+let first_click = false;//一度目のクリックをしているのかどうか
 //画面作成-----------------------------------------------------------
 let now_click = (0,(0,0))//(s,(row,column)) s...0:メイン 1:自分の手ごま　2:相手の手ごま
 let choose = (true,0)//0:board上のどこか 1:自分の手ごま 2:相手の手ごま
@@ -575,8 +575,8 @@ function rearrange(hands){//hands = {1:{},2:{}}//
 
 function blight(blt){
     for(let i = 0; i < blt.length; i ++){
-        let c = blt[i][0];/* data["blight_list"]のi+1個目の要素のx座標 */
-        let r = blt[i][1];
+        let c = blt[i][0]+1;/* data["blight_list"]のi+1個目の要素のx座標 */
+        let r = blt[i][1]+1;
         const bltkoma = document.getElementById(`komablock_r${r}_c${c}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
         const bltkoma_img = document.getElementById(`komaimg_r${r}_c${c}`);
         bltkoma.style.transition = "background-color 0.1s ease";
