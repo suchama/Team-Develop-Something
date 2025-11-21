@@ -34,7 +34,10 @@ socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
 });
 
-let first_click = false;//一度目のクリックをしているのかどうか
+let click_as_first = false;//一度目のクリックをしているのかどうか
+let click_as_second = false;
+//let answer_to_click_first = false;
+//let answer_to_click_second = false;
 //画面作成-----------------------------------------------------------
 let now_click = (0,(0,0))//(s,(row,column)) s...0:メイン 1:自分の手ごま　2:相手の手ごま
 let choose = (true,0)//0:board上のどこか 1:自分の手ごま 2:相手の手ごま
@@ -58,47 +61,58 @@ for(let r = 1 ; r <= 9 ; r ++){
         /* マウスが駒の上に来た時とはずれたときの操作 */
         block.addEventListener('mouseenter', () =>{
             if(current_turn == "slf"){
-                block.style.transition = "background-color 0.3s ease";
+                //block.style.transition = "background-color 0.3s ease";
                 block.style.backgroundColor = "rgb(249, 255, 167)";
             }
         });
         block.addEventListener('mouseleave', () =>{
-            block.style.transition = "background-color 0s ease";
+            //block.style.transition = "background-color 0s ease";
             block.style.backgroundColor = "rgb(208, 195, 70)";
         });
         /* クリックされたら送信する */
         block.addEventListener('click', () =>{
-            if (current_turn == "slf"){
+            if (current_turn == "slf" && click_ok == true){
                 block.style.backgroundColor = "rgb(249, 255, 167)";
                 now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                if (click_as_first == false){
+                    click_as_first = true;
+                }else if (click_as_second == false){
+                    click_as_second = true;
+                }
                 console.log("make_move送信")
             }
         });
                 /* マウスが駒の上に来た時とはずれたときの操作 */
         img.addEventListener('mouseenter', () =>{
             if(current_turn == "slf"){
-                block.style.transition = "background-color 0.3s ease";
+                //block.style.transition = "background-color 0.3s ease";
                 block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
             }
         });
         img.addEventListener('mouseleave', () =>{
             if(current_turn == "slf"){
-                block.style.transition = "background-color 0s ease";
+                //block.style.transition = "background-color 0s ease";
                 block.style.backgroundColor = "rgb(208, 195, 70)";
                 img.style.filter = "brightness(100%)";
             }
         });
         /* クリックされたら送信する */
         img.addEventListener('click', () =>{
-            if (current_turn == "slf"){
+            if (current_turn == "slf" && click_ok == true){
                 block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
                 now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                if (click_as_first == false){
+                    click_as_first = true;
+                }else if (click_as_second == false){
+                    click_as_second = true;
+                }
+                
                 console.log("make_move送信")
             }
         });
@@ -125,23 +139,29 @@ for(let r = 1 ; r <= 5 ; r ++){
         /* マウスが駒の上に来た時とはずれたときの操作 */
         img.addEventListener('mouseenter', () =>{
             if(current_turn == "slf"){
-                block.style.transition = "background-color 0.3s ease";
+                //block.style.transition = "background-color 0.3s ease";
                 block.style.backgroundColor = "rgb(249, 255, 167)";
             }
         });
         img.addEventListener('mouseleave', () =>{
             if(current_turn == "slf"){
-                block.style.transition = "background-color 0s ease";
+                //block.style.transition = "background-color 0s ease";
                 block.style.backgroundColor = "rgb(212, 204, 129)";
             }
         });
         /* クリックされたら送信する */
         img.addEventListener('click', () =>{
-            if (current_turn == "slf"){
+            if (current_turn == "slf" && click_ok == true){
                 block.style.backgroundColor = "rgb(249, 255, 167)";
                 now_click = (1,(r,c))
                 block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][4*(c-1)+5*(r-1)]  , "current_player": player_index});
+                if (click_as_first == false){
+                    click_as_first = true;
+                }else if (click_as_second == false){
+                    click_as_second = true;
+                }
+                
                 console.log("make_move送信")
             }
         });
@@ -205,7 +225,17 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
         hidaripop.classList.remove("blight_to_normal");
         console.log("errorpop消去");
     }, 1500); // 単位はミリ秒（1000ms = 1秒）
+    if (click_as_second == true){
+        click_as_second = false;
+    }else if (click_as_first == true){//二回目のクリックがfalseなときに、一回目のクリックがtrueならば
+        click_as_first = false
+    }
 });
+
+socket.on('nari_check',(data)=>{
+    activate_play_pop("成りますか？");
+    click_ok = false;
+})
 
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     if((game_mode == "pvc") && (data["gamestate"]["current_turn"] == player_index)){//CPUの一手が送られてくるまでにラグがあるので、その間表示していた「。。。」を、ここで消す
@@ -283,12 +313,13 @@ socket.on('time_out', (data) => {// emit("time_out", {}, room=key)
 });
 
 let player_index_detect = false;
-let player_index = 0
+let player_index = 1
 const time_1 = document.getElementById(`time_1`);
 const turn_1 = document.getElementById(`turn_1`);
 const time_2 = document.getElementById(`time_2`);
 const turn_2 = document.getElementById(`turn_2`);
 socket.on("your_turn",()=>{//データなし。ターンが切り替わっただけ
+    click_ok = true
     if(player_index_detect == false){//最初のターンが自分か相手か判明したタイミングで、自分の番号が１か２か確定する
         player_index = gamestate["current_turn"];
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
@@ -312,6 +343,11 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
 })
 
 socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっただけ
+    click_as_first = false;//相手のターンになったタイミングで、自分の入力に関する変数をリセットしておく
+    click_as_second = false;
+    click_ok = false;
+    answer_to_click_first = false;
+    answer_to_click_second = false;
     if(player_index_detect == false){
         player_index = gamestate["current_turn"] % 2 + 1;
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
@@ -448,6 +484,7 @@ function activate_play_pop(text){
         button_Push(text,"no");
     })
 }
+
 
 function button_Push(situation,button_text){
     if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "もう一度"){
