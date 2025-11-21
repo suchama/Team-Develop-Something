@@ -204,6 +204,7 @@
     border-color: rgb(0, 0, 0);
 }
 
+
 .komaimg{
     display: block;
     margin: 0px;
@@ -213,6 +214,7 @@
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
 }
+
 
 /*手ごま*/
 .tegoma{
