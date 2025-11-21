@@ -47,7 +47,6 @@ portfolio/
 │            └── gungi_image/
 │
 ├── games/           #ローカルで遊べるゲームのフォルダ
-|
 └── README.md
 ```
 ---
