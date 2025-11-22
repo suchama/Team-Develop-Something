@@ -233,7 +233,7 @@ def handle_join(data):
 
 # 降参ボタンが押されたとき(将棋、軍議のみ)
 @socketio.on("give_up")
-def handle_give_up():
+def handle_give_up(data):
     global gamestate
     sid = request.sid
 
@@ -258,7 +258,7 @@ def handle_give_up():
                 socketio.emit("game_over", {
                     "reason": "give_up",
                     "winner": state["winner"]
-                }, to = sid)
+                })
 
             # 対人戦
             elif mode == "pvp":
@@ -280,7 +280,7 @@ def handle_give_up():
                     "winner": state["winner"]
                 }, to = sid)
 
-            break
+            return
 
 
 # プレイヤーが手を打ったとき
