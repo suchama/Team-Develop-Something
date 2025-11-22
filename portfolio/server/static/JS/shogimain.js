@@ -62,17 +62,17 @@ for(let r = 1 ; r <= 9 ; r ++){
         block.addEventListener('mouseenter', () =>{
             if(current_turn == "slf"){
                 //block.style.transition = "background-color 0.3s ease";
-                block.style.backgroundColor = "rgb(249, 255, 167)";
+                //block.style.backgroundColor = "rgb(249, 255, 167)";
             }
         });
         block.addEventListener('mouseleave', () =>{
             //block.style.transition = "background-color 0s ease";
-            block.style.backgroundColor = "rgb(208, 195, 70)";
+            //block.style.backgroundColor = "rgb(208, 195, 70)";
         });
         /* クリックされたら送信する */
         block.addEventListener('click', () =>{
             if (current_turn == "slf" && click_ok == true){
-                block.style.backgroundColor = "rgb(249, 255, 167)";
+                //block.style.backgroundColor = "rgb(249, 255, 167)";
                 now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
@@ -88,21 +88,21 @@ for(let r = 1 ; r <= 9 ; r ++){
         img.addEventListener('mouseenter', () =>{
             if(current_turn == "slf"){
                 //block.style.transition = "background-color 0.3s ease";
-                block.style.backgroundColor = "rgb(249, 255, 167)";
+                //block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
             }
         });
         img.addEventListener('mouseleave', () =>{
             if(current_turn == "slf"){
                 //block.style.transition = "background-color 0s ease";
-                block.style.backgroundColor = "rgb(208, 195, 70)";
+                //block.style.backgroundColor = "rgb(208, 195, 70)";
                 img.style.filter = "brightness(100%)";
             }
         });
         /* クリックされたら送信する */
         img.addEventListener('click', () =>{
             if (current_turn == "slf" && click_ok == true){
-                block.style.backgroundColor = "rgb(249, 255, 167)";
+                //block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
                 now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
@@ -234,7 +234,8 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
 
 socket.on('nari_check',(data)=>{
     activate_play_pop("成りますか？");
-    click_ok = false;
+    click_ok = false;//成りチェックのフェーズはいったら次のターンまで入力処理は要らないのでfalse
+    console.log("nari_check受信");
 })
 
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
@@ -534,10 +535,12 @@ function board_update(grid,tegoma){// grid[row][column]
             if(grid[r-1][c-1] >=1 && grid[r-1][c-1] <=8 ){
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]]+".png";
+                img.style.transform = "rotate(0deg) translate(-50%,-50%)";//回転の基準は真ん中（デフォルト）
                 img.style.display = "block";
             }else if(grid[r-1][c-1] >=22 && grid[r-1][c-1] <=28 ){
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]]+".png";
+                img.style.transform = "rotate(0deg) translate(-50%,-50%)";//回転の基準は真ん中（デフォルト）
                 img.style.display = "block";
             }else if(grid[r-1][c-1] >=11 && grid[r-1][c-1] <=18 ){//相手の駒（つまり回転させる）
                 const img = document.getElementById(`komaimg_r${r}_c${c}`);
@@ -625,12 +628,12 @@ function blight(blt){
 
 function cansel_bright(blt){
     for(let i = 0; i < blt.length; i ++){
-        let c = blt[i][0];/* data["blight_list"]のi+1個目の要素のx座標 */
-        let r = blt[i][1];
+        let c = blt[i][0]+1;/* data["blight_list"]のi+1個目の要素のx座標 */
+        let r = blt[i][1]+1;
         const bltkoma = document.getElementById(`komablock_r${r}_c${c}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
         const bltkoma_img = document.getElementById(`komaimg_r${r}_c${c}`);
         bltkoma.style.transition = "background-color 0s ease";
-        bltkoma.style.backgroundColor = "rgb(254, 201, 255)";/* 元の色に戻す */
+        bltkoma.style.backgroundColor = "rgb(208, 195, 70)";/* 元の色に戻す */
         bltkoma_img.style.filter = "brightness(100%)";
 
     };
