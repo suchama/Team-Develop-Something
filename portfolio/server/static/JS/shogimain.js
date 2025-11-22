@@ -34,12 +34,10 @@ socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate
     time_1.textContent = String(gamestate["remaining_time"][1]);//初期時間がそれぞれ異なる場合はそれを判別できないのできつい
     time_2.textContent = String(gamestate["remaining_time"][2]);
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
+    console.log("start_game受信");
 });
 
-let click_as_first = false;//一度目のクリックをしているのかどうか
-let click_as_second = false;
-//let answer_to_click_first = false;
-//let answer_to_click_second = false;
+
 //画面作成-----------------------------------------------------------
 let now_click = (0,(0,0))//(s,(row,column)) s...0:メイン 1:自分の手ごま　2:相手の手ごま
 let choose = (true,0)//0:board上のどこか 1:自分の手ごま 2:相手の手ごま
@@ -78,17 +76,12 @@ for(let r = 1 ; r <= 9 ; r ++){
                 now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
-                if (click_as_first == false){
-                    click_as_first = true;
-                }else if (click_as_second == false){
-                    click_as_second = true;
-                }
                 console.log("make_move送信")
             }
         });
                 /* マウスが駒の上に来た時とはずれたときの操作 */
         img.addEventListener('mouseenter', () =>{
-            if(current_turn == "slf"){
+            if(current_turn == "slf" && click_ok == true){
                 //block.style.transition = "background-color 0.3s ease";
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
@@ -107,13 +100,8 @@ for(let r = 1 ; r <= 9 ; r ++){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
                 now_click = (0,(r,c))
-                block.style.transition = "background-color 0s ease";
+                //block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
-                if (click_as_first == false){
-                    click_as_first = true;
-                }else if (click_as_second == false){
-                    click_as_second = true;
-                }
                 
                 console.log("make_move送信")
             }
@@ -140,30 +128,27 @@ for(let r = 1 ; r <= 5 ; r ++){
 
         /* マウスが駒の上に来た時とはずれたときの操作 */
         img.addEventListener('mouseenter', () =>{
-            if(current_turn == "slf"){
+            if(current_turn == "slf" && click_ok == true){
                 //block.style.transition = "background-color 0.3s ease";
-                block.style.backgroundColor = "rgb(249, 255, 167)";
+                //block.style.backgroundColor = "rgb(249, 255, 167)";
+                img.style.filter = "brightness(200%)";
             }
         });
         img.addEventListener('mouseleave', () =>{
             if(current_turn == "slf"){
                 //block.style.transition = "background-color 0s ease";
-                block.style.backgroundColor = "rgb(212, 204, 129)";
+                //block.style.backgroundColor = "rgb(212, 204, 129)";
+                img.style.filter = "brightness(100%)";
             }
         });
         /* クリックされたら送信する */
         img.addEventListener('click', () =>{
             if (current_turn == "slf" && click_ok == true){
-                block.style.backgroundColor = "rgb(249, 255, 167)";
+                //block.style.backgroundColor = "rgb(249, 255, 167)";
+                img.style.filter = "brightness(200%)";
                 now_click = (1,(r,c))
-                block.style.transition = "background-color 0s ease";
+                //block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][4*(c-1)+5*(r-1)]  , "current_player": player_index});
-                if (click_as_first == false){
-                    click_as_first = true;
-                }else if (click_as_second == false){
-                    click_as_second = true;
-                }
-                
                 console.log("make_move送信")
             }
         });
@@ -227,11 +212,6 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
         hidaripop.classList.remove("blight_to_normal");
         console.log("errorpop消去");
     }, 1500); // 単位はミリ秒（1000ms = 1秒）
-    if (click_as_second == true){
-        click_as_second = false;
-    }else if (click_as_first == true){//二回目のクリックがfalseなときに、一回目のクリックがtrueならば
-        click_as_first = false
-    }
 });
 
 socket.on('nari_check',(data)=>{
@@ -245,15 +225,16 @@ socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key],
         thinking_time.classList.remove("is_active");
     }
     if(data["gamestate"]["current_turn"] == player_index){
-        board_update(data["gamestate"]["board"],gamestate["tegoma"]);
+        board_update(data["gamestate"]["board"],data["gamestate"]["tegoma"]);
         current_turn = "slf";
         console.log("game_data受信","current_turn:自分");
     }
     else if(!(data["gamestate"]["current_turn"] == player_index)){
-        board_update(data["gamestate"]["board"],gamestate["tegoma"]);
+        board_update(data["gamestate"]["board"],data["gamestate"]["tegoma"]);
         current_turn = "opp";
         console.log("game_data受信","current_turn:相手");
     }
+    //console.log("送られてきた手ごま：",data["gamestate"]["tegoma"])
 });
 
 socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores": outcome["scores"]}または{"reason": "opponent_disconnected","winner": state["winner"]}, room = key) */
@@ -327,8 +308,13 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
         player_index = gamestate["current_turn"];
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
         current_turn = "slf";
-        turn_1.innerHTML = "YOU<br>(下)"
-        turn_2.innerHTML = "対戦相手<br>(上)"
+        if(player_index == 1){
+            turn_1.innerHTML = "YOU<br>(下)";
+            turn_2.innerHTML = "対戦相手<br>(上)";
+        }else{
+            turn_1.innerHTML = "YOU<br>(上)";
+            turn_2.innerHTML = "対戦相手<br>(下)";
+        }
         console.log("初手＝こちら,自分のindex=",player_index)
     }
     turn_1.classList.add("now");
@@ -340,8 +326,6 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
 })
 
 socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっただけ
-    click_as_first = false;//相手のターンになったタイミングで、自分の入力に関する変数をリセットしておく
-    click_as_second = false;
     click_ok = false;
     answer_to_click_first = false;
     answer_to_click_second = false;
@@ -349,8 +333,13 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
         player_index = gamestate["current_turn"] % 2 + 1;
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
         current_turn = "opp";
-        turn_1.innerHTML = "YOU<br>(下)";
-        turn_2.innerHTML = "対戦相手<br>(上)";
+        if(player_index == 1){
+            turn_1.innerHTML = "YOU<br>(下)";
+            turn_2.innerHTML = "対戦相手<br>(上)";
+        }else{
+            turn_1.innerHTML = "YOU<br>(上)";
+            turn_2.innerHTML = "対戦相手<br>(下)";
+        }
         console.log("初手＝相手,自分のindex=",player_index)
     }
     turn_1.classList.remove("now");
@@ -549,13 +538,12 @@ function board_update(grid,tegoma){// grid[row][column]
         }
     }
     rearrange(tegoma);//ここで自分と相手の手ごまを、描画用に並べなおしてtegoma_gridに入れる
-    console.log(tegoma_grid);
     //自分の手ごま描画　使うデータ：tegoma_grid[player_index] 表示する手ごま板:tegoma1
     for(let r = 1 ; r <= 5 ; r ++){
         for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
             if (!(tegoma_grid[player_index][(c-1)+4*(r-1)] == 0)){
                 const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
-                img.src = "../static/JS/shogi_image/"+tegoma_grid[player_index][(c-1)+4*(r-1)]+".png";
+                img.src = "../static/JS/shogi_image/"+img_index[tegoma_grid[player_index][(c-1)+4*(r-1)]]+".png";
                 img.style.display = "block";
             }else{
                 const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
@@ -566,9 +554,9 @@ function board_update(grid,tegoma){// grid[row][column]
     //相手の手ごま描画　使うデータ：tegoma_grid[player_index%2+1] 表示する手ごま板:tegoma2
     for(let r = 1 ; r <= 5 ; r ++){
         for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
-            if (!(tegoma_grid[player_index][(c-1)+4*(r-1)] == 0)){
+            if (!(tegoma_grid[player_index %2 +1][(c-1)+4*(r-1)] == 0)){
                 const img = document.getElementById(`tegoma2img_r${r}_c${c}`);
-                img.src = "../static/JS/shogi_image/"+tegoma_grid[player_index %2 + 1][(c-1)+4*(r-1)]+".png";
+                img.src = "../static/JS/shogi_image/"+img_index[tegoma_grid[player_index %2 + 1][(c-1)+4*(r-1)]]+".png";
                 img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
                 img.style.display = "block";
             }else{
@@ -587,19 +575,22 @@ let tegoma_grid = {1:Array(20).fill(0),2:Array(20).fill(0)};//手ごま用のgri
     ...19
 と手ごま上の位置を対応*/
 //app.pyでもらったデータを、使いやすい形に並べなおす
-function rearrange(hands){//hands = {1:{},2:{}}//
+function rearrange(hands){//hands = {1:{},2:{}}// tegoma = {1:{1:5},2:{}};
     for(let turn = 1; turn <= 2 ; turn ++){
         const kinds_of_hands = Object.keys(hands[turn]);
+        //console.log("turn:",turn,"持っている手ごまの種類:",kinds_of_hands)
         let numbering = 0
-        for(const key in kinds_of_hands){//各種類
+        for(const key of kinds_of_hands){//各種類
+            //console.log("turn:",turn,"考えている駒の種類：",key)
             for(let i=1; i <= hands[turn][key] ; i++){//各種類の所持数分まわす
-                tegoma_grid[turn][numbering] = hands[turn][key];
+                tegoma_grid[turn][numbering] = Number(key);
                 numbering += 1
             }
+        }
         for(let i = numbering ; i <= 19 ;i ++){//こまおきの残りのところは空白
             tegoma_grid[turn][i] = 0;
         }
-        }
+        
     }
 }
 

@@ -35,6 +35,7 @@ socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate
     time_1.textContent = String(gamestate["remaining_time"][1]);//初期時間がそれぞれ異なる場合はそれを判別できないのできつい
     time_2.textContent = String(gamestate["remaining_time"][2]);
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
+    console.log("start_game受信");
 });
 
 

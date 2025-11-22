@@ -199,7 +199,6 @@
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
     background-color: rgb(208, 195, 70);
-    border: 1px solid;
     border: 0.1vw solid;
     border-color: rgb(0, 0, 0);
 }
@@ -225,7 +224,7 @@
     height: 40%;
     aspect-ratio: 4/5;
     transform: translate(-50%,-50%);
-    background-color: rgb(144, 27, 91);
+    background-color: rgb(191, 184, 116);
 }
 
 #tegoma1{
@@ -247,6 +246,9 @@
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
     background-color: rgb(212, 204, 129);
+    border: 0.1vw solid;
+    border-color: rgb(185, 178, 113);
+    
 }
 
 .tegomaimg{
@@ -257,7 +259,6 @@
     width: 24%;
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
-    background-color: rgb(212, 204, 129);
 }
 
 
