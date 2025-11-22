@@ -617,7 +617,6 @@ def handle_check(data):
 
     if check == "cancel":
         gamestate[key]["selected_pos"] = None
-        return
 
     if game == "shogi" and check == "nari":
         outcome = game_name[game].handle_nari(board, player, gamestate[key]["selected_pos"], [x,y])
