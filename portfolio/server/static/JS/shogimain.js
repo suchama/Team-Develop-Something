@@ -31,6 +31,8 @@ socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate
     count_matches = data["count_matches"];/* 受け取ったデータをこっち側にも保存 */
     gamestate = data["gamestate"];//gamestate["othello"]は"board","current_turn","remaining_time"(→1,2のキーに残り秒数が入っている)
     board_update(gamestate["board"],gamestate["tegoma"]);
+    time_1.textContent = String(gamestate["remaining_time"][1]);//初期時間がそれぞれ異なる場合はそれを判別できないのできつい
+    time_2.textContent = String(gamestate["remaining_time"][2]);
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
 });
 
@@ -325,14 +327,8 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
         player_index = gamestate["current_turn"];
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
         current_turn = "slf";
-        if (player_index == 1){
-            turn_1.innerHTML = "YOU<br>(black)"
-            turn_2.innerHTML = "対戦相手<br>(white)"
-        };
-        if (player_index == 2){
-            turn_1.innerHTML = "YOU<br>(white)"
-            turn_2.innerHTML = "対戦相手<br>(black)"
-        };
+        turn_1.innerHTML = "YOU<br>(下)"
+        turn_2.innerHTML = "対戦相手<br>(上)"
         console.log("初手＝こちら,自分のindex=",player_index)
     }
     turn_1.classList.add("now");
@@ -353,14 +349,8 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
         player_index = gamestate["current_turn"] % 2 + 1;
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
         current_turn = "opp";
-        if (player_index == 1){
-            turn_1.innerHTML = "YOU<br>(black)"
-            turn_2.innerHTML = "対戦相手<br>(white)"
-        };
-        if (player_index == 2){
-            turn_1.innerHTML = "YOU<br>(white)"
-            turn_2.innerHTML = "対戦相手<br>(black)"
-        };
+        turn_1.innerHTML = "YOU<br>(下)";
+        turn_2.innerHTML = "対戦相手<br>(上)";
         console.log("初手＝相手,自分のindex=",player_index)
     }
     turn_1.classList.remove("now");
