@@ -568,7 +568,7 @@ function board_update(grid,tegoma){// grid[row][column]
                     img.style.transform = "rotate(0deg) translate(-50%,-50%)";
                 }
                 img.style.display = "block";
-            }else if(grid[r-1][c-1] >=22 && grid[r-1][c-1] <=28 ){//相手の駒(つまり回転させる)
+            }else if(grid[r-1][c-1] >=32 && grid[r-1][c-1] <=38 ){//相手の駒(つまり回転させる)
                 const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]-10]+".png";
                 if(player_index == 1){
@@ -585,6 +585,7 @@ function board_update(grid,tegoma){// grid[row][column]
     }
     rearrange(tegoma);//ここで自分と相手の手ごまを、描画用に並べなおしてtegoma_gridに入れる
     console.log("手ごまのデータ：",tegoma)
+    console.log("盤面のデータ：",grid)
     //自分の手ごま描画　使うデータ：tegoma_grid[player_index] 表示する手ごま板:tegoma1
     for(let r = 1 ; r <= 5 ; r ++){
         for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
