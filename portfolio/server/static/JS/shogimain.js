@@ -458,10 +458,12 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
 }
 
 const play_pop = document.getElementById("on_play_pop");
+const play_pop_text = document.getElementById("play_pop_text");
 const sbutton1 = document.getElementById("sbutton1");
 const sbutton2 = document.getElementById("sbutton2");
 function activate_play_pop(text){
     play_pop.classList.add("is_active")//ポップ表示する
+    play_pop_text.innerHTML = text;
     sbutton1.addEventListener("click",()=>{
         play_pop.classList.remove("is_active");//ボタン押されたらすぐきえる
         button_Push(text,"yes");
@@ -487,8 +489,8 @@ function button_Push(situation,button_text){
         console.log("check送信");
     } 
     if(((situation.includes("成り"))) && button_text == "no"){
-        //socket.emit("check",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "check":"nari", "current_turn":player_index});
-        //console.log("check送信");
+        socket.emit("check",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "check":"cancel", "current_turn":player_index});
+        console.log("check送信");
     } 
 }
 
@@ -642,7 +644,7 @@ function blight(blt){
         const bltkoma_img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
         bltkoma.style.transition = "background-color 0.1s ease";
         bltkoma.style.backgroundColor = "rgba(254, 255, 235, 1)";
-        bltkoma_img.style.filter = "brightness(200%)";
+        //bltkoma_img.style.filter = "brightness(200%)";
 
     }
 }
@@ -662,8 +664,7 @@ function cansel_bright(blt){
         const bltkoma_img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
         bltkoma.style.transition = "background-color 0s ease";
         bltkoma.style.backgroundColor = "rgb(208, 195, 70)";/* 元の色に戻す */
-        bltkoma_img.style.filter = "brightness(100%)";
+        //bltkoma_img.style.filter = "brightness(100%)";
 
     };
 }
-

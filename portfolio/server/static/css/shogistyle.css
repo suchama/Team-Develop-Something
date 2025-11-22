@@ -39,7 +39,7 @@
     text-align: center;
     width: 20%;
     aspect-ratio: 2/1;
-    top: 50%;
+    top: 60%;
     left: 13%;
     background-color: rgba(176, 33, 33, 0.644);
     color: rgb(255, 210, 210);
@@ -115,12 +115,12 @@
     place-items: center;
     text-align: center;
     width: 25%;
-    aspect-ratio: 2/3;
-    top: 50%;
-    left: 13%;
-    background-color: rgba(176, 33, 33, 0.644);
+    aspect-ratio: 1/1;
+    bottom: 2%;
+    left: 13.1%;
+    background-color: rgba(133, 80, 0, 0.644);
     color: rgb(255, 210, 210);
-    transform: translate(-50%,-50%);
+    transform: translate(-50%,0%);
     z-index: 1010;
     font-size: 2vw;
 }
@@ -136,27 +136,27 @@
     aspect-ratio: 2/1;
     top: 0%;
     left: 50%;
-    background-color: rgba(176, 33, 33, 0.644);
+    background-color: rgba(133, 80, 0, 0.644);
     color: rgb(255, 210, 210);
     transform: translate(-50%,0%);
     z-index: 1010;
-    font-size: 1vw;
+    font-size: 3vw;
 }
 
 .small_button{/* 親は#on_play_pop */
-    display: block;
+    display: grid;
     margin: 0px;
     padding: 0px;
     position: absolute;
     place-items: center;
     width: 40%;
     aspect-ratio: 1/1;
-    top: 70%;/* 左右位置は#個別で指定 */
-    font-size: 3vw;
+    top: 58%;/* 左右位置は#個別で指定 */
+    font-size: 2.5vw;
     background-color: rgba(255, 199, 125, 0.8);
     border: 0.5vw solid;
     border-color: rgba(255, 229, 194, 0.8) rgba(122, 69, 1, 0.8) rgba(122, 69, 1, 0.8) rgba(255, 229, 194, 0.8);
-    color: white;
+    color: rgb(82, 60, 0);
     transition: color 0.2s ease;
     transition: background-color 0.2s ease;
     transition: border-color 0.2s ease;
@@ -166,14 +166,14 @@
     background-color: rgba(225, 169, 95, 0.8);
     border: 0.5vw solid;
     border-color: rgba(122, 69, 1, 0.8) rgba(255, 229, 194, 0.8) rgba(255, 229, 194, 0.8) rgba(122, 69, 1, 0.8);
-    color: rgb(255, 252, 217);
+    color: rgb(42, 30, 0);
 }
 
 #sbutton1{
-    left:20%;
+    left: 5%;
 }
 #sbutton2{
-    left:80%;
+    right: 5%;
 }
 
 /*将棋盤*/
@@ -350,6 +350,10 @@
 
 
 .is_active {/* JavaScriptで付与する「表示中」のクラス*/
+  display: block; /* 表示に切り替える */
+}
+
+#on_play_pop.is_active {/* JavaScriptで付与する「表示中」のクラス*/
   display: block; /* 表示に切り替える */
 }
 
