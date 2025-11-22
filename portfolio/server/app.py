@@ -619,17 +619,17 @@ def handle_check(data):
         gamestate[key]["selected_pos"] = None
 
     if game == "shogi" and check == "nari":
-        outcome = game_name[game].handle_nari(board, player, gamestate[key]["selected_pos"], [x,y])
+        outcome = game_name[game].handle_nari(board, player, gamestate[key]["selected_pos"])
         # outcome = {"board_grid": board.grid,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
         gamestate[key]["selected_pos"] = None
     elif game == "gungi" and check == "tuke":
-        outcome = game_name[game].handle_tuke(board, player, gamestate[key]["selected_pos"], [x,y])
+        outcome = game_name[game].handle_tuke(board, player, gamestate[key]["selected_pos"])
         # outcome = {"board_grid": board.grid,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
         gamestate[key]["selected_pos"] = None
     elif game == "gungi" and check == "bou":
-        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"], [x,y])
+        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"])
         # 謀は手駒の更新がある
         # outcome = {"board_grid": board.grid,"tegoma": tegoma,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
