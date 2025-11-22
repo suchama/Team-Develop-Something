@@ -180,6 +180,11 @@ for(let r = 1 ; r <= 5 ; r ++){
     };
 };
 
+//投了ボタン
+const touryou_pop = document.getElementById("touryou_pop");
+touryou_pop.addEventListener("click",()=>{
+    activate_play_pop("投了しますか？")
+})
 
 //CPUが考えているときの。。。表示
 const thinking_time = document.createElement("div");
@@ -492,6 +497,13 @@ function button_Push(situation,button_text){
         socket.emit("check",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "check":"cancel", "current_turn":player_index});
         console.log("check送信");
     } 
+    if(((situation.includes("投了"))) && button_text == "yes"){
+        socket.emit("give_up",{});
+        console.log("give_up送信");
+    }
+    if(((situation.includes("投了"))) && button_text == "no"){
+        play_pop.classList.remove("is_active");
+    }
 }
 
 /*
