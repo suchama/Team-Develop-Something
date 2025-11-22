@@ -75,8 +75,12 @@ for(let r = 1 ; r <= 9 ; r ++){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
-                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
-                console.log("make_move送信")
+                if(player_index==1){
+                    socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                }else{
+                    socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: 9-c, y: 9-r, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                }
+                    console.log("make_move送信")
             }
         });
                 /* マウスが駒の上に来た時とはずれたときの操作 */
@@ -101,8 +105,11 @@ for(let r = 1 ; r <= 9 ; r ++){
                 img.style.filter = "brightness(200%)";
                 now_click = (0,(r,c))
                 //block.style.transition = "background-color 0s ease";
-                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
-                
+                if(player_index==1){
+                    socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                }else{
+                    socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: 9-c, y: 9-r, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                }
                 console.log("make_move送信")
             }
         });
@@ -312,8 +319,8 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
             turn_1.innerHTML = "YOU<br>(下)";
             turn_2.innerHTML = "対戦相手<br>(上)";
         }else{
-            turn_1.innerHTML = "YOU<br>(上)";
-            turn_2.innerHTML = "対戦相手<br>(下)";
+            turn_1.innerHTML = "YOU<br>(旧上)";
+            turn_2.innerHTML = "対戦相手<br>(旧下)";
         }
         console.log("初手＝こちら,自分のindex=",player_index)
     }
@@ -337,8 +344,8 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
             turn_1.innerHTML = "YOU<br>(下)";
             turn_2.innerHTML = "対戦相手<br>(上)";
         }else{
-            turn_1.innerHTML = "YOU<br>(上)";
-            turn_2.innerHTML = "対戦相手<br>(下)";
+            turn_1.innerHTML = "YOU<br>(旧上)";
+            turn_2.innerHTML = "対戦相手<br>(旧下)";
         }
         console.log("初手＝相手,自分のindex=",player_index)
     }
@@ -507,37 +514,63 @@ const img_index = {
                     1:"osho",2:"hisha",3:"kaku",4:"kin",5:"gin",6:"keima",7:"kyosha",8:"hohei",
                     22:"narihisha",23:"uma",25:"narigin",26:"narikeima",27:"narikyosha",28:"narihohei"
                     }//画像path指定に使う辞書
+let r_adjust = 0;
+let c_adjust = 0;
 function board_update(grid,tegoma){// grid[row][column]
     //将棋盤の盤面の更新
     for(let r = 1 ; r <= 9 ; r ++){
         for(let c = 1 ; c <= 9 ; c ++){/* r:row(行)　c:column(列) */
+            if (player_index == 1){
+                r_adjust = r;
+                c_adjust = c;
+            }else{
+                r_adjust = 10-r
+                c_adjust = 10-c
+            }
             if(grid[r-1][c-1] >=1 && grid[r-1][c-1] <=8 ){
-                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]]+".png";
-                img.style.transform = "rotate(0deg) translate(-50%,-50%)";//回転の基準は真ん中（デフォルト）
+                if(player_index == 1){
+                    img.style.transform = "rotate(0deg) translate(-50%,-50%)";//回転の基準は真ん中（デフォルト）
+                }else{
+                    img.style.transform = "rotate(180deg) translate(50%,50%)";
+                }
                 img.style.display = "block";
             }else if(grid[r-1][c-1] >=22 && grid[r-1][c-1] <=28 ){
-                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]]+".png";
-                img.style.transform = "rotate(0deg) translate(-50%,-50%)";//回転の基準は真ん中（デフォルト）
+                if(player_index == 1){
+                    img.style.transform = "rotate(0deg) translate(-50%,-50%)";//回転の基準は真ん中（デフォルト）
+                }else{
+                    img.style.transform = "rotate(180deg) translate(50%,50%)";
+                }
                 img.style.display = "block";
             }else if(grid[r-1][c-1] >=11 && grid[r-1][c-1] <=18 ){//相手の駒（つまり回転させる）
-                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]-10]+".png";
-                img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                if(player_index == 1){
+                    img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                }else{
+                    img.style.transform = "rotate(0deg) translate(-50%,-50%)";
+                }
                 img.style.display = "block";
             }else if(grid[r-1][c-1] >=22 && grid[r-1][c-1] <=28 ){//相手の駒(つまり回転させる)
-                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]-10]+".png";
-                img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                if(player_index == 1){
+                    img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                }else{
+                    img.style.transform = "rotate(0deg) translate(-50%,-50%)";
+                }
                 img.style.display = "block";
             }else{
-                const img = document.getElementById(`komaimg_r${r}_c${c}`);
+                const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
                 img.style.display = "none";
             }
         }
     }
     rearrange(tegoma);//ここで自分と相手の手ごまを、描画用に並べなおしてtegoma_gridに入れる
+    console.log("手ごまのデータ：",tegoma)
     //自分の手ごま描画　使うデータ：tegoma_grid[player_index] 表示する手ごま板:tegoma1
     for(let r = 1 ; r <= 5 ; r ++){
         for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
@@ -598,8 +631,15 @@ function blight(blt){
     for(let i = 0; i < blt.length; i ++){
         let c = blt[i][0]+1;/* data["blight_list"]のi+1個目の要素のx座標 */
         let r = blt[i][1]+1;
-        const bltkoma = document.getElementById(`komablock_r${r}_c${c}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
-        const bltkoma_img = document.getElementById(`komaimg_r${r}_c${c}`);
+        if (player_index == 1){
+            r_adjust = r;
+            c_adjust = c;
+        }else{
+            r_adjust = 10-r
+            c_adjust = 10-c
+        }
+        const bltkoma = document.getElementById(`komablock_r${r_adjust}_c${c_adjust}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
+        const bltkoma_img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
         bltkoma.style.transition = "background-color 0.1s ease";
         bltkoma.style.backgroundColor = "rgba(254, 255, 235, 1)";
         bltkoma_img.style.filter = "brightness(200%)";
@@ -611,8 +651,15 @@ function cansel_bright(blt){
     for(let i = 0; i < blt.length; i ++){
         let c = blt[i][0]+1;/* data["blight_list"]のi+1個目の要素のx座標 */
         let r = blt[i][1]+1;
-        const bltkoma = document.getElementById(`komablock_r${r}_c${c}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
-        const bltkoma_img = document.getElementById(`komaimg_r${r}_c${c}`);
+        if (player_index == 1){
+            r_adjust = r;
+            c_adjust = c;
+        }else{
+            r_adjust = 10-r
+            c_adjust = 10-c
+        }
+        const bltkoma = document.getElementById(`komablock_r${r_adjust}_c${c_adjust}`); /* 光らせる要素を座標を含むidからgetしてbltkomaに代入する */
+        const bltkoma_img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
         bltkoma.style.transition = "background-color 0s ease";
         bltkoma.style.backgroundColor = "rgb(208, 195, 70)";/* 元の色に戻す */
         bltkoma_img.style.filter = "brightness(100%)";
