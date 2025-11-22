@@ -492,6 +492,7 @@ def handle_make_AI_move(data):
         gamestate[key]["current_turn"] = outcome["current_turn"]
         if game == "shogi" or game == "gungi":
             gamestate[key]["tegoma"] = outcome["tegoma"]
+            print("AIの手後の手駒:", gamestate[key]["tegoma"])
         # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
         swich_turn_god(game, mode, match)
         return

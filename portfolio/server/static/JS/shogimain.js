@@ -253,7 +253,7 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
     if (game_mode == "pvc"){//相手がAIなら「。。。」の表示消す
         thinking_time.classList.remove("is_active");
     }
-    if (!(data["reason"] == "opponent_disconnected")){
+    if (!(data["reason"] == "opponent_disconnected") && !(data["reason"] == "give_up")){
         board_update(data["board"],gamestate["tegoma"]);
         console.log(data["board"]);
         console.log("最後のboard_update（盤面更新）");
