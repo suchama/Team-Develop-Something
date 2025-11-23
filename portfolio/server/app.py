@@ -14,7 +14,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # SocketIO：サーバーとクライアントどちらにもインストールされていると双方向通信が可能
 # cors_allowed_origins="*" → 別ドメインからの接続を許可
 # socketio.run()でサーバーを起動できるようになる
-
+#a
 game_name = {}
 # 各ゲームのロジックファイルを辞書型で管理
 gamestate = {}
