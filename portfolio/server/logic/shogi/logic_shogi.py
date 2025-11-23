@@ -53,7 +53,7 @@ def get_valid_moves(board: List[List[int]],
                     continue
                 if not _can_drop_on_rank(piece, y, player):     #行き場なし
                     continue
-                moves.append([x, y])
+                moves.append((x, y))
         return moves
     return [[]]
 
@@ -86,6 +86,10 @@ def handle_player_move(board: List[List[int]],
         piece  = b.grid[y0][x0]
         to_piece = b.grid[y1][x1]
 
+        # 勝敗判定
+        if to_piece % 10 == 1:
+            gs.winner = gs.current_turn
+        
         # 敵駒を取る場合
         if to_piece != 0 and b.is_enemy(to_piece, player):
             koma_type = b.unpromote(to_piece) % 10
@@ -115,8 +119,6 @@ def handle_player_move(board: List[List[int]],
         if gs.hands[player][piece] == 0:
             del gs.hands[player][piece]
 
-    # 勝敗判定
-    gs.check_winner()
     if gs.winner is None:
         gs.switch_turn()
     
@@ -180,11 +182,13 @@ def handle_ai_move(gamestate_dict: Dict,
         base = b.unpromote(captured) % 10
         gs.hands[turn][base] = gs.hands[turn].get(base, 0) + 1
 
+    # 勝敗判定
+    if captured % 10 == 1:
+        gs.winner = gs.current_turn
 
     gs = GameState()
     gs.current_turn = turn
     gs.hands = gamestate_dict["tegoma"]
-    gs.check_winner()
     if gs.winner is None:
         gs.switch_turn()
 
