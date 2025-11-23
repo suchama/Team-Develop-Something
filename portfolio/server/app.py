@@ -608,7 +608,7 @@ def handle_check(data):
     x, y = gamestate[key]["selected_pos"]
     player = data["current_turn"]
     board = gamestate[key]["board"]
-    tegoma = gamestate[key]["tegoma"]
+    tegoma = gamestate[key]["tegoma"][player]
 
     socketio.emit("cansel_bright", {}, to = request.sid)
     # 光らせている場所を消す
