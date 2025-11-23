@@ -320,13 +320,9 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
         player_index = gamestate["current_turn"];
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
         current_turn = "slf";
-        if(player_index == 1){
-            turn_1.innerHTML = "YOU<br>(下)";
-            turn_2.innerHTML = "対戦相手<br>(上)";
-        }else{
-            turn_1.innerHTML = "YOU<br>(旧上)";
-            turn_2.innerHTML = "対戦相手<br>(旧下)";
-        }
+        turn_1.innerHTML = "YOU";//<br>(下)";
+        turn_2.innerHTML = "対戦相手";//<br>(上)";
+
         console.log("初手＝こちら,自分のindex=",player_index)
     }
     turn_1.classList.add("now");
@@ -345,13 +341,10 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
         player_index = gamestate["current_turn"] % 2 + 1;
         player_index_detect = true;//一度（最初）しか自分のindexをうけとらない
         current_turn = "opp";
-        if(player_index == 1){
-            turn_1.innerHTML = "YOU<br>(下)";
-            turn_2.innerHTML = "対戦相手<br>(上)";
-        }else{
-            turn_1.innerHTML = "YOU<br>(旧上)";
-            turn_2.innerHTML = "対戦相手<br>(旧下)";
-        }
+
+        turn_1.innerHTML = "YOU";//<br>(下)";
+        turn_2.innerHTML = "対戦相手";//<br>(上)";
+
         console.log("初手＝相手,自分のindex=",player_index)
     }
     turn_1.classList.remove("now");
