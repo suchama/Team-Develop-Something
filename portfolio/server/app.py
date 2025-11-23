@@ -376,6 +376,7 @@ def handle_make_move(data):
             # 光らせている場所を消す
             if place == "tegoma":
             # 手駒には動かせないのでエラー
+                gamestate[key]["move_check"] = []
                 socketio.emit("error", {"msg": "手駒には移動できません"}, to = request.sid)
                 return
             if (x,y) in gamestate[key]["move_check"]:
