@@ -86,6 +86,10 @@ def handle_player_move(board: List[List[int]],
         piece  = b.grid[y0][x0]
         to_piece = b.grid[y1][x1]
 
+        # 勝敗判定
+        if to_piece % 10 == 1:
+            gs.winner = gs.current_turn
+        
         # 敵駒を取る場合
         if to_piece != 0 and b.is_enemy(to_piece, player):
             koma_type = b.unpromote(to_piece) % 10
@@ -116,7 +120,8 @@ def handle_player_move(board: List[List[int]],
             del gs.hands[player][piece]
 
     # 勝敗判定
-    gs.check_winner()
+    
+    print(f"winner : {gs.winner}")
     if gs.winner is None:
         gs.switch_turn()
     
