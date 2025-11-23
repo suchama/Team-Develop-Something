@@ -258,12 +258,21 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
         console.log(data["board"]);
         console.log("最後のboard_update（盤面更新）");
     }
-    setTimeout(() => {
+    setTimeout(() => {//相手の切断→こちらの勝ち
         if (data["reason"] == "opponent_disconnected"){
             activate_pop(["YOU WIN"], ["もう一度","止める"]);
         }
-////////////////////////どっちが勝者か判定してそれをもとにpop出す
     },1000)
+
+    if(data["reason"] == "give_up"){//どちらかの投了
+        setTimeout(() => {
+            if (data["winner"] == player_index){
+                activate_pop(["YOU WIN","相手が投了しました"], ["もう一度","止める"]);
+            }else{
+               activate_pop(["YOU LOSE","投了しました"], ["もう一度","止める"]); 
+            }
+        },1000)
+    }
     console.log("game_over受信")
 });
 
