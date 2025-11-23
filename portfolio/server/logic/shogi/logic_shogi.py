@@ -119,9 +119,6 @@ def handle_player_move(board: List[List[int]],
         if gs.hands[player][piece] == 0:
             del gs.hands[player][piece]
 
-    # 勝敗判定
-    
-    print(f"winner : {gs.winner}")
     if gs.winner is None:
         gs.switch_turn()
     
@@ -185,11 +182,13 @@ def handle_ai_move(gamestate_dict: Dict,
         base = b.unpromote(captured) % 10
         gs.hands[turn][base] = gs.hands[turn].get(base, 0) + 1
 
+    # 勝敗判定
+    if captured % 10 == 1:
+        gs.winner = gs.current_turn
 
     gs = GameState()
     gs.current_turn = turn
     gs.hands = gamestate_dict["tegoma"]
-    gs.check_winner()
     if gs.winner is None:
         gs.switch_turn()
 
