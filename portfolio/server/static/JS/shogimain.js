@@ -53,46 +53,30 @@ for(let r = 1 ; r <= 9 ; r ++){
         img.style.top = `${11*r-5}%`;
         img.style.left = `${11*c-5}%`;
 
-        /* マウスが駒の上に来た時とはずれたときの操作 */
-        block.addEventListener('mouseenter', () =>{
-            if(current_turn == "slf"){
-                //block.style.transition = "background-color 0.3s ease";
-                //block.style.backgroundColor = "rgb(249, 255, 167)";
-            }
-        });
-        block.addEventListener('mouseleave', () =>{
-            //block.style.transition = "background-color 0s ease";
-            //block.style.backgroundColor = "rgb(208, 195, 70)";
-        });
-        /* クリックされたら送信する */
+        //クリックされたとき→make_move送信 
         block.addEventListener('click', () =>{
             if (current_turn == "slf" && click_ok == true){
-                //block.style.backgroundColor = "rgb(249, 255, 167)";
-                block.style.transition = "background-color 0s ease";
                 if(player_index==1){
                     socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                 }else{
+                    //player_indexが２の時は画像が反転しているので座標を調整
                     socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: 9-c, y: 9-r, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                 }
                     console.log("make_move送信")
             }
         });
-                /* マウスが駒の上に来た時とはずれたときの操作 */
+        //マウスが駒の上にあるときのみ光らせる
         img.addEventListener('mouseenter', () =>{
             if(current_turn == "slf" && click_ok == true){
-                //block.style.transition = "background-color 0.3s ease";
-                //block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
             }
         });
         img.addEventListener('mouseleave', () =>{
             if(current_turn == "slf"){
-                //block.style.transition = "background-color 0s ease";
-                //block.style.backgroundColor = "rgb(208, 195, 70)";
                 img.style.filter = "brightness(100%)";
             }
         });
-        /* クリックされたら送信する */
+        //クリックされたとき→make_move送信 
         img.addEventListener('click', () =>{
             if (current_turn == "slf" && click_ok == true){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
@@ -111,7 +95,7 @@ for(let r = 1 ; r <= 9 ; r ++){
 //<手ごま>
 //手ごま_1（自分（右下））
 for(let r = 1 ; r <= 5 ; r ++){
-    for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
+    for(let c = 1 ; c <= 4 ; c ++){// r:row(行)　c:column(列)
         const block = document.createElement("div");
         document.getElementById("tegoma1").appendChild(block);
         block.classList.add("tegomablock");
