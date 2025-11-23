@@ -393,10 +393,10 @@ def handle_make_move(data):
                 if outcome["winner"] is not None:
                     gamestate[key]["winner"] = outcome["winner"]
                     if mode == "pvp":
-                        socketio.emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]}, room = key)
+                        socketio.emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"]}, room = key)
                         send_signal(key, "game_over")
                     else:
-                        socketio.emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"], "scores": outcome["scores"]})
+                        socketio.emit("game_over", {"board": gamestate[key]["board"], "tegoma": outcome["tegoma"]})
                         send_signal(key, "game_over")
                     return
                 else:
@@ -667,7 +667,6 @@ def handle_finish(data):
         socketio.emit("game_continue", {})
         # html側はリロードして最初の画面に戻る
         return
-    ß
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=8000)
