@@ -399,6 +399,15 @@
     animation: blight-to-normal 1.0s linear;
 }
 
+
+.hover_light:hover{
+    filter: brightness(200%);
+}
+
+
+
+
+
 /*カスケード順(コードの上から順）に読み込むのでこれは最後に置いておく*/
 .hide{
     display: none;
