@@ -661,12 +661,12 @@ def handle_finish(data):
         leave_room(room, sid=gamestate[key]["player_1"])
         leave_room(room, sid=gamestate[key]["player_2"])
     if choose == "end":
-        socketio.emit("game_end", {})
+        socketio.emit("game_end", {} , to = request.sid)
         return
     elif choose == "continue":
-        socketio.emit("game_continue", {})
+        socketio.emit("game_continue", {} , to = request.sid)
         # html側はリロードして最初の画面に戻る
         return
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=8000)
+    socketio.run(app, host='0.0.0.0', port=8000 , debug=False)
