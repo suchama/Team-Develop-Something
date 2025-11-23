@@ -1,6 +1,4 @@
-
-//aiueo
-//socket使うときに解放する
+//将棋の表示(JavaScript) 
 const socket = io(); // Flask-SocketIOならこのURL
 
 //接続した時に実行される
@@ -8,24 +6,26 @@ socket.on('connect', () => {
 console.log('接続成功');
 });
 
-//プレイが始まるまでにやること------------------------------------------------------
-//まずモードを送信　例えば("pvp",{game:"othello"})
+//プレイが始まるまでにやること（上から時系列順------------------------------------------------------
+//まずモードをapp.pyに送信　例えば("pvp",{game:"othello"})
 const game_mode = document.getElementById("mode").textContent.trim();
 const game = document.getElementById("game").textContent.trim();
 socket.emit(game_mode, { "game": game })
 
-//相手探し中
-let current_turn = false;//"slf"/"opp"...主に自分が入力可能な状態かを判定する。game_data受信のところで処理。
+
 const pop = document.getElementById("popBG");
 const hidaripop = document.getElementById("hidaripopBG");
 const popuptext = document.getElementById("popUpper");
+//対戦相手待ち...waiting受信処理→pop表示
 socket.on('waiting', (data) => {/* emit("waiting", {"msg": "相手を待っています..."}) */
     activate_pop([data["msg"]],["ゲーム選択画面に戻る"])
+    console.log("waiting受信");
 });
 
-// startさせる
+
 let count_matches = 0/* 起動してから何試合したか */
-let gamestate = 0
+let gamestate = 0;
+//ゲームスタート...start_game受信処理→一度目の種々のデータ受信
 socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate[key], "count_matche"s: count_matches}) */
     count_matches = data["count_matches"];/* 受け取ったデータをこっち側にも保存 */
     gamestate = data["gamestate"];//gamestate["othello"]は"board","current_turn","remaining_time"(→1,2のキーに残り秒数が入っている)
@@ -35,10 +35,8 @@ socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate
 });
 
 
-//画面作成-----------------------------------------------------------
-let now_click = (0,(0,0))//(s,(row,column)) s...0:メイン 1:自分の手ごま　2:相手の手ごま
-let choose = (true,0)//0:board上のどこか 1:自分の手ごま 2:相手の手ごま
-/* メインのボード */
+//画面作成
+//<メインのボード>
 for(let r = 1 ; r <= 9 ; r ++){
     for(let c = 1 ; c <= 9 ; c ++){/* r:row(行)　c:column(列) */
         const block = document.createElement("div");
@@ -70,7 +68,6 @@ for(let r = 1 ; r <= 9 ; r ++){
         block.addEventListener('click', () =>{
             if (current_turn == "slf" && click_ok == true){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
-                now_click = (0,(r,c))
                 block.style.transition = "background-color 0s ease";
                 if(player_index==1){
                     socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
@@ -100,7 +97,6 @@ for(let r = 1 ; r <= 9 ; r ++){
             if (current_turn == "slf" && click_ok == true){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
-                now_click = (0,(r,c))
                 //block.style.transition = "background-color 0s ease";
                 if(player_index==1){
                     socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
@@ -112,8 +108,8 @@ for(let r = 1 ; r <= 9 ; r ++){
         });
     };
 };
-//手ごま
-//手ごま_1(自分)
+//<手ごま>
+//手ごま_1（自分（右下））
 for(let r = 1 ; r <= 5 ; r ++){
     for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
         const block = document.createElement("div");
@@ -150,7 +146,6 @@ for(let r = 1 ; r <= 5 ; r ++){
             if (current_turn == "slf" && click_ok == true){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 img.style.filter = "brightness(200%)";
-                now_click = (1,(r,c))
                 //block.style.transition = "background-color 0s ease";
                 socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][4*(c-1)+5*(r-1)]  , "current_player": player_index});
                 console.log("make_move送信")
@@ -158,7 +153,7 @@ for(let r = 1 ; r <= 5 ; r ++){
         });
     };
 };
-//手ごま_2(相手)(クリックはできない)
+//手ごま_2（相手（左上））（クリックはできない）
 for(let r = 1 ; r <= 5 ; r ++){
     for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
         const block = document.createElement("div");
@@ -266,10 +261,10 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
 
     if(data["reason"] == "give_up"){//どちらかの投了
         setTimeout(() => {
-            if (data["winner"] == player_index){
+            if (data["winner"] == `player_${player_index}`){
                 activate_pop(["YOU WIN","相手が投了しました"], ["もう一度","止める"]);
             }else{
-               activate_pop(["YOU LOSE","投了しました"], ["もう一度","止める"]); 
+                activate_pop(["YOU LOSE","投了しました"], ["もう一度","止める"]); 
             }
         },1000)
     }
