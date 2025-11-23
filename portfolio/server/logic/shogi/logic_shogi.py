@@ -53,7 +53,7 @@ def get_valid_moves(board: List[List[int]],
                     continue
                 if not _can_drop_on_rank(piece, y, player):     #行き場なし
                     continue
-                moves.append([x, y])
+                moves.append((x, y))
         return moves
     return [[]]
 
