@@ -475,19 +475,23 @@ def handle_make_AI_move(data):
     outcome = game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
     #outcome = {"board_grid": board.grid,"current_turn": current_turn, "winner": gamestate.winner,"scores": {"black": black_count, "white": white_count}}
     #オセロならスコア、将棋、軍議なら手駒も更新される。
-    if "winner" in gamestate[key] and game == "othello":
+    if outcome["winner"] != None and game == "othello":
         if mode == "pvp":
+            gamestate[key]["winner"] = outcome["winner"]
             socketio.emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]}, room = key)
             send_signal(key, "game_over")
         else:
+            gamestate[key]["winner"] = outcome["winner"]
             socketio.emit("game_over", {"board": gamestate[key]["board"], "scores": outcome["scores"]})
             send_signal(key, "game_over")
         return
-    elif "winner" in gamestate[key] and (game == "shogi" or game == "gungi"):
+    elif outcome["winner"] != None and (game == "shogi" or game == "gungi"):
         if mode == "pvp":
+            gamestate[key]["winner"] = outcome["winner"]
             socketio.emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]}, room = key)
             send_signal(key, "game_over")
         else:
+            gamestate[key]["winner"] = outcome["winner"]
             socketio.emit("game_over", {"board": gamestate[key]["board"], "tegoma": gamestate[key]["tegoma"]})
             send_signal(key, "game_over")
         return
