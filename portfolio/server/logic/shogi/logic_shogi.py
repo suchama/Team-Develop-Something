@@ -155,40 +155,43 @@ def handle_ai_move(gamestate_dict: Dict,
     b = Board()
     b.grid = [row[:] for row in gamestate_dict["board"]]
     gs  = GameState()
-    turn = current_turn
+    gs.hands = gamestate_dict["tegoma"]
+    player = current_turn
 
     moves = []
     for y in range(9):
         for x in range(9):
-            if b.is_own(b.grid[y][x], turn):
-                for (nx,ny) in b.get_valid_moves(x, y, turn):   # nx,nyはnextの手
+            if b.is_own(b.grid[y][x], player):
+                for (nx,ny) in b.get_valid_moves(x, y, player):   # nx,nyはnextの手
                     moves.append(((x,y),(nx,ny)))
 
     if not moves:
         return {
             "board_grid": b.grid,
-            "current_turn": turn,
+            "current_turn": player,
             "winner": None,
             "tegoma": gamestate_dict["tegoma"]
         }
 
     (x0,y0),(x1,y1) = random.choice(moves)
     piece = b.grid[y0][x0]
+
+    # 駒を取ったときの処理（AI側）
+    to_piece = b.grid[y1][x1]
+    if to_piece != 0 and b.is_enemy(to_piece, player):
+        koma_type = b.unpromote(to_piece) % 10
+        gs.hands[player][koma_type] = gs.hands[player].get(koma_type, 0) + 1
+        print(f"komatottayo : {gs.hands[player][koma_type]}")
+        
+    # 勝敗判定
+    if to_piece % 10 == 1:
+        gs.winner = gs.current_turn
+
+    # 盤面に反映
     b.grid[y1][x1] = piece
     b.grid[y0][x0] = 0
 
-    # 駒を取ったときの処理（AI側）
-    captured = b.grid[y1][x1]
-    if captured != 0 and b.is_enemy(captured, turn):
-        base = b.unpromote(captured) % 10
-        gs.hands[turn][base] = gs.hands[turn].get(base, 0) + 1
-
-    # 勝敗判定
-    if captured % 10 == 1:
-        gs.winner = gs.current_turn
-
-    gs.current_turn = turn
-    gs.hands = gamestate_dict["tegoma"]
+    gs.current_turn = player
     if gs.winner is None:
         gs.switch_turn()
 

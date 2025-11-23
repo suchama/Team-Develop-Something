@@ -1,1 +1,1 @@
-score
+gamestate[key]
