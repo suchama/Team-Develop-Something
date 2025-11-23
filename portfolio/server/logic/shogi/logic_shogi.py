@@ -154,6 +154,7 @@ def handle_ai_move(gamestate_dict: Dict,
     """
     b = Board()
     b.grid = [row[:] for row in gamestate_dict["board"]]
+    gs  = GameState()
     turn = current_turn
 
     moves = []
@@ -186,7 +187,6 @@ def handle_ai_move(gamestate_dict: Dict,
     if captured % 10 == 1:
         gs.winner = gs.current_turn
 
-    gs = GameState()
     gs.current_turn = turn
     gs.hands = gamestate_dict["tegoma"]
     if gs.winner is None:
