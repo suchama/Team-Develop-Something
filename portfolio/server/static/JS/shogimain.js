@@ -30,9 +30,9 @@ let gamestate = 0
 socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate[key], "count_matche"s: count_matches}) */
     count_matches = data["count_matches"];/* 受け取ったデータをこっち側にも保存 */
     gamestate = data["gamestate"];//gamestate["othello"]は"board","current_turn","remaining_time"(→1,2のキーに残り秒数が入っている)
-    board_update(gamestate["board"],gamestate["tegoma"]);
-    time_1.textContent = String(gamestate["remaining_time"][1]);//初期時間がそれぞれ異なる場合はそれを判別できないのできつい
-    time_2.textContent = String(gamestate["remaining_time"][2]);
+    //board_update(gamestate["board"],gamestate["tegoma"]);
+    //time_1.textContent = String(gamestate["remaining_time"][1]);//初期時間がそれぞれ異なる場合はそれを判別できないのできつい
+    //time_2.textContent = String(gamestate["remaining_time"][2]);
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
     console.log("start_game受信");
 });
@@ -183,7 +183,9 @@ for(let r = 1 ; r <= 5 ; r ++){
 //投了ボタン
 const touryou_pop = document.getElementById("touryou_pop");
 touryou_pop.addEventListener("click",()=>{
-    activate_play_pop("投了しますか？")
+    if(click_ok == true){
+        activate_play_pop("投了しますか？")
+    }
 })
 
 //CPUが考えているときの。。。表示
@@ -331,7 +333,9 @@ socket.on("your_turn",()=>{//データなし。ターンが切り替わっただ
         current_turn = "slf";
         turn_1.innerHTML = "YOU";//<br>(下)";
         turn_2.innerHTML = "対戦相手";//<br>(上)";
-
+        time_1.textContent = String(gamestate["remaining_time"][player_index]);
+        time_2.textContent = String(gamestate["remaining_time"][player_index%2+1]);
+        board_update(gamestate["board"],gamestate["tegoma"]);
         console.log("初手＝こちら,自分のindex=",player_index)
     }
     turn_1.classList.add("now");
@@ -353,7 +357,9 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
 
         turn_1.innerHTML = "YOU";//<br>(下)";
         turn_2.innerHTML = "対戦相手";//<br>(上)";
-
+        time_1.textContent = String(gamestate["remaining_time"][player_index]);
+        time_2.textContent = String(gamestate["remaining_time"][player_index%2+1]);
+        board_update(gamestate["board"],gamestate["tegoma"]);
         console.log("初手＝相手,自分のindex=",player_index)
     }
     turn_1.classList.remove("now");
@@ -418,6 +424,7 @@ function getRandomInt(min, max) {
 
 let timerID_MainPop= false;
 function activate_pop(text,buttonText){//text=["一行目","二行目",...], buttonText=["a","b","c"]
+    click_ok = false;
     if(pop.classList.contains("is_active")){//既にポップが表示されていたらリセットする
         if (!(timerID_MainPop == false)){
             clearTimeout(timerID_MainPop);
@@ -528,11 +535,12 @@ function button_Push(situation,button_text){
 */
 const img_index = {
                     1:"osho",2:"hisha",3:"kaku",4:"kin",5:"gin",6:"keima",7:"kyosha",8:"hohei",
-                    22:"narihisha",23:"uma",25:"narigin",26:"narikeima",27:"narikyosha",28:"narihohei"
+                    22:"narihisha",23:"uma",25:"narigin",26:"narikeima",27:"narikyosha",28:"narihohei",11:"gyokusho"
                     }//画像path指定に使う辞書
 let r_adjust = 0;
 let c_adjust = 0;
 function board_update(grid,tegoma){// grid[row][column]
+    console.log("player_index:",player_index)
     //将棋盤の盤面の更新
     for(let r = 1 ; r <= 9 ; r ++){
         for(let c = 1 ; c <= 9 ; c ++){/* r:row(行)　c:column(列) */
@@ -561,7 +569,16 @@ function board_update(grid,tegoma){// grid[row][column]
                     img.style.transform = "rotate(180deg) translate(50%,50%)";
                 }
                 img.style.display = "block";
-            }else if(grid[r-1][c-1] >=11 && grid[r-1][c-1] <=18 ){//相手の駒（つまり回転させる）
+            }else if(grid[r-1][c-1] ==11){
+                const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
+                img.src = "../static/JS/shogi_image/gyokusho.png";
+                if(player_index == 1){
+                    img.style.transform = "rotate(180deg) translate(50%,50%)";//回転の基準は真ん中（デフォルト）
+                }else{
+                    img.style.transform = "rotate(0deg) translate(-50%,-50%)";
+                }
+                img.style.display = "block";
+            }else if(grid[r-1][c-1] >=12 && grid[r-1][c-1] <=18 ){//相手の駒（つまり回転させる）
                 const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}`);
                 img.src = "../static/JS/shogi_image/"+img_index[grid[r-1][c-1]-10]+".png";
                 if(player_index == 1){
