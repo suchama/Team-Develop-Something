@@ -366,7 +366,7 @@ function button_Push(situation,button_text){
     }
     if(button_text == "ゲーム選択画面に戻る"){
         console.log("ゲーム選択画面に戻ります");
-        window.location.href = "../";//../でさっきまで開いていたhtmlに飛ぶっぽい
+        window.location.href = "../";//../でさっきまで開いていたhtmlに飛ぶ
     }
 }
 

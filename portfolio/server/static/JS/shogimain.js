@@ -19,9 +19,8 @@ let current_turn = false;//"slf"/"opp"...主に自分が入力可能な状態か
 const pop = document.getElementById("popBG");
 const hidaripop = document.getElementById("hidaripopBG");
 const popuptext = document.getElementById("popUpper");
-/* waitは最初かくしておいてwaitがきたら出現させる 消すときどうしよう...*/
 socket.on('waiting', (data) => {/* emit("waiting", {"msg": "相手を待っています..."}) */
-    activate_pop([data["msg"]],[])
+    activate_pop([data["msg"]],["ゲーム選択画面に戻る"])
 });
 
 // startさせる
@@ -30,10 +29,8 @@ let gamestate = 0
 socket.on('start_game', (data) => {/* emit("start_game", {"gamestate": gamestate[key], "count_matche"s: count_matches}) */
     count_matches = data["count_matches"];/* 受け取ったデータをこっち側にも保存 */
     gamestate = data["gamestate"];//gamestate["othello"]は"board","current_turn","remaining_time"(→1,2のキーに残り秒数が入っている)
-    //board_update(gamestate["board"],gamestate["tegoma"]);
-    //time_1.textContent = String(gamestate["remaining_time"][1]);//初期時間がそれぞれ異なる場合はそれを判別できないのできつい
-    //time_2.textContent = String(gamestate["remaining_time"][2]);
     pop.classList.remove("is_active");/* 表示されていたらpopを消す */
+    on_playing = true
     console.log("start_game受信");
 });
 
@@ -181,9 +178,10 @@ for(let r = 1 ; r <= 5 ; r ++){
 };
 
 //投了ボタン
+let on_playing = false
 const touryou_pop = document.getElementById("touryou_pop");
 touryou_pop.addEventListener("click",()=>{
-    if(click_ok == true){
+    if(on_playing == true){
         activate_play_pop("投了しますか？")
     }
 })
@@ -306,6 +304,7 @@ socket.on('pass', (data) => {/* emit("pass", {"current_turn": gamestate[key]["cu
     timerID_MainPop = setTimeout(() => {
     // 1秒後に実行される非表示処理
         pop.classList.remove("is_active");
+        on_playing = true;
     }, 1000); // 単位はミリ秒（1000ms = 1秒）
 });
 
@@ -316,6 +315,7 @@ socket.on('time_out', (data) => {// emit("time_out", {}, room=key)
     setTimeout(() => {
     // 1秒後に実行される非表示処理
         pop.classList.remove("is_active");
+        on_playing = true;
     }, 1000); // 単位はミリ秒（1000ms = 1秒）
 });
 
@@ -360,7 +360,7 @@ socket.on("opponent_turn",()=>{//データなし。ターンが切り替わっ�
         time_1.textContent = String(gamestate["remaining_time"][player_index]);
         time_2.textContent = String(gamestate["remaining_time"][player_index%2+1]);
         board_update(gamestate["board"],gamestate["tegoma"]);
-        console.log("初手＝相手,自分のindex=",player_index)
+        console.log("初手＝相手,自分のindex=",player_index);
     }
     turn_1.classList.remove("now");
     time_1.classList.remove("now");
@@ -383,11 +383,11 @@ socket.on('time_update', (data)=>{/* socketio.emit("time_update", {
                                   }, room=key) */
     if (player_index == data["current_turn"]){
         time_1.textContent = String(data["remaining_time"]);
-        console.log("time_update受信","playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
+        //console.log("time_update受信","playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
     }
     if (!(player_index == data["current_turn"])){
         time_2.textContent = String(data["remaining_time"]);
-        console.log("time_update受信","playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
+        //console.log("time_update受信","playerのターンindex:",player_index,"現在のターン：",data["current_turn"],"残り時間",data["remaining_time"]);
     }
 })
 
@@ -425,6 +425,7 @@ function getRandomInt(min, max) {
 let timerID_MainPop= false;
 function activate_pop(text,buttonText){//text=["一行目","二行目",...], buttonText=["a","b","c"]
     click_ok = false;
+    on_playing = false;
     if(pop.classList.contains("is_active")){//既にポップが表示されていたらリセットする
         if (!(timerID_MainPop == false)){
             clearTimeout(timerID_MainPop);
@@ -448,18 +449,21 @@ function activate_pop(text,buttonText){//text=["一行目","二行目",...], but
         button.textContent = buttonText[i-1];
         if (number_of_button == 1){
             button.style.left = `${i*50}%`;
+            button.style.aspectRatio = "2/1";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 2){
             button.style.left = `${i*50-25}%`;
+            button.style.aspectRatio = "3/2";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
         }
         if (number_of_button == 3){
             button.style.left = `${i*33-16}%`;
+            button.style.aspectRatio = "1/1";
             button.addEventListener("click",()=>{
                 button_Push(ready_text,buttonText[i-1])
             })
@@ -490,6 +494,10 @@ function activate_play_pop(text){
 
 
 function button_Push(situation,button_text){
+    if(button_text == "ゲーム選択画面に戻る"){
+        console.log("ゲーム選択画面に戻ります");
+        window.location.href = "../";//../でさっきまで開いていたhtmlに飛ぶ
+    }
     if(((situation.includes("WIN"))||(situation.includes("LOSE"))||(situation.includes("DRAW"))) && button_text == "もう一度"){
         socket.emit("finish",{"game": "shogi", "mode":game_mode, "count_match": count_matches, "end_or_continue": "continue"});
         console.log("finish(countinue)送信");
@@ -540,7 +548,6 @@ const img_index = {
 let r_adjust = 0;
 let c_adjust = 0;
 function board_update(grid,tegoma){// grid[row][column]
-    console.log("player_index:",player_index)
     //将棋盤の盤面の更新
     for(let r = 1 ; r <= 9 ; r ++){
         for(let c = 1 ; c <= 9 ; c ++){/* r:row(行)　c:column(列) */
