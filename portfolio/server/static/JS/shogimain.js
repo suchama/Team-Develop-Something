@@ -239,7 +239,7 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
     }
     setTimeout(() => {//相手の切断→こちらの勝ち
         if (data["reason"] == "opponent_disconnected"){
-            activate_pop(["YOU WIN"], ["もう一度","止める"]);
+            activate_pop(["YOU WIN","相手が切断しました"], ["もう一度","止める"]);
         }
     },1000)
 
@@ -257,13 +257,13 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
 
 socket.on("game_over_win",(data) => {
     setTimeout(() => {
-            activate_pop(["YOU WIN"], ["もう一度","止める"]);
+            activate_pop(["YOU WIN","終局です"], ["もう一度","止める"]);
     },1000)
 })
 
 socket.on("game_over_lose",(data) => {
     setTimeout(() => {
-            activate_pop(["YOU LOSE"], ["もう一度","止める"]);
+            activate_pop(["YOU LOSE","終局です"], ["もう一度","止める"]);
     },1000)
 })
 
