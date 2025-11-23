@@ -98,14 +98,15 @@ def handle_disconnect():
                     winner_sid = p1
 
                 # 勝者を確定して通知
-                state["winner"] = "player_1" if sid == p2 else "player_2"
-                print(f"{key}: 切断による勝敗確定 → {state['winner']} の勝ち")
+                if "winner" not in state:
+                    state["winner"] = "player_1" if sid == p2 else "player_2"
+                    print(f"{key}: 切断による勝敗確定 → {state['winner']} の勝ち")
 
-                if winner_sid != "AI":
-                    socketio.emit("game_over", {
-                        "reason": "opponent_disconnected",
-                        "winner": state["winner"]
-                    }, to=winner_sid)
+                    if winner_sid != "AI":
+                        socketio.emit("game_over", {
+                            "reason": "opponent_disconnected",
+                            "winner": state["winner"]
+                        }, to=winner_sid)
 
             break
 
@@ -269,16 +270,17 @@ def handle_give_up(data):
                     winner_sid = p1
             
                 # 勝者を確定して通知
-                state["winner"] = "player_1" if sid == p2 else "player_2"
-                socketio.emit("game_over", {
-                    "reason": "give_up",
-                    "winner": state["winner"]
-                }, to = winner_sid)
+                if "winner" not in state:
+                    state["winner"] = "player_1" if sid == p2 else "player_2"
+                    socketio.emit("game_over", {
+                        "reason": "give_up",
+                        "winner": state["winner"]
+                    }, to = winner_sid)
 
-                socketio.emit("game_over", {
-                    "reason": "give_up",
-                    "winner": state["winner"]
-                }, to = sid)
+                    socketio.emit("game_over", {
+                        "reason": "give_up",
+                        "winner": state["winner"]
+                    }, to = sid)
 
             return
 
