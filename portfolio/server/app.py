@@ -368,7 +368,7 @@ def handle_make_move(data):
                 return
             else:
             # 選択した駒が動けない場合
-                socketio.emit("error", {"msg": "動かせません"}, to = request.sid)
+                socketio.emit("error", {"msg": "その駒は動かせません"}, to = request.sid)
                 return
         else:
         # 1回目の選択ができている場合(2回目の選択)
