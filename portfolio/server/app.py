@@ -667,7 +667,7 @@ def handle_finish(data):
         socketio.emit("game_continue", {})
         # html側はリロードして最初の画面に戻る
         return
-    ß
+    #fuckß
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=8000)
