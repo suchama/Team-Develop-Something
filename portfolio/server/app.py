@@ -361,14 +361,14 @@ def handle_make_move(data):
                 gamestate[key]["move_check"] = valid_moves
                 gamestate[key]["selected_place"] = place
                 if place == "tegoma":
-                    gamestate[key]["selected_pos"] = koma
+                    gamestate[key]["selected_pos"] = [koma]
                 else:
                     gamestate[key]["selected_pos"] = [x,y]
                 socketio.emit("blight", {"blight_list": valid_moves, "place": place}, to = request.sid)
                 return
             else:
             # 選択した駒が動けない場合
-                socketio.emit("error", {"msg": "動かせません"}, to = request.sid)
+                socketio.emit("error", {"msg": "その駒は動かせません"}, to = request.sid)
                 return
         else:
         # 1回目の選択ができている場合(2回目の選択)
@@ -428,7 +428,7 @@ def handle_make_move(data):
                         swich_turn_god(game, mode, match)
             else:
                 gamestate[key]["move_check"] = []
-                socketio.emit("error", {"msg": "おけないよん"}, to = request.sid)
+                socketio.emit("error", {"msg": "おける場所じゃないよん"}, to = request.sid)
                 return
 
 # AIの手を実行する。(時間だけ送られるので、JSはAIのターン受信→好きな時間空ける→emit送信 すればok)
