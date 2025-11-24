@@ -110,6 +110,13 @@ for(let r = 1 ; r <= 5 ; r ++){
         img.style.top = `${20*r-10}%`;
         img.style.left = `${24*c-10}%`;
 
+        const maisuu = document.createElement("div");
+        document.getElementById("tegoma1").appendChild(maisuu);
+        maisuu.classList.add("tegomamaisuu_self");
+        maisuu.id = `tegoma1maisuu_r${r}_c${c}`;
+        maisuu.style.top = `${20*r-10-5.5}%`;
+        maisuu.style.left = `${24*c-10+8}%`;
+
         /* マウスが駒の上に来た時とはずれたときの操作 */
         img.addEventListener('mouseenter', () =>{
             if(current_turn == "slf" && click_ok == true){
@@ -153,6 +160,14 @@ for(let r = 1 ; r <= 5 ; r ++){
         img.id = `tegoma2img_r${r}_c${c}`;
         img.style.bottom = `${20*r-29}%`;
         img.style.right = `${24*c-34}%`;
+
+        const maisuu = document.createElement("div");
+        document.getElementById("tegoma2").appendChild(maisuu);
+        maisuu.classList.add("tegomamaisuu_oppo");
+        maisuu.id = `tegoma2maisuu_r${r}_c${c}`;
+        maisuu.style.bottom = `${20*(r+1)-29-6}%`;
+        maisuu.style.right = `${24*(c+1)-34+8}%`;
+        
     };
 };
 
@@ -210,6 +225,7 @@ socket.on('nari_check',(data)=>{
     click_ok = false;//成りチェックのフェーズはいったら次のターンまで入力処理は要らないのでfalse
     console.log("nari_check受信");
 })
+
 
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     if((game_mode == "pvc") && (data["gamestate"]["current_turn"] == player_index)){//CPUの一手が送られてくるまでにラグがあるので、その間表示していた「。。。」を、ここで消す
@@ -600,10 +616,12 @@ function board_update(grid,tegoma){// grid[row][column]
     console.log("手ごまのデータ：",tegoma)
     console.log("盤面のデータ：",grid)
     //自分の手ごま描画　使うデータ：tegoma_grid[player_index] 表示する手ごま板:tegoma1
+    /*
     for(let r = 1 ; r <= 5 ; r ++){
-        for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
+        for(let c = 1 ; c <= 4 ; c ++){//r:row(行)　c:column(列) 
             const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
-            if (!(tegoma_grid[player_index][(c-1)+4*(r-1)] == 0)){
+            
+            if (!(kinds_of_hands[player_index][(c-1)+4*(r-1)] == 0)){
                 //const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
                 img.src = "../static/JS/shogi_image/"+img_index[tegoma_grid[player_index][(c-1)+4*(r-1)]]+".png";
                 img.style.display = "block";
@@ -618,9 +636,44 @@ function board_update(grid,tegoma){// grid[row][column]
             }
         }
     }
+    
+    */
+    let number = 0
+    let obj = Object.keys(tegoma[player_index])
+    for (const key of obj){
+        let r = Math.trunc(number / 4) + 1
+        let c = (number % 4) + 1
+        const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
+        img.src = "../static/JS/shogi_image/"+img_index[key]+".png";
+        img.style.display = "block";
+        if (current_turn== "slf"){
+            img.classList.add("hover_light");
+        }else{
+            img.classList.remove("hover_light");
+        }
+
+        const img_maisuu = document.getElementById(`tegoma1maisuu_r${r}_c${c}`);
+        img_maisuu.textContent = String(tegoma[player_index][key]);
+        img_maisuu.style.display = "grid";
+
+        number += 1;
+    }
+
+    for (let i=number; i<=19; i++){
+        let r = Math.trunc(i / 4) + 1
+        let c = (i % 4) + 1
+        const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
+        img.style.display = "none";
+        
+        const img_maisuu = document.getElementById(`tegoma1maisuu_r${r}_c${c}`);
+        img_maisuu.style.display = "none";
+    }
+
+
     //相手の手ごま描画　使うデータ：tegoma_grid[player_index%2+1] 表示する手ごま板:tegoma2
+    /*
     for(let r = 1 ; r <= 5 ; r ++){
-        for(let c = 1 ; c <= 4 ; c ++){/* r:row(行)　c:column(列) */
+        for(let c = 1 ; c <= 4 ; c ++){// r:row(行)　c:column(列) 
             if (!(tegoma_grid[player_index %2 +1][(c-1)+4*(r-1)] == 0)){
                 const img = document.getElementById(`tegoma2img_r${r}_c${c}`);
                 img.src = "../static/JS/shogi_image/"+img_index[tegoma_grid[player_index %2 + 1][(c-1)+4*(r-1)]]+".png";
@@ -632,6 +685,35 @@ function board_update(grid,tegoma){// grid[row][column]
             }
         }
     }
+    */
+    number = 0
+    obj = Object.keys(tegoma[player_index %2 +1])
+    for (const key of obj){
+        let r = Math.trunc(number / 4) + 1
+        let c = (number % 4) + 1
+        const img = document.getElementById(`tegoma2img_r${r}_c${c}`);
+        img.src = "../static/JS/shogi_image/"+img_index[key]+".png";
+        img.style.transform = "rotate(180deg) translate(50%,50%)";
+        img.style.display = "block";
+
+        const img_maisuu = document.getElementById(`tegoma2maisuu_r${r}_c${c}`);
+        img_maisuu.textContent = String(tegoma[player_index %2 +1][key]);
+        img_maisuu.style.display = "grid";
+
+        number += 1;
+    }
+
+    for (let i=number; i<=19; i++){
+        let r = Math.trunc(i / 4) + 1
+        let c = (i % 4) + 1
+        const img = document.getElementById(`tegoma2img_r${r}_c${c}`);
+        img.style.display = "none";
+
+        const img_maisuu = document.getElementById(`tegoma2maisuu_r${r}_c${c}`);
+        img_maisuu.style.display = "none";
+    }
+
+
 
 }
 let tegoma_grid = {1:Array(20).fill(0),2:Array(20).fill(0)};//手ごま用のgrid

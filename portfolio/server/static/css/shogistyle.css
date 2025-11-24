@@ -85,7 +85,7 @@
     left: 50%;
     transform: translate(-50%,-50%);
     background-color: rgba(73, 197, 7, 0.8);
-    z-index: 1000;
+    z-index: 1500;
 }
 
 #popUpper{
@@ -285,9 +285,40 @@
     width: 24%;
     aspect-ratio: 1/1;
     transform: translate(-50%,-50%);
+    z-index: 9;
 }
 
+.tegomamaisuu_self{
+    display: none;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    text-align: center;
+    place-items: center;
+    width: 8%;
+    aspect-ratio: 1/1;
+    transform: translate(-50%,-50%);
+    background-color: rgba(180, 0, 60, 0.548);
+    color:white;
+    font-size: 1vw;
+    z-index: 10;
+}
 
+.tegomamaisuu_oppo{
+    display: none;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    text-align: center;
+    place-items: center;
+    width: 8%;
+    aspect-ratio: 1/1;
+    transform: translate(50%,50%);
+    background-color: rgba(180, 0, 60, 0.548);
+    color:white;
+    font-size: 1vw;
+    z-index: 10;
+}
 
 
 
@@ -398,7 +429,6 @@
 .blight_to_normal{
     animation: blight-to-normal 1.0s linear;
 }
-
 
 .hover_light:hover{
     filter: brightness(200%);
