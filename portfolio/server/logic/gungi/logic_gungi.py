@@ -289,9 +289,7 @@ def handle_bou( board,
     }
 
 
-def handle_ai_move(board,
-                   tegoma,
-                   gamestate_dict,
+def handle_ai_move(gamestate_dict,
                    current_turn,
                    ) -> Dict:
     """
@@ -300,8 +298,10 @@ def handle_ai_move(board,
     - 手駒を使うことも考慮（自陣の空きマスへランダム配置）。
     """
     b = Board()
+    board = gamestate_dict["board"]
     b.grid = [[layer[:] for layer in row] for row in board]
     gs = GameState()
+    tegoma = gamestate_dict["tegoma"]
     gs.hands = {1: dict(tegoma[1]), 2: dict(tegoma[2])}
     gs.board = b
 
