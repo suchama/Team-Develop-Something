@@ -76,19 +76,15 @@ def handle_disconnect():
     for key, state in list(gamestate.items()):
         p1 = state.get("player_1")
         p2 = state.get("player_2")
-
         # どの試合のプレイヤーかを判定
         if sid == p1 or sid == p2:
-
             # 試合のモードを取得（key形式: othello_pvp_1 など）
             parts = key.split("_")
             game = parts[0]
             mode = parts[1]
-
             # AI戦
             if mode == "pvc":
                 state["disconnected"] = True
-
             # 対人戦
             elif mode == "pvp":
                 state["disconnected"] = True
@@ -96,7 +92,6 @@ def handle_disconnect():
                     winner_sid = p2
                 else:
                     winner_sid = p1
-
                 # 勝者を確定して通知
                 if "winner" not in state:
                     state["winner"] = "player_1" if sid == p2 else "player_2"
@@ -107,7 +102,6 @@ def handle_disconnect():
                             "reason": "opponent_disconnected",
                             "winner": state["winner"]
                         }, to=winner_sid)
-
             break
 
 

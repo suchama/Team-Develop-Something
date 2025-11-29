@@ -148,7 +148,7 @@ socket.on('game_over', (data) => {/* emit("game_over", {"board": board, "scores"
     }
     setTimeout(() => {
         if (data["reason"] == "opponent_disconnected"){
-            activate_pop(["YOU WIN"], ["もう一度","止める"]);
+            activate_pop(["YOU WIN","相手が切断しました"], ["もう一度","止める"]);
         }
         else if (data["scores"][stone_color[player_index]] > data["scores"][stone_color[player_index % 2+1]]){
             //board_update(data["board"])
