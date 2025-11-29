@@ -347,6 +347,7 @@ def handle_make_move(data):
         if gamestate[key]["move_check"] == []:
         # 1回目の選択ができていない場合
             if place == "board":
+                print(board, tegoma, player, place, [x,y])
                 valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y])
             elif place == "tegoma":
                 valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [koma])
