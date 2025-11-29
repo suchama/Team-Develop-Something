@@ -142,7 +142,7 @@ for(let r = 1 ; r <= 5 ; r ++){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 //img.style.filter = "brightness(200%)";
                 //block.style.transition = "background-color 0s ease";
-                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[player_index][4*(c-1)+5*(r-1)]  , "current_player": player_index});
+                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][c-1+5*(r-1)]  , "current_player": player_index});
                 console.log("make_move送信")
             }
         });
@@ -589,9 +589,6 @@ function board_update(grid,tegoma){// grid[row][column]
             }
         }
     }
-    rearrange(tegoma);//ここで自分と相手の手ごまを、描画用に並べなおしてtegoma_gridに入れる
-    console.log("手ごまのデータ：",tegoma)
-    console.log("盤面のデータ：",grid)
     //自分の手ごま描画　使うデータ：tegoma_grid[player_index] 表示する手ごま板:tegoma1
     
     let number = 0
@@ -602,6 +599,7 @@ function board_update(grid,tegoma){// grid[row][column]
         const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
         img.src = "../static/JS/gungi_image/"+img_index[player_index]+String(key+100*(player_index-1))+".png";
         img.style.display = "block";
+        tegoma_grid[1][number] = Number(key);
         if (current_turn== "slf"){
             img.classList.add("hover_light");
         }else{
@@ -620,11 +618,13 @@ function board_update(grid,tegoma){// grid[row][column]
         let c = (i % 4) + 1
         const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
         img.style.display = "none";
-        
         const img_maisuu = document.getElementById(`tegoma1maisuu_r${r}_c${c}`);
         img_maisuu.style.display = "none";
+        tegoma_grid[1][i] = 0;
     }
 
+    console.log("手ごまのデータ1：",tegoma,"手ごまのデータ2:",tegoma_grid);
+    console.log("盤面のデータ：",grid);
 
     //相手の手ごま描画　使うデータ：tegoma_grid[player_index%2+1] 表示する手ごま板:tegoma2
     number = 0
@@ -731,9 +731,9 @@ const narabe1 = document.createElement("img");
 const narabe2 = document.createElement("img");
 const narabe3 = document.createElement("img");
 const center = document.getElementById("center")
-center.appendChild(narebe1);
-center.appendChild(narebe2);
-center.appendChild(narebe3);
+center.appendChild(narabe1);
+center.appendChild(narabe2);
+center.appendChild(narabe3);
 
 narabe1.classList.add("komaimg");
 narabe2.classList.add("komaimg");
