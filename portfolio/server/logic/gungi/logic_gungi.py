@@ -63,7 +63,6 @@ def game_start() -> Dict:
         "current_turn": gs.current_turn,
     }
 
-
 def get_valid_moves(board: List[List[List[int]]],
                     tegoma: Dict[int, Dict[int, int]],
                     player: int,
