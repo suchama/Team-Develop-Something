@@ -1,6 +1,6 @@
 #盤面データ、手番、持ち駒、駒の配置、勝敗情報の管理
 import random
-from board import Board
+from .board import Board
 
 class GameState:
     def __init__(self):
