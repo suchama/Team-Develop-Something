@@ -138,8 +138,8 @@ for(let r = 1 ; r <= 5 ; r ++){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 //img.style.filter = "brightness(200%)";
                 //block.style.transition = "background-color 0s ease";
-                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[player_index][4*(c-1)+5*(r-1)]  , "current_player": player_index});
-                console.log("make_move送信")
+                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][c-1+5*(r-1)]  , "current_player": player_index});
+                console.log("make_move送信");
             }
         });
     };
@@ -612,9 +612,11 @@ function board_update(grid,tegoma){// grid[row][column]
             }
         }
     }
+    /*
     rearrange(tegoma);//ここで自分と相手の手ごまを、描画用に並べなおしてtegoma_gridに入れる
     console.log("手ごまのデータ：",tegoma)
     console.log("盤面のデータ：",grid)
+    */
     //自分の手ごま描画　使うデータ：tegoma_grid[player_index] 表示する手ごま板:tegoma1
     /*
     for(let r = 1 ; r <= 5 ; r ++){
@@ -646,6 +648,7 @@ function board_update(grid,tegoma){// grid[row][column]
         const img = document.getElementById(`tegoma1img_r${r}_c${c}`);
         img.src = "../static/JS/shogi_image/"+img_index[key]+".png";
         img.style.display = "block";
+        tegoma_grid[1][number] = Number(key);
         if (current_turn== "slf"){
             img.classList.add("hover_light");
         }else{
@@ -667,8 +670,8 @@ function board_update(grid,tegoma){// grid[row][column]
         
         const img_maisuu = document.getElementById(`tegoma1maisuu_r${r}_c${c}`);
         img_maisuu.style.display = "none";
+        tegoma_grid[1][i] = 0;
     }
-
 
     //相手の手ごま描画　使うデータ：tegoma_grid[player_index%2+1] 表示する手ごま板:tegoma2
     /*

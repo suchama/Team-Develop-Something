@@ -81,7 +81,7 @@ for(let r = 1 ; r <= 9 ; r ++){
             });
             //クリックされたとき→make_move送信 
             img.addEventListener('click', () =>{
-                if (current_turn == "slf" && click_ok == true){
+            if (current_turn == "slf" && click_ok == true && h == floor_grid[r-1][c-1]){
                     //block.style.backgroundColor = "rgb(249, 255, 167)";
                     //img.style.filter = "brightness(200%)";
                     //block.style.transition = "background-color 0s ease";
