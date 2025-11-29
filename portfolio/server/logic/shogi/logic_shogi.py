@@ -53,7 +53,7 @@ def get_valid_moves(board, tegoma_player, player, place, pos):
                     continue
                 if not _can_drop_on_rank(piece, y, player):
                     continue
-                moves.append([x, y])
+                moves.append((x, y))
 
         return moves
 
