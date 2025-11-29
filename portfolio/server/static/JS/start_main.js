@@ -24,9 +24,9 @@ const btn4 = document.getElementById("pvp");
 const btn5 = document.getElementById("pvc");
 const btn6 = document.getElementById("modoru");
 
-btn1.style.left = "16.7%";
+btn1.style.left = "20.83%";
 btn2.style.left = "50%";
-btn3.style.left = "83.7%";
+btn3.style.left = "79.17%";
 btn4.style.left = "30%";
 btn5.style.left = "70%";
 btn6.style.left = "50%";

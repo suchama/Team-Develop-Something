@@ -138,7 +138,7 @@ for(let r = 1 ; r <= 5 ; r ++){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 //img.style.filter = "brightness(200%)";
                 //block.style.transition = "background-color 0s ease";
-                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][c-1+5*(r-1)]  , "current_player": player_index});
+                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][c-1+4*(r-1)]  , "current_player": player_index});
                 console.log("make_move送信");
             }
         });
