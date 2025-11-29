@@ -802,12 +802,19 @@ function naraberu_delete(){
     narabe2.style.display = "none";
     narabe3.style.display = "none";
 }
+<<<<<<< HEAD
 let floor_grid = [
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す
 
+=======
+
+let floor_grid = Array(9).fill(Array(9).fill(0));
+function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す
+    console.log("floor_grid_update実行");
+>>>>>>> 4158ee0a42dff297583a5faef058b865ac45b88b
     for(let r = 1 ; r <= 9 ; r++){
         for(let c = 1 ; c <= 9 ; c++){
             console.log("floor:",grid[r-1][c-1][0]);
@@ -819,7 +826,15 @@ function floor_grid_update(grid){//各座標に、データの(r,c)の段数を�
                 floor_grid[r-1][c-1] = 2;
             }else{
                 floor_grid[r-1][c-1] = 3;
+<<<<<<< HEAD
             }
         }
     }
+=======
+            }       
+
+        }
+    }
+    console.log(floor_grid);
+>>>>>>> 4158ee0a42dff297583a5faef058b865ac45b88b
 }
