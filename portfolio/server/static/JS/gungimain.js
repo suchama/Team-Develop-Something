@@ -75,7 +75,7 @@ for(let r = 1 ; r <= 9 ; r ++){
             //ホバー処理...マウスが駒の上にホバー中、重なった駒を表示させる
             img.addEventListener('mouseenter', () =>{
                 if(current_turn == "slf" && click_ok == true){
-                    naraberu((r,c));//表示関数
+                    naraberu([r,c]);//表示関数
                 }
             });
             img.addEventListener('mouseleave', () =>{
@@ -738,53 +738,55 @@ narabe3.style.top = "50%";
 
 function naraberu(position){//pos = (r,c) board_data_now_dispの座標(+(1.1))に対応（つまりindex1のプレイヤーが下側としたときの座標）
     let num_of_narabe = 0
-    let pos = (-1,-1);
+    let pos = [-1,-1];
     if(player_index == 2){
         pos[0] = 10-position[0];
         pos[1] = 10-position[1];
     }else{
-        pos = position;
+        pos[0] = position[0];
+        pos[1] = position[1];
     }
+    console.log("board_data_now_disp",board_data_now_disp,pos[0]-1,pos[1]-1)
     for (let h = 1 ; h <= 3 ; h ++){
-       if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]!=0){
-        num_of_narabe = h
-        if(h==1){
-            if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
-                narabe1.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
-            }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
-                narabe1.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
-            }
-        }else if(h==2){
-            if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
-                narabe2.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
-            }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
-                narabe2.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
-            }
-        }else if(h==3){
-            if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
-                narabe3.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
-            }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
-                narabe3.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+        if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]!=0){
+            num_of_narabe = h
+            if(h==1){
+                if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
+                    narabe1.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+                }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
+                    narabe1.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+                }
+            }else if(h==2){
+                if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
+                    narabe2.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+                }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
+                    narabe2.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+                }
+            }else if(h==3){
+                if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
+                    narabe3.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+                }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
+                    narabe3.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+                }
             }
         }
-       }
     }//num_of_narabe= 0 or 1 or 2 or 3
 
     if(num_of_narabe == 1){
-        narabe1.style.left = "40%";
+        narabe1.style.left = "15%";
         narabe1.style.display = "block";
         narabe2.style.display = "none";
         narabe3.style.display = "none";
     }else if(num_of_narabe == 2){
-        narabe1.style.left = "30%";
-        narabe2.style.left = "50%";
+        narabe1.style.left = "10%";
+        narabe2.style.left = "20%";
         narabe1.style.display = "block";
         narabe2.style.display = "block";
         narabe3.style.display = "none";
     }else if(num_of_narabe == 3){
-        narabe1.style.left = "30%";
-        narabe2.style.left = "40%";
-        narabe3.style.left = "50%";
+        narabe1.style.left = "5%";
+        narabe2.style.left = "15%";
+        narabe3.style.left = "25%";
         narabe1.style.display = "block";
         narabe2.style.display = "block";
         narabe3.style.display = "block";
@@ -800,20 +802,26 @@ function naraberu_delete(){
     narabe2.style.display = "none";
     narabe3.style.display = "none";
 }
-let floor_grid = Array(9).fill(Array(9).fill(0));
+
 function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す
+    let floor_grid = Array(9).fill(Array(9).fill(0));
     for(let r = 1 ; r <= 9 ; r++){
         for(let c = 1 ; c <= 9 ; c++){
+            console.log("floor:",grid[r-1][c-1][0]);
             if(grid[r-1][c-1][0] == 0){
-                floor_grid[r-1][c-1] = 0
+                console.log("floor0:",grid[r-1][c-1][0]);
+                floor_grid[r-1][c-1] = 0;
             }else if(grid[r-1][c-1][1] == 0){
-                floor_grid[r-1][c-1] = 1
+                console.log("floor1:",grid[r-1][c-1]);
+                floor_grid[r-1][c-1] = 1;
             }else if(grid[r-1][c-1][2] == 0){
-                floor_grid[r-1][c-1] = 2
+                floor_grid[r-1][c-1] = 2;
             }else{
-                floor_grid[r-1][c-1] = 3
+                floor_grid[r-1][c-1] = 3;
             }
+        console.log("各行floor_grid",floor_grid);        
 
         }
     }
+    console.log("grid",grid,"floor_grid",floor_grid)
 }
