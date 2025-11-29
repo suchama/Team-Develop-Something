@@ -91,7 +91,7 @@ for(let r = 1 ; r <= 9 ; r ++){
                     }else{
                         socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: 9-c, y: 9-r, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                     }
-                    console.log("make_move送信")
+                    console.log("make_move送信","座標",c-1,r-1,"or",9-c,9-r)
                 }
             });
         }
@@ -528,7 +528,7 @@ const img_index = {
                     1:"siro/",2:"kuro/"}
 let r_adjust = 0;
 let c_adjust = 0;
-let board_data_now_disp = Array(9).fill(Array(9).fill(0));
+let board_data_now_disp = Array(9).fill(Array(9).fill(Array(3).fill(0)));
 let tegoma_grid = {1:Array(20).fill(0), 2:Array(20).fill(0)};
 function board_update(grid,tegoma){;// grid[row][column]
     board_data_now_disp = grid;//このgridは下側がindex1のプレイヤー
@@ -547,15 +547,15 @@ function board_update(grid,tegoma){;// grid[row][column]
             for( let height = 0 ; height<=2 ; height ++ ){//3段目まで
                 const img = document.getElementById(`komaimg_r${r_adjust}_c${c_adjust}_h${height+1}`);
                 if(grid[r-1][c-1][height] >=1 && grid[r-1][c-1][height] <=14 ){
-                    img.src = "../static/JS/gungi_image/"+img_index[player_index]+String(grid[r-1][c-1][height])+"_"+`${height+1}`+".png";
+                    img.src = "../static/JS/gungi_image/siro/"+String(grid[r-1][c-1][height])+"_"+`${height+1}`+".png";
                     if(player_index == 1){
                         img.style.transform = `rotate(0deg) translate(-50%,-50%)`;//回転の基準は真ん中（デフォルト）
                     }else{
                         img.style.transform = `rotate(180deg) translate(50%,50%)`;
                     }
                     img.style.display = "block";
-                }else if(grid[r-1][c-1] >=101 && grid[r-1][c-1] <=114 ){//相手の駒（つまり回転させる）
-                    img.src = "../static/JS/gungi_image/"+img_index[player_index]+String(grid[r-1][c-1][height])+"_"+`${height+1}`+".png";
+                }else if(grid[r-1][c-1][height] >=101 && grid[r-1][c-1][height] <=114 ){//相手の駒（つまり回転させる）
+                    img.src = "../static/JS/gungi_image/kuro/"+String(grid[r-1][c-1][height])+"_"+`${height+1}`+".png";
                     if(player_index == 1){
                         img.style.transform = `rotate(180deg) translate(50%,50%)`;//回転の基準は真ん中（デフォルト）
                     }else{
@@ -746,25 +746,25 @@ function naraberu(position){//pos = (r,c) board_data_now_dispの座標(+(1.1))�
         pos = position;
     }
     for (let h = 1 ; h <= 3 ; h ++){
-       if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]!=0){
+       if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]!=0){
         num_of_narabe = h
         if(h==1){
-            if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1] <= 14){
-                narabe1.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
-            }else if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]>=101){
-                narabe1.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
+                narabe1.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+            }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
+                narabe1.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
             }
         }else if(h==2){
-            if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1] <= 14){
-                narabe2.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
-            }else if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]>=101){
-                narabe2.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
+                narabe2.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+            }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
+                narabe2.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
             }
         }else if(h==3){
-            if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1] <= 14){
-                narabe3.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
-            }else if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]>=101){
-                narabe3.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1] <= 14){
+                narabe3.src = "../static/JS/gungi_image/siro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
+            }else if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]>=101){
+                narabe3.src = "../static/JS/gungi_image/kuro/"+String(board_data_now_disp[pos[0]-1][pos[1]-1][h-1])+".png";
             }
         }
        }
