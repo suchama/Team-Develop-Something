@@ -97,7 +97,7 @@ def get_valid_moves(board: List[List[List[int]]],
                     continue
                 if player == 2 and y > 2:
                     continue
-                moves.append([x, y])
+                moves.append((x, y))
         return moves
     return [[]]
 
