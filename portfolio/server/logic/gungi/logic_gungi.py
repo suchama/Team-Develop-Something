@@ -1,8 +1,8 @@
 # logic_gungi
  
 from typing import Dict, List, Tuple
-from board import Board
-from gamestate import GameState
+from .board import Board
+from .gamestate import GameState
 import random
 
 def game_start() -> Dict:
