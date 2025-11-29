@@ -802,6 +802,7 @@ function naraberu_delete(){
     narabe2.style.display = "none";
     narabe3.style.display = "none";
 }
+
 let floor_grid = [
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
