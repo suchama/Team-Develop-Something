@@ -142,7 +142,7 @@ for(let r = 1 ; r <= 5 ; r ++){
                 //block.style.backgroundColor = "rgb(249, 255, 167)";
                 //img.style.filter = "brightness(200%)";
                 //block.style.transition = "background-color 0s ease";
-                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][4*(c-1)+5*(r-1)]  , "current_player": player_index});
+                socket.emit("make_move", {"game": "shogi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[player_index][4*(c-1)+5*(r-1)]  , "current_player": player_index});
                 console.log("make_move送信")
             }
         });
@@ -545,7 +545,10 @@ const img_index = {
                     1:"siro/",2:"kuro/"}
 let r_adjust = 0;
 let c_adjust = 0;
+let board_data_now_disp = Array(9).fill(Array(9).fill(0));
 function board_update(grid,tegoma){// grid[row][column]
+    board_data_now_disp = grid;//このgridは下側がindex1のプレイヤー
+    floor_grid_update(grid);
     console.log("current_turn",current_turn)
     //将棋盤の盤面の更新
     for(let r = 1 ; r <= 9 ; r ++){
@@ -578,7 +581,7 @@ function board_update(grid,tegoma){// grid[row][column]
                 }else{
                     img.style.display = "none";
                 }
-                if (current_turn== "slf"){
+                if (current_turn== "slf" && height+1 == floor_grid[r-1][c-1]){//最上段だけホバーで光るクラスを追加
                     img.classList.add("hover_light");
                 }else{
                     img.classList.remove("hover_light");
@@ -654,7 +657,9 @@ function board_update(grid,tegoma){// grid[row][column]
 
 
 }
+/*
 let tegoma_grid = {1:Array(20).fill(0),2:Array(20).fill(0)};//手ごま用のgrid
+*/
 /*例えば自分の駒だったら（相手なら１８０度回転）tegoma_gridの配列の要素は順に
     0123
     4567
@@ -662,6 +667,7 @@ let tegoma_grid = {1:Array(20).fill(0),2:Array(20).fill(0)};//手ごま用のgri
     ...19
 と手ごま上の位置を対応*/
 //app.pyでもらったデータを、使いやすい形に並べなおす
+/*
 function rearrange(hands){//hands = {1:{},2:{}}// tegoma = {1:{1:5},2:{}};
     for(let turn = 1; turn <= 2 ; turn ++){
         const kinds_of_hands = Object.keys(hands[turn]);
@@ -680,7 +686,7 @@ function rearrange(hands){//hands = {1:{},2:{}}// tegoma = {1:{1:5},2:{}};
         
     }
 }
-
+*/
 function blight(blt){
     for(let i = 0; i < blt.length; i ++){
         let c = blt[i][0]+1;/* data["blight_list"]のi+1個目の要素のx座標 */
@@ -719,4 +725,103 @@ function cansel_bright(blt){
         //bltkoma_img.style.filter = "brightness(100%)";
 
     };
+}
+
+const narabe1 = document.createElement("img");
+const narabe2 = document.createElement("img");
+const narabe3 = document.createElement("img");
+const center = document.getElementById("center")
+center.appendChild(narebe1);
+center.appendChild(narebe2);
+center.appendChild(narebe3);
+
+narabe1.classList.add("komaimg");
+narabe2.classList.add("komaimg");
+narabe3.classList.add("komaimg");
+
+narabe1.style.display = "none";
+narabe2.style.display = "none";
+narabe3.style.display = "none";
+
+narabe1.style.zIndex = "199";
+narabe2.style.zIndex = "200";
+narabe3.style.zIndex = "201";
+
+narabe1.style.top = "50%";
+narabe2.style.top = "50%";
+narabe3.style.top = "50%";
+
+function naraberu(pos){//pos = (r,c) board_data_now_dispの座標(+(1.1))に対応（つまりindex1のプレイヤーが下側としたときの座標）
+    let num_of_narabe = 0
+    for (let h = 1 ; h <= 3 ; h ++){
+       if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]!=0){
+        num_of_narabe = h
+        if(h==1){
+            if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1] <= 14){
+                narabe1.src = "../static/JS/shogi_image/siro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            }else if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]>=101){
+                narabe1.src = "../static/JS/shogi_image/kuro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            }
+        }else if(h==2){
+            if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1] <= 14){
+                narabe2.src = "../static/JS/shogi_image/siro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            }else if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]>=101){
+                narabe2.src = "../static/JS/shogi_image/kuro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            }
+        }else if(h==3){
+            if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1] <= 14){
+                narabe3.src = "../static/JS/shogi_image/siro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            }else if (board_data_now_disp[pos[0]-1,pos[1]-1][h-1]>=101){
+                narabe3.src = "../static/JS/shogi_image/kuro/"+String(board_data_now_disp[pos[0]-1,pos[1]-1][h-1])+".png";
+            }
+        }
+       }
+    }//num_of_narabe= 0 or 1 or 2 or 3
+
+    if(num_of_narabe == 1){
+        narabe1.style.left = "40%";
+        narabe1.style.display = "block";
+        narabe2.style.display = "none";
+        narabe3.style.display = "none";
+    }else if(num_of_narabe == 2){
+        narabe1.style.left = "30%";
+        narabe2.style.left = "50%";
+        narabe1.style.display = "block";
+        narabe2.style.display = "block";
+        narabe3.style.display = "none";
+    }else if(num_of_narabe == 3){
+        narabe1.style.left = "30%";
+        narabe2.style.left = "40%";
+        narabe3.style.left = "50%";
+        narabe1.style.display = "block";
+        narabe2.style.display = "block";
+        narabe3.style.display = "block";
+    }else{
+        narabe1.style.display = "none";
+        narabe2.style.display = "none";
+        narabe3.style.display = "none";
+    }
+}
+
+function naraberu_delete(){
+    narabe1.style.display = "none";
+    narabe2.style.display = "none";
+    narabe3.style.display = "none";
+}
+let floor_grid = Array(9).fill(Array(9).fill(0));
+function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す
+    for(let r = 1 ; r <= 9 ; r++){
+        for(let c = 1 ; c <= 9 ; c++){
+            if(grid[r-1][c-1][0] == 0){
+                floor_grid[r-1][c-1] = 0
+            }else if(grid[r-1][c-1][1] == 0){
+                floor_grid[r-1][c-1] = 1
+            }else if(grid[r-1][c-1][2] == 0){
+                floor_grid[r-1][c-1] = 2
+            }else{
+                floor_grid[r-1][c-1] = 3
+            }
+
+        }
+    }
 }
