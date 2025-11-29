@@ -123,7 +123,8 @@ def handle_player_move(board,
     gs.hands = {1: dict(tegoma[1]), 2: dict(tegoma[2])}
     gs.board = b
 
-    x0, y0 = selected_pos
+    if selected_place == "board":
+        x0, y0 = selected_pos
     x1, y1 = to_pos
 
     tuke_check = False
