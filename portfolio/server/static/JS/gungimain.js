@@ -85,7 +85,7 @@ for(let r = 1 ; r <= 9 ; r ++){
             });
             //入力処理...重なりの最上段の駒クリックされたとき→make_move送信 
             img.addEventListener('click', () =>{
-            if (current_turn == "slf" && click_ok == true && h == floor_grid[r-1][c-1]){
+            if (current_turn == "slf" && click_ok == true && floor_grid[r-1][c-1] == h){
                     if(player_index==1){
                         socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                     }else{
@@ -565,7 +565,7 @@ function board_update(grid,tegoma){;// grid[row][column]
                 }else{
                     img.style.display = "none";
                 }
-                if (current_turn== "slf" && height+1 == floor_grid[r-1][c-1]){//最上段だけホバーで光るクラスを追加
+                if (current_turn== "slf" && floor_grid[r-1][c-1] == height+1){//最上段だけホバーで光るクラスを追加
                     img.classList.add("hover_light");
                 }else{
                     img.classList.remove("hover_light");
@@ -802,26 +802,24 @@ function naraberu_delete(){
     narabe2.style.display = "none";
     narabe3.style.display = "none";
 }
-
+let floor_grid = [
+                    [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す
-    let floor_grid = Array(9).fill(Array(9).fill(0));
+
     for(let r = 1 ; r <= 9 ; r++){
         for(let c = 1 ; c <= 9 ; c++){
             console.log("floor:",grid[r-1][c-1][0]);
             if(grid[r-1][c-1][0] == 0){
-                console.log("floor0:",grid[r-1][c-1][0]);
                 floor_grid[r-1][c-1] = 0;
             }else if(grid[r-1][c-1][1] == 0){
-                console.log("floor1:",grid[r-1][c-1]);
                 floor_grid[r-1][c-1] = 1;
             }else if(grid[r-1][c-1][2] == 0){
                 floor_grid[r-1][c-1] = 2;
             }else{
                 floor_grid[r-1][c-1] = 3;
             }
-        console.log("各行floor_grid",floor_grid);        
-
         }
     }
-    console.log("grid",grid,"floor_grid",floor_grid)
 }
