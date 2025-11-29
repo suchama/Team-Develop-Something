@@ -11,11 +11,10 @@ from .utils import _can_drop_on_rank, _error_out
 import random
 
 
-# ============================================
-#  初期化
-# ============================================
-
 def game_start() -> Dict:
+    """
+    初期盤面を返す
+    """
     b = Board()
     gs = GameState()
 
@@ -27,20 +26,25 @@ def game_start() -> Dict:
     }
 
 
-# ============================================
-# 合法手生成
-# ============================================
-
-def get_valid_moves(board, tegoma_player, player, place, pos):
+def get_valid_moves(board: List[List[int]], 
+                    tegoma: Dict[int, Dict[int, int]],
+                    player: int, 
+                    place:str,
+                    pos: List[int]
+                    ) -> List[List[int]]:
+    """
+    1回目クリック時の処理
+    画面のどこかを選択する。有効な場所をクリックしていたら、そこを返す。
+    """
     b = Board()
     b.grid = [row[:] for row in board]
 
-    # --- 盤面の駒を選んだ場合 ---
+    #  盤面の駒を選んだ場合 
     if place == "board":
         x, y = pos
         return b.get_valid_moves(x, y, player)
 
-    # --- 手駒を選んだ場合 ---
+    #  手駒を選んだ場合 
     elif place == "tegoma":
         piece = pos[0]
         moves = []
@@ -53,44 +57,53 @@ def get_valid_moves(board, tegoma_player, player, place, pos):
                     continue
                 if not _can_drop_on_rank(piece, y, player):
                     continue
-                moves.append([x, y])
-
+                moves.append((x, y))
         return moves
-
     return []
 
 
-# ============================================
-# プレイヤーの手（2回目クリック）
-# ============================================
-
-def handle_player_move(board, tegoma, player, selected_place, selected_pos, to_pos) -> Dict:
+def handle_player_move(board: List[List[int]], 
+                       tegoma: Dict[int, Dict[int,int]],
+                       player: int, 
+                       selected_place: str,             # プレイヤーが押した場所
+                       selected_pos: List[int], 
+                       to_pos: List[int]) -> Dict:
+    """
+    2回目クリック時の処理
+    1回目で選択したものをどうするかの処理
+    ・移動のみ
+    ・駒捕り
+    ・成り
+    """
     b = Board()
     b.grid = [row[:] for row in board]
-
-    # 正しい手駒の参照
     hands = {1: dict(tegoma[1]), 2: dict(tegoma[2])}
 
+    print(f"player : {player}")
+    print(f"hands : {hands}")
+    print(f"tegoma : {tegoma}")
     nari_check = False
     winner = None
 
-    # ---------- 盤面の駒を動かす ----------
+    print(f"-------selected pos ----------: {selected_pos}")
+
+    #  盤面の駒を動かす 
     if selected_place == "board":
         x0, y0 = selected_pos
         x1, y1 = to_pos
         piece = b.grid[y0][x0]
         to_piece = b.grid[y1][x1]
 
-        # 玉を取ったら勝利
+        # 勝敗判定
         if to_piece % 10 == 1:
             winner = player
 
-        # 取った駒を手駒に戻す
+        # 敵駒を取る場合
         if to_piece != 0 and b.is_enemy(to_piece, player):
             koma_type = b.unpromote(to_piece) % 10
             hands[player][koma_type] = hands[player].get(koma_type, 0) + 1
 
-        # 移動反映
+        # 盤面に反映
         b.grid[y1][x1] = piece
         b.grid[y0][x0] = 0
 
@@ -98,38 +111,37 @@ def handle_player_move(board, tegoma, player, selected_place, selected_pos, to_p
         if b.should_promote(piece, y0, y1, player):
             nari_check = True
 
-    # ---------- 手駒 → 盤面に置く ----------
+    #  手駒を置く
     elif selected_place == "tegoma":
-        piece = selected_pos      # selected_pos はint
+        piece = selected_pos[0]      # selected_pos はint
+        x1,y1 = to_pos
 
-        x1, y1 = to_pos
-
-        # 配置
-        place_code = piece if player == 1 else piece + 10
-        b.grid[y1][x1] = place_code
+        # 駒の配置
+        if player == 1:    
+            b.grid[y1][x1] = piece
+        else:
+            b.grid[y1][x1] = piece + 10
 
         # 手駒を減らす
+        print(f"player2 : {player}")
+        print(f"piece2 : {piece}")
+
         hands[player][piece] -= 1
         if hands[player][piece] == 0:
             del hands[player][piece]
-
-    # ターン切替（勝ったら交代しない）
-    next_turn = player % 2 + 1
 
     return {
         "winner": winner,
         "nari_check": nari_check,
         "board_grid": b.grid,
         "tegoma": hands,
-        "next_turn": next_turn,
     }
 
 
-# ============================================
-# 成り処理
-# ============================================
-
 def handle_nari(board, player, to_pos):
+    """
+    成りの処理
+    """
     b = Board()
     b.grid = [row[:] for row in board]
 
@@ -142,11 +154,10 @@ def handle_nari(board, player, to_pos):
     }
 
 
-# ============================================
-# AI の手
-# ============================================
-
 def handle_ai_move(gamestate_dict, current_turn):
+    """
+    AIの手
+    """
     b = Board()
     b.grid = [row[:] for row in gamestate_dict["board"]]
 
@@ -158,7 +169,7 @@ def handle_ai_move(gamestate_dict, current_turn):
     player = current_turn
     winner = None
 
-    # --- 全合法手を収集 ---
+    #  全合法手を収集 
     moves = []
     for y in range(9):
         for x in range(9):
@@ -174,7 +185,7 @@ def handle_ai_move(gamestate_dict, current_turn):
             "tegoma": hands,
         }
 
-    # --- ランダムに手を選ぶ ---
+    #  ランダムに手を選ぶ 
     (x0, y0), (x1, y1) = random.choice(moves)
 
     piece = b.grid[y0][x0]
