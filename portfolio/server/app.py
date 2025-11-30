@@ -279,6 +279,7 @@ def handle_give_up(data):
             return
 
 
+
 # プレイヤーが手を打ったとき
 @socketio.on("make_move")
 # 各ゲームのjs内でsocket.emit("make_move", {game: "othello", mode: "pvp", count_match: 数字, place:"board", x: x, y: y, current_player: 1})のように送信される
