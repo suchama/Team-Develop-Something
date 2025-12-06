@@ -298,6 +298,7 @@ def handle_make_move(data):
     place = data["place"]
     if place == "board":
         x, y = data["x"], data["y"]
+        print(x,y)
     elif place == "tegoma":
         koma = data["koma"]
     player = data["current_player"]
