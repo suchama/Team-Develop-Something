@@ -8,10 +8,6 @@ from typing import Dict, List
 from .board import Board
 from .gamestate import GameState
 from .utils import _can_drop_on_rank, _error_out
-import torch
-import torch.nn.functional as F
-import numpy as np
-from .architecture import ShogiCNN
 import random
 
 
@@ -161,24 +157,9 @@ def handle_nari(board, player, to_pos):
 def handle_ai_move(gamestate_dict, current_turn):
     """
     AIの手
-    簡易学習版どすえ
-    
     """
     b = Board()
     b.grid = [row[:] for row in gamestate_dict["board"]]
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    # モデル読み込み
-    import os
-
-    # logic_shogi.py があるディレクトリ
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    MODEL_PATH = os.path.join(BASE_DIR, "params", "best_shogi_cnn_model_2.pth")
-    print("MODEL_PATH =", MODEL_PATH)
-
-    shogi_ai_model = ShogiCNN().to(device)
-    shogi_ai_model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
-    shogi_ai_model.eval()
 
     hands = {
         1: dict(gamestate_dict["tegoma"][1]),
@@ -188,22 +169,13 @@ def handle_ai_move(gamestate_dict, current_turn):
     player = current_turn
     winner = None
 
-    board_tensor = board_to_tensor(b.grid, player).to(device)
-
-    with torch.no_grad():
-        logits = shogi_ai_model(board_tensor)[0]      # shape [6561]
-        probs = F.softmax(logits, dim=0).cpu().numpy()
-
     #  全合法手を収集 
     moves = []
     for y in range(9):
         for x in range(9):
             if b.is_own(b.grid[y][x], player):
                 for nx, ny in b.get_valid_moves(x, y, player):
-                    from_id = 9*y + x
-                    to_id   = 9*nx + nx
-                    move_id = 81*from_id + to_id
-                    moves.append((move_id, (x, y, nx, ny)))
+                    moves.append(((x, y), (nx, ny)))
 
     if not moves:
         return {
@@ -213,10 +185,8 @@ def handle_ai_move(gamestate_dict, current_turn):
             "tegoma": hands,
         }
 
-    #  手の選択
-    move_scores = [(probs[mid], move) for mid, move in moves]
-    move_scores.sort(reverse=True, key=lambda x: x[0])
-    _, (x0, y0, x1, y1) = move_scores[0]
+    #  ランダムに手を選ぶ 
+    (x0, y0), (x1, y1) = random.choice(moves)
 
     piece = b.grid[y0][x0]
     to_piece = b.grid[y1][x1]
@@ -234,7 +204,6 @@ def handle_ai_move(gamestate_dict, current_turn):
     b.grid[y1][x1] = piece
     b.grid[y0][x0] = 0
 
-    # これ消すな。AIだけはこっちでターンを管理
     next_turn = player % 2 + 1
 
     return {
@@ -243,32 +212,3 @@ def handle_ai_move(gamestate_dict, current_turn):
         "winner": winner,
         "tegoma": hands,
     }
-
-
-def board_to_tensor(board_grid, current_turn):
-    import numpy as np
-    tensor = np.zeros((40, 9, 9), dtype=np.float32)
-
-    for y in range(9):
-        for x in range(9):
-            piece = board_grid[y][x]
-
-            if piece == 0:
-                continue
-
-            # --- 安全な駒番号チェック ---
-            if 1 <= piece <= 20:          # 先手
-                idx = piece - 1
-            elif 21 <= piece <= 40:       # 後手
-                idx = piece - 13
-            else:
-                # 範囲外の番号は無視（エラー回避）
-                # 例: 99, -1, 50 など
-                continue
-
-            idx = max(0, min(idx, 39))
-            tensor[idx, y, x] = 1.0
-
-    tensor[-1, :, :] = 1.0 if current_turn == 1 else 0.0
-
-    return torch.tensor(tensor, dtype=torch.float32).unsqueeze(0)
