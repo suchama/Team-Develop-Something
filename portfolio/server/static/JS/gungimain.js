@@ -57,10 +57,11 @@ for(let r = 1 ; r <= 9 ; r ++){
             if (current_turn == "slf" && click_ok == true){
                 if(player_index==1){
                     socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                    console.log("make_move送信.player_index=1","x,y=",c-1,r-1)
                 }else{//player_indexが２の時は画像が反転しているので座標を調整
                     socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: 9-c, y: 9-r, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                    console.log("make_move送信.player_index=2","x,y=",9-c,9-r)
                 }
-                console.log("make_move送信")
             }
         });
 
@@ -88,10 +89,11 @@ for(let r = 1 ; r <= 9 ; r ++){
             if (current_turn == "slf" && click_ok == true && floor_grid[r-1][c-1] == h){
                     if(player_index==1){
                         socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                        console.log("make_move送信.player_index=1","x,y=",c-1,r-1)
                     }else{
                         socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: 9-c, y: 9-r, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
+                        console.log("make_move送信.player_index=2","x,y=",9-c,9-r)
                     }
-                    console.log("make_move送信","座標",c-1,r-1,"or",9-c,9-r)
                 }
             });
         }
@@ -127,7 +129,7 @@ for(let r = 1 ; r <= 5 ; r ++){
         img.addEventListener('click', () =>{
             if (current_turn == "slf" && click_ok == true){
                 socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"tegoma", "koma":tegoma_grid[1][c-1+4*(r-1)]  , "current_player": player_index});
-                console.log("make_move送信")
+                console.log("make_move送信 駒：",tegoma_grid[1][c-1+4*(r-1)])
             }
         });
     };
@@ -533,7 +535,7 @@ let tegoma_grid = {1:Array(20).fill(0), 2:Array(20).fill(0)};
 function board_update(grid,tegoma){;// grid[row][column]
     board_data_now_disp = grid;//このgridは下側がindex1のプレイヤー
     floor_grid_update(grid);
-    console.log("current_turn",current_turn);
+    //console.log("current_turn",current_turn);
     //将棋盤の盤面の更新
     for(let r = 1 ; r <= 9 ; r ++){
         for(let c = 1 ; c <= 9 ; c ++){/* r:row(行)　c:column(列) */
@@ -732,9 +734,9 @@ narabe1.style.zIndex = "199";
 narabe2.style.zIndex = "200";
 narabe3.style.zIndex = "201";
 
-narabe1.style.top = "50%";
-narabe2.style.top = "50%";
-narabe3.style.top = "50%";
+narabe1.style.top = "53%";
+narabe2.style.top = "53%";
+narabe3.style.top = "53%";
 
 function naraberu(position){//pos = (r,c) board_data_now_dispの座標(+(1.1))に対応（つまりindex1のプレイヤーが下側としたときの座標）
     let num_of_narabe = 0
@@ -746,7 +748,7 @@ function naraberu(position){//pos = (r,c) board_data_now_dispの座標(+(1.1))�
         pos[0] = position[0];
         pos[1] = position[1];
     }
-    console.log("board_data_now_disp",board_data_now_disp,pos[0]-1,pos[1]-1)
+    console.log("board_data_now_disp,座標：x,y=",pos[1]-1,pos[0]-1)
     for (let h = 1 ; h <= 3 ; h ++){
         if (board_data_now_disp[pos[0]-1][pos[1]-1][h-1]!=0){
             num_of_narabe = h
@@ -810,7 +812,6 @@ let floor_grid = [
 function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す
     for(let r = 1 ; r <= 9 ; r++){
         for(let c = 1 ; c <= 9 ; c++){
-            console.log("floor:",grid[r-1][c-1][0]);
             if(grid[r-1][c-1][0] == 0){
                 floor_grid[r-1][c-1] = 0;
             }else if(grid[r-1][c-1][1] == 0){
