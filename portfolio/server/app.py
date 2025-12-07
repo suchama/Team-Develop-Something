@@ -648,12 +648,14 @@ def handle_check(data):
         outcome = game_name[game].handle_tuke(board, player, gamestate[key]["selected_pos"][0],gamestate[key]["selected_pos"][1], gamestate[key]["high_memory"], check)
         # outcome = {"board_grid": board.grid,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
+        gamestate[key]["high_memory"] = outcome["high_memory"]
         gamestate[key]["selected_pos"] = None
     elif game == "gungi" and check == "bou":
         outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"][0],gamestate[key]["selected_pos"][1], gamestate[key]["high_memory"])
         # 謀は手駒の更新がある
         # outcome = {"board_grid": board.grid,"tegoma": tegoma,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
+        gamestate[key]["high_memory"] = outcome["high_memory"]
         gamestate[key]["tegoma"] = outcome["tegoma"]
         gamestate[key]["selected_pos"] = None
     
