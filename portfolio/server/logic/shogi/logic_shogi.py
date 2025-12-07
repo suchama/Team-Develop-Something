@@ -157,7 +157,7 @@ def handle_nari(board, player, to_pos):
 
 def handle_ai_move(gamestate_dict, current_turn, none):
     """
-    AIの手だよ
+    AIの手だお
     """
     b = Board()
     b.grid = [row[:] for row in gamestate_dict["board"]]
