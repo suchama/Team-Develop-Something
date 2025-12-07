@@ -44,7 +44,8 @@ class Board:
         return (current_turn == 1 and ( 1 <= piece <= 14)) or (current_turn == 2 and ( 101 <= piece <= 114))
     
     #統合では、if is_own(self.grid[y][x][self.high_memory[y][x]],current_turn) == Trueなら以下の関数を呼び出すようにする
-    def get_valid_moves(self, x, y, current_turn):
+    def get_valid_moves(self, x, y, current_turn, high_memory):
+        self.high_memory = high_memory
         z = self.high_memory[y][x]
         # 指定マスの駒に対し、合法な移動先座標リストを返す
         piece = self.grid[y][x][z - 1]
