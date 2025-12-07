@@ -78,7 +78,7 @@ def get_valid_moves(board: List[List[List[int]]],
     b = Board()
     b.grid = [[layer[:] for layer in row] for row in board]
     b.high_memory = high_memory
-
+    print(f"high memo: {b.high_memory}")
     if place == "board":
         x, y = pos
         return b.get_valid_moves(x, y, player)
@@ -165,7 +165,7 @@ def handle_player_move(board,
             }
 
         ## ツケチェック
-        if to_piece != 0 and b.high_memory[y1][x1] < 3:
+        if to_piece != 0 and b.high_memory[y1][x1] < 3 and z0 >= z1:
             if to_piece % 100 != 1:
                 tuke_check = True
                 print("つけられるよ！！！！！！！！！！")
@@ -271,23 +271,43 @@ def handle_tuke(board,
                 selected_pos,
                 to_pos,
                 high_memory: List[List[int]],  
+                check,
                 ) -> Dict:
     """
     ツケの処理
     """
+    print("ツケがはじまるよ")
     b = Board()
     b.grid = [[row[:] for row in line] for line in board]
     b.high_memory = high_memory
     x0, y0 = selected_pos
     x1, y1 = to_pos
+
     z0 = b.high_memory[y0][x0] - 1
+
+
     piece = b.grid[y0][x0][z0]
 
-    b.grid[y1][x1][b.high_memory[y1][x1]] = piece
-    b.high_memory += 1
-    b.grid[y0][x0][z0] = 0
-    b.high_memory -= 1
+    print(f"check :{check}")
+    # ツケる
+    if check == "tuke":
+        b.grid[y1][x1][b.high_memory[y1][x1]] = piece
+        b.high_memory[y1][x1] += 1
+        b.grid[y0][x0][z0] = 0
+        b.high_memory[y1][x1] -= 1
+        print(f"")
+    # 駒捕り
+    else:
+        ### 盤面の更新
+        print("こまとり")
+        b.grid[y1][x1][0] = piece
+        b.grid[y1][x1][1] = b.grid[y1][x1][2] = 0
+        b.grid[y0][x0][z0] = 0
+        b.high_memory[y0][x0] -= 1
+        b.high_memory[y1][x1] = 1
 
+    print(f"from pos: {b.grid[y0][x0][z0]}")
+    print(f"to pos: {b.grid[y1][x1][b.high_memory[y1][x1]]}")
     return {"board_grid": b.grid, 
             "current_turn": player,
             "high_memory": b.high_memory, 
