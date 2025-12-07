@@ -383,6 +383,7 @@ def handle_ai_move(gamestate_dict,
             selected_place="board",
             selected_pos=move["from"],
             to_pos=move["to"],
+            high_memory=high_memory,
         )
     else:
         result = handle_player_move(
@@ -392,6 +393,7 @@ def handle_ai_move(gamestate_dict,
             selected_place="tegoma",
             selected_pos=move["from"],
             to_pos=move["to"],
+            high_memory=high_memory,
         )
 
     # --- 6. 結果を返す ---
