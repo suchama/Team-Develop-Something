@@ -146,25 +146,6 @@ def handle_player_move(board,
             to_piece = b.grid[y1][x1][z1]  
         else:
             to_piece = 0
-
-        ## 駒の移動のみ
-        if to_piece == 0:
-            b.grid[y1][x1][0] = piece
-            b.grid[y0][x0][z0] = 0
-            b.high_memory[y0][x0] -= 1
-            b.high_memory[y1][x1] = 1
-
-            return {
-                "winner": winner,
-                "tuke_check": tuke_check,
-                "bou_check": bou_check,
-                "board_grid": b.grid,
-                "tegoma": gs.hands,
-                "current_turn": gs.current_turn,
-                "high_memory": b.high_memory,
-            }
-
-        ## ツケチェック
         if to_piece != 0 and b.high_memory[y1][x1] < 3 and z0 >= z1:
             if to_piece % 100 != 1:
                 tuke_check = True
@@ -178,6 +159,25 @@ def handle_player_move(board,
                     "current_turn": gs.current_turn,
                     "high_memory": b.high_memory,
                 }
+
+        ## 駒の移動のみ
+        if to_piece == 0:
+            
+            b.grid[y1][x1][0] = piece
+            b.grid[y0][x0][z0] = 0
+            b.high_memory[y0][x0] -= 1
+            b.high_memory[y1][x1] = 1
+            print(f"high memo san:{high_memory}")
+            return {
+                "winner": winner,
+                "tuke_check": tuke_check,
+                "bou_check": bou_check,
+                "board_grid": b.grid,
+                "tegoma": gs.hands,
+                "current_turn": gs.current_turn,
+                "high_memory": b.high_memory,
+            }
+
              
         ## 駒捕り
         print(f"to_piece:{to_piece}")
@@ -284,18 +284,29 @@ def handle_tuke(board,
     x1, y1 = to_pos
 
     z0 = b.high_memory[y0][x0] - 1
-
+    z1 = b.high_memory[y1][x1] - 1
 
     piece = b.grid[y0][x0][z0]
 
-    print(f"check :{check}")
+    print(f"hi me :{high_memory}")
     # ツケる
     if check == "tuke":
+        print(f"high memo 0: {b.high_memory[y0][x0]}")
+        print(f"high memo 1: {b.high_memory[y1][x1]}")
+
+        # 駒を積む
         b.grid[y1][x1][b.high_memory[y1][x1]] = piece
         b.high_memory[y1][x1] += 1
+
+        # 元の駒を削除
         b.grid[y0][x0][z0] = 0
-        b.high_memory[y1][x1] -= 1
-        print(f"")
+        b.high_memory[y0][x0] -= 1
+
+        print(f"high memo 0: {b.high_memory[y0][x0]}")
+        print(f"high memo 1: {b.high_memory[y1][x1]}")
+        print(f"1段目: {b.grid[y1][x1][0]}")
+        print(f"2段目: {b.grid[y1][x1][1]}")
+        print("aaa")
     # 駒捕り
     else:
         ### 盤面の更新
@@ -306,8 +317,7 @@ def handle_tuke(board,
         b.high_memory[y0][x0] -= 1
         b.high_memory[y1][x1] = 1
 
-    print(f"from pos: {b.grid[y0][x0][z0]}")
-    print(f"to pos: {b.grid[y1][x1][b.high_memory[y1][x1]]}")
+    print("return")
     return {"board_grid": b.grid, 
             "current_turn": player,
             "high_memory": b.high_memory, 
