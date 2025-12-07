@@ -30,7 +30,8 @@ def get_valid_moves(board: List[List[int]],
                     tegoma: Dict[int, Dict[int, int]],
                     player: int, 
                     place:str,
-                    pos: List[int]
+                    pos: List[int],
+                    none,
                     ) -> List[List[int]]:
     """
     1回目クリック時の処理
@@ -67,7 +68,9 @@ def handle_player_move(board: List[List[int]],
                        player: int, 
                        selected_place: str,             # プレイヤーが押した場所
                        selected_pos: List[int], 
-                       to_pos: List[int]) -> Dict:
+                       to_pos: List[int],
+                       none,
+                       ) -> Dict:
     """
     2回目クリック時の処理
     1回目で選択したものをどうするかの処理
@@ -154,7 +157,7 @@ def handle_nari(board, player, to_pos):
     }
 
 
-def handle_ai_move(gamestate_dict, current_turn):
+def handle_ai_move(gamestate_dict, current_turn, none):
     """
     AIの手
     """

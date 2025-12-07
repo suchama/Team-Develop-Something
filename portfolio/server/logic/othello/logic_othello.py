@@ -110,7 +110,7 @@ def check_pass(current_grid: list[list[int]], current_turn: int) -> dict:
     return {"pass": (not can_play_now)}
 
 
-def handle_ai_move(game_state_dict: dict, current_turn: int) -> dict:
+def handle_ai_move(game_state_dict: dict, current_turn: int, none) -> dict:
     """
     AI の一手を決定。
     game_state_dict を in-place 更新しつつ outcome も返す。
