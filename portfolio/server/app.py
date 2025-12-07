@@ -390,7 +390,7 @@ def handle_make_move(data):
             if (x,y) in gamestate[key]["move_check"]:
             # 動ける場所リストの中に選択した場所がある場合
                 outcome = game_name[game].handle_player_move(board, tegoma, player, gamestate[key]["selected_place"], gamestate[key]["selected_pos"], [x,y], highmemo)
-                print("outcome:", outcome)
+                #print("outcome:", outcome)
                 # gamestate[key]["selected_pos"]には、tegomaなら数字、boardなら[x,y]が入る。注意
                 # 動ける前提で勝敗判定、(将棋:成定),(軍議:ツケ,謀の能力)の発生判定と移動判定(ターン切り替えは含まない。)を行う。
                 # outcome = {"winner": None or 1 or 2,"nari_check": True or False,"tuke_check": True or False,"bou_check": True or False, "board_grid": board.grid,"tegoma": tegoma}

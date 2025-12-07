@@ -133,6 +133,7 @@ def handle_player_move(board,
 
     tuke_check = False
     bou_check = False
+    winner = None
     
     # 盤面をクリックした場合
     if selected_place == "board":
@@ -141,7 +142,10 @@ def handle_player_move(board,
         z1 = b.high_memory[y1][x1] - 1
 
         piece = b.grid[y0][x0][z0]
-        to_piece = b.grid[y1][x1][z1] if b.high_memory[y1][x1] > 0 else 0
+        if b.high_memory[y1][x1] > 0:
+            to_piece = b.grid[y1][x1][z1]  
+        else:
+            to_piece = 0
 
         ## 駒の移動のみ
         if to_piece == 0:
@@ -151,21 +155,48 @@ def handle_player_move(board,
             b.high_memory[y1][x1] = 1
 
             return {
+                "winner": winner,
+                "tuke_check": tuke_check,
+                "bou_check": bou_check,
                 "board_grid": b.grid,
                 "tegoma": gs.hands,
+                "current_turn": gs.current_turn,
                 "high_memory": b.high_memory,
             }
-            
+
+        ## ツケチェック
+        if to_piece != 0 and b.high_memory[y1][x1] < 3:
+            if to_piece % 100 != 1:
+                tuke_check = True
+                print("つけられるよ！！！！！！！！！！")
+                return {
+                    "winner": winner,
+                    "tuke_check": tuke_check,
+                    "bou_check": bou_check,
+                    "board_grid": b.grid,
+                    "tegoma": gs.hands,
+                    "current_turn": gs.current_turn,
+                    "high_memory": b.high_memory,
+                }
+             
         ## 駒捕り
-        if to_piece != 0 and b.is_enemy(to_piece, player) and z0 > z1:
+        print(f"to_piece:{to_piece}")
+        print(b.is_enemy(to_piece, player))
+        print(f"z0, z1:{z0, z1}")
+        if to_piece != 0 and b.is_enemy(to_piece, player) and z0 >= z1:
+            print("ここまで")
             koma_type = to_piece % 100
             ### 勝利判定
             if koma_type == 1:
-                gs.winner = player
-                return{
-                    "winner": gs.winner,
-                    "board_grid": b.grid,
-                    "tegoma": gs.hands,
+                winner = player
+                return {
+                "winner": winner,
+                "tuke_check": tuke_check,
+                "bou_check": bou_check,
+                "board_grid": b.grid,
+                "tegoma": gs.hands,
+                "current_turn": gs.current_turn,
+                "high_memory": b.high_memory,
                 }
             ### 盤面の更新
             b.grid[y1][x1][0] = piece
@@ -174,10 +205,6 @@ def handle_player_move(board,
             b.high_memory[y0][x0] -= 1
             b.high_memory[y1][x1] = 1
 
-        ## ツケチェック
-        if to_piece != 0 and b.is_own(to_piece, player) and b.high_memory[y1][x1] < 3:
-            if to_piece % 100 != 1:
-                tuke_check = True
 
         ## 謀チェック
         ### 動かす駒が謀、高さ条件、行先が帥でない、を満たしているか
@@ -226,7 +253,7 @@ def handle_player_move(board,
                     bou_check = True
         
     return {
-        "winner": gs.winner,
+        "winner": winner,
         "tuke_check": tuke_check,
         "bou_check": bou_check,
         "board_grid": b.grid,
