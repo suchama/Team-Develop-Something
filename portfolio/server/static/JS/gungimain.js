@@ -469,17 +469,38 @@ const play_pop = document.getElementById("on_play_pop");
 const play_pop_text = document.getElementById("play_pop_text");
 const sbutton1 = document.getElementById("sbutton1");
 const sbutton2 = document.getElementById("sbutton2");
+let text_play_pop = "";
+sbutton1.addEventListener("click",()=>{
+    play_pop.classList.remove("is_active");//ボタン押されたらすぐきえる
+    button_Push(text_play_pop,"yes");
+})
+sbutton2.addEventListener("click",()=>{
+    play_pop.classList.remove("is_active");
+    button_Push(text_play_pop,"no");
+    
+})
 function activate_play_pop(text){
+    text_play_pop = text;
+    console.log("pop表示,text:",text_play_pop)
     play_pop.classList.add("is_active")//ポップ表示する
     play_pop_text.innerHTML = text;
-    sbutton1.addEventListener("click",()=>{
+/*
+    sbutton1.replaceWith(sbutton1.cloneNode(true));
+    sbutton2.replaceWith(sbutton2.cloneNode(true));
+/*
+    const sbutton1_ = document.getElementById("sbutton1");
+    const sbutton2_ = document.getElementById("sbutton2");
+    
+    sbutton1_.addEventListener("click",()=>{
         play_pop.classList.remove("is_active");//ボタン押されたらすぐきえる
         button_Push(text,"yes");
     })
-    sbutton2.addEventListener("click",()=>{
+    sbutton2_.addEventListener("click",()=>{
         play_pop.classList.remove("is_active");
         button_Push(text,"no");
+        
     })
+        */
 }
 
 
@@ -498,19 +519,19 @@ function button_Push(situation,button_text){
     }
     if(((situation.includes("つけ"))) && button_text == "yes"){
         socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"tuke", "current_turn":player_index});
-        console.log("check送信");
+        console.log("check送信:つけyes");
     } 
     if(((situation.includes("つけ"))) && button_text == "no"){
         socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"cancel", "current_turn":player_index});
-        console.log("check送信");
+        console.log("check送信つけno");
     } 
     if(((situation.includes("寝返"))) && button_text == "yes"){
         socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"bou", "current_turn":player_index});
-        console.log("check送信");
+        console.log("check送信:ぼうyes");
     } 
     if(((situation.includes("寝返"))) && button_text == "no"){
         socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"cancel", "current_turn":player_index});
-        console.log("check送信");
+        console.log("check送信:ぼうno");
     } 
     if(((situation.includes("降参"))) && button_text == "yes"){
         socket.emit("give_up",{});
