@@ -661,7 +661,7 @@ def handle_check(data):
         remove = gamestate[key].pop("bou_check_after_tuke")
         # 削除するためなのでremove変数は使わなくてok
         # 軍議の謀が発生する場合、selected_posに該当座標を保存しておく。
-        socketio.emit("blight", {"blight_list": [[x,y]], "place": place}, to = request.sid)
+        socketio.emit("blight", {"blight_list": [[x,y]], "place": "board"}, to = request.sid)
         # わかりやすいように謀駒を光らせる
         gamestate[key]["selected_pos"] = [gamestate[key]["selected_pos"],[x,y]]
         socketio.emit("bou_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
