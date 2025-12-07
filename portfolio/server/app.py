@@ -166,6 +166,9 @@ def handle_pvc(data):
     if game != "othello":
         gamestate[key]["tegoma"] = game_data["tegoma"]
         # 将棋、軍議の場合は手駒の情報も追加
+        if game == "gungi":
+            gamestate[key]["high_memory"] = game_data["high_memory"]
+        # 軍議の場合は高さメモリの情報も追加
     socketio.emit("start_game", {"gamestate": gamestate[key], "count_matches": count_matches})
 
     # 現在の手番を通知
@@ -212,8 +215,12 @@ def handle_join(data):
         gamestate[key]["remaining_time"] = game_data["remaining_time"]
         gamestate[key]["current_turn"] = game_data["current_turn"]
 
-        if game != "othello":
-            gamestate[key]["tegoma"] = game_data["tegoma"]
+    if game != "othello":
+        gamestate[key]["tegoma"] = game_data["tegoma"]
+        # 将棋、軍議の場合は手駒の情報も追加
+        if game == "gungi":
+            gamestate[key]["high_memory"] = game_data["high_memory"]
+        # 軍議の場合は高さメモリの情報も追加
         # 両方にゲーム開始を通知
         gamestate[key]["main_update_time"] = game_data["remaining_time"][gamestate[key]["current_turn"]]
         socketio.emit("start_game", {"gamestate": gamestate[key], "count_matches": count_matches}, room = room)
@@ -345,12 +352,16 @@ def handle_make_move(data):
     else:
     # 将棋、軍議の場合
         tegoma = gamestate[key]["tegoma"]
+        highmemo = None
+        if game == "gungi":
+            highmemo = gamestate[key]["high_memory"]
         if gamestate[key]["move_check"] == []:
         # 1回目の選択ができていない場合
+
             if place == "board":
-                valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y])
+                valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y], highmemo)
             elif place == "tegoma":
-                valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [koma])
+                valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [koma], highmemo)
             print("valid_moves:", valid_moves)
             #[x,y] もしくは koma が None
             if valid_moves != []:
@@ -378,7 +389,7 @@ def handle_make_move(data):
                 return
             if (x,y) in gamestate[key]["move_check"]:
             # 動ける場所リストの中に選択した場所がある場合
-                outcome = game_name[game].handle_player_move(board, tegoma, player, gamestate[key]["selected_place"], gamestate[key]["selected_pos"], [x,y])
+                outcome = game_name[game].handle_player_move(board, tegoma, player, gamestate[key]["selected_place"], gamestate[key]["selected_pos"], [x,y], highmemo)
                 print("outcome:", outcome)
                 # gamestate[key]["selected_pos"]には、tegomaなら数字、boardなら[x,y]が入る。注意
                 # 動ける前提で勝敗判定、(将棋:成定),(軍議:ツケ,謀の能力)の発生判定と移動判定(ターン切り替えは含まない。)を行う。
@@ -388,6 +399,8 @@ def handle_make_move(data):
                 # 勝敗がついている場合でも手駒を更新するので、王や帥を取った際に手駒に追加しないよう注意
                 gamestate[key]["move_check"] = []
                 gamestate[key]["selected_place"] = None
+                if game == "gungi": 
+                    gamestate[key]["high_memory"] = outcome["high_memory"]
                 if outcome["winner"] is not None:
                     gamestate[key]["winner"] = outcome["winner"]
                     if mode == "pvp":
@@ -440,6 +453,9 @@ def handle_make_AI_move(data):
     match = data["count_match"][f"{game}_{mode}"]
     key = f"{game}_{mode}_{match}"
     current_turn = gamestate[key]["current_turn"]
+    highmemo = None
+    if game == "gungi":
+        highmemo = gamestate[key]["high_memory"]
     if gamestate[key][f"player_{current_turn}"] != "AI":
         return
     if game == "othello":
@@ -467,7 +483,7 @@ def handle_make_AI_move(data):
             gamestate[key]["pass_count"] = 0
     
     # AIの手を実行
-    outcome = game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"])
+    outcome = game_name[game].handle_ai_move(gamestate[key], gamestate[key]["current_turn"], highmemo)
     #outcome = {"board_grid": board.grid,"current_turn": current_turn, "winner": gamestate.winner,"scores": {"black": black_count, "white": white_count}}
     #オセロならスコア、将棋、軍議なら手駒も更新される。
     if outcome["winner"] != None and game == "othello":
@@ -495,6 +511,8 @@ def handle_make_AI_move(data):
         gamestate[key]["current_turn"] = outcome["current_turn"]
         if game == "shogi" or game == "gungi":
             gamestate[key]["tegoma"] = outcome["tegoma"]
+            if game == "gungi": 
+                gamestate[key]["high_memory"] = outcome["high_memory"]
             print("AIの手後の手駒:", gamestate[key]["tegoma"])
         # AIの手の中でcurrent_turnが変わっていることになっている。わかりづらくてすまん。
         swich_turn_god(game, mode, match)
@@ -633,7 +651,7 @@ def handle_check(data):
         gamestate[key]["board"] = outcome["board_grid"]
         gamestate[key]["selected_pos"] = None
     elif game == "gungi" and check == "bou":
-        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"])
+        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"], gamestate[key]["high_memory"])
         # 謀は手駒の更新がある
         # outcome = {"board_grid": board.grid,"tegoma": tegoma,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
