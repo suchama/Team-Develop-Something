@@ -663,7 +663,6 @@ def handle_check(data):
         # 軍議の謀が発生する場合、selected_posに該当座標を保存しておく。
         socketio.emit("blight", {"blight_list": [[x,y]], "place": "board"}, to = request.sid)
         # わかりやすいように謀駒を光らせる
-        gamestate[key]["selected_pos"] = [gamestate[key]["selected_pos"],[x,y]]
         socketio.emit("bou_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
         return
     else:
