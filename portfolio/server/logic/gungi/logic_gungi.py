@@ -320,6 +320,7 @@ def handle_ai_move(gamestate_dict,
     gs.hands = {1: dict(tegoma[1]), 2: dict(tegoma[2])}
     gs.board = b
 
+    winner = None
     player = current_turn
     legal_moves = []
 
