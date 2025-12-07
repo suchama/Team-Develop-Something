@@ -357,7 +357,6 @@ def handle_make_move(data):
             highmemo = gamestate[key]["high_memory"]
         if gamestate[key]["move_check"] == []:
         # 1回目の選択ができていない場合
-
             if place == "board":
                 valid_moves = game_name[game].get_valid_moves(board, tegoma, player, place, [x,y], highmemo)
             elif place == "tegoma":
@@ -422,7 +421,7 @@ def handle_make_move(data):
                         # 軍議のツケが発生する場合、selected_posに該当座標を保存しておく。
                         socketio.emit("blight", {"blight_list": [[x,y]], "place": place}, to = request.sid)
                         # わかりやすいようにツケる駒を光らせる
-                        gamestate[key]["selected_pos"] = [x,y]
+                        gamestate[key]["selected_pos"] = [gamestate[key]["selected_pos"],[x,y]]
                         socketio.emit("tuke_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
                         if game == "gungi" and (outcome["bou_check"]):
                             gamestate[key]["bou_check_after_tuke"] = True
@@ -431,7 +430,7 @@ def handle_make_move(data):
                         # 軍議の謀が発生する場合、selected_posに該当座標を保存しておく。
                         socketio.emit("blight", {"blight_list": [[x,y]], "place": place}, to = request.sid)
                         # わかりやすいように謀駒を光らせる
-                        gamestate[key]["selected_pos"] = [x,y]
+                        gamestate[key]["selected_pos"] = [gamestate[key]["selected_pos"],[x,y]]
                         socketio.emit("bou_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
                     else:
                         # 何のチェックも発生しなかった場合、ターン交代
@@ -637,7 +636,7 @@ def handle_check(data):
         socketio.emit("error", {"msg": "おけないよん"}, to = request.sid)
         return
 
-    if check == "cancel":
+    if check == "cancel" and game in ["shogi", "othello"]:
         gamestate[key]["selected_pos"] = None
 
     if game == "shogi" and check == "nari":
@@ -645,13 +644,13 @@ def handle_check(data):
         # outcome = {"board_grid": board.grid,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
         gamestate[key]["selected_pos"] = None
-    elif game == "gungi" and check == "tuke":
-        outcome = game_name[game].handle_tuke(board, player, gamestate[key]["selected_pos"])
+    elif game == "gungi":
+        outcome = game_name[game].handle_tuke(board, player, gamestate[key]["selected_pos"][0],gamestate[key]["selected_pos"][1], gamestate[key]["high_memory"], check)
         # outcome = {"board_grid": board.grid,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
         gamestate[key]["selected_pos"] = None
     elif game == "gungi" and check == "bou":
-        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"], gamestate[key]["high_memory"])
+        outcome = game_name[game].handle_bou(board, tegoma, player, gamestate[key]["selected_pos"][0],gamestate[key]["selected_pos"][1], gamestate[key]["high_memory"])
         # 謀は手駒の更新がある
         # outcome = {"board_grid": board.grid,"tegoma": tegoma,"current_turn": current_turn}
         gamestate[key]["board"] = outcome["board_grid"]
@@ -661,6 +660,11 @@ def handle_check(data):
     if (game == "gungi" and check == "tuke") and ("bou_check_after_tuke" in gamestate[key]):
         remove = gamestate[key].pop("bou_check_after_tuke")
         # 削除するためなのでremove変数は使わなくてok
+        # 軍議の謀が発生する場合、selected_posに該当座標を保存しておく。
+        socketio.emit("blight", {"blight_list": [[x,y]], "place": place}, to = request.sid)
+        # わかりやすいように謀駒を光らせる
+        gamestate[key]["selected_pos"] = [gamestate[key]["selected_pos"],[x,y]]
+        socketio.emit("bou_check", {"board": outcome["board_grid"], "tegoma": outcome["tegoma"]}, to = request.sid)
         return
     else:
         gamestate[key]["current_turn"] = gamestate[key]["current_turn"] % 2 + 1
