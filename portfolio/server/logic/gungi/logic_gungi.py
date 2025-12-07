@@ -61,6 +61,7 @@ def game_start() -> Dict:
         "tegoma": gs.hands,
         "remaining_time": {1: 300, 2: 300},
         "current_turn": gs.current_turn,
+        "high_memory": b.high_memory,
     }
 
 def get_valid_moves(board: List[List[List[int]]],
@@ -68,6 +69,7 @@ def get_valid_moves(board: List[List[List[int]]],
                     player: int,
                     place: str,
                     pos: List[int],
+                    high_memory: List[List[int]],              
                     ):
     """
     1回目クリック時の処理
@@ -75,6 +77,7 @@ def get_valid_moves(board: List[List[List[int]]],
     """
     b = Board()
     b.grid = [[layer[:] for layer in row] for row in board]
+    b.high_memory = high_memory
 
     if place == "board":
         x, y = pos
@@ -107,6 +110,7 @@ def handle_player_move(board,
                        selected_place,  # str
                        selected_pos,    # list
                        to_pos,
+                       high_memory: List[List[int]],  
                        ) -> Dict:
     """
     2回目クリック時の処理
@@ -118,6 +122,7 @@ def handle_player_move(board,
     """
     b = Board()
     b.grid = [row[:] for row in board]
+    b.high_memory = high_memory
     gs = GameState()
     gs.hands = {1: dict(tegoma[1]), 2: dict(tegoma[2])}
     gs.board = b
@@ -148,6 +153,7 @@ def handle_player_move(board,
             return {
                 "board_grid": b.grid,
                 "tegoma": gs.hands,
+                "high_memory": b.high_memory,
             }
             
         ## 駒捕り
@@ -225,7 +231,8 @@ def handle_player_move(board,
         "bou_check": bou_check,
         "board_grid": b.grid,
         "tegoma": gs.hands,
-        "current_turn": gs.current_turn
+        "current_turn": gs.current_turn,
+        "high_memory": b.high_memory,
     }
 
 
@@ -236,12 +243,14 @@ def handle_tuke(board,
                 player,
                 selected_pos,
                 to_pos,
+                high_memory: List[List[int]],  
                 ) -> Dict:
     """
     ツケの処理
     """
     b = Board()
     b.grid = [[row[:] for row in line] for line in board]
+    b.high_memory = high_memory
     x0, y0 = selected_pos
     x1, y1 = to_pos
     z0 = b.high_memory[y0][x0] - 1
@@ -253,7 +262,8 @@ def handle_tuke(board,
     b.high_memory -= 1
 
     return {"board_grid": b.grid, 
-            "current_turn": player 
+            "current_turn": player,
+            "high_memory": b.high_memory, 
     }
 
 
@@ -262,12 +272,14 @@ def handle_bou( board,
                 player,
                 selected_pos,
                 to_pos,
+                high_memory: List[List[int]],  
                 )-> Dict:
     """
     謀の処理
     """
     b = Board()
     b.grid = [[row[:] for row in line] for line in board]
+    b.high_memory = high_memory
     gs = GameState()
     gs.hands = {1: dict(tegoma[1]), 2: dict(tegoma[2])}
 
@@ -285,12 +297,14 @@ def handle_bou( board,
 
     return {"board_grid": board, 
             "tegoma": {1:dict,2:dict}, 
-            "current_turn": player 
+            "current_turn": player,
+            "high_memory": b.high_memory, 
     }
 
 
 def handle_ai_move(gamestate_dict,
                    current_turn,
+                   high_memory: List[List[int]],  
                    ) -> Dict:
     """
     AIの手の処理（ランダム行動版）
@@ -300,6 +314,7 @@ def handle_ai_move(gamestate_dict,
     b = Board()
     board = gamestate_dict["board"]
     b.grid = [[layer[:] for layer in row] for row in board]
+    b.high_memory = high_memory
     gs = GameState()
     tegoma = gamestate_dict["tegoma"]
     gs.hands = {1: dict(tegoma[1]), 2: dict(tegoma[2])}
@@ -385,5 +400,6 @@ def handle_ai_move(gamestate_dict,
         "board_grid": result.get("board_grid", b.grid),
         "current_turn": 1 if player == 2 else 2,
         "winner": result.get("winner", None),
-        "tegoma": result.get("tegoma", gs.hands)
+        "tegoma": result.get("tegoma", gs.hands),
+        "high_memory": b.high_memory,
     }
