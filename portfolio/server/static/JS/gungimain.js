@@ -70,7 +70,7 @@ for(let r = 1 ; r <= 9 ; r ++){
             document.getElementById("mainB").appendChild(img);
             img.classList.add("komaimg");
             img.id = `komaimg_r${r}_c${c}_h${h}`;
-            img.style.top = `${11*r-5-3*(h-1)}%`;
+            img.style.top = `${11*r-5-2*(h-1)}%`;
             img.style.left = `${11*c-5}%`;
 
             //ホバー処理...マウスが駒の上にホバー中、重なった駒を表示させる
@@ -209,12 +209,17 @@ socket.on('error', (data) => {/* emit("error", {"msg": "おけないよん"}, to
     }, 1500); // 単位はミリ秒（1000ms = 1秒）
 });
 
-socket.on('nari_check',(data)=>{
-    activate_play_pop("成りますか？");
+socket.on('tuke_check',(data)=>{
+    activate_play_pop("つけますか？");
     click_ok = false;//成りチェックのフェーズはいったら次のターンまで入力処理は要らないのでfalse
-    console.log("nari_check受信");
+    console.log("tuke_check受信");
 })
 
+socket.on('bou_check',(data)=>{
+    activate_play_pop("寝返らせますか？");
+    click_ok = false;//成りチェックのフェーズはいったら次のターンまで入力処理は要らないのでfalse
+    console.log("bou_check受信");
+})
 
 socket.on('game_data',(data)=>{//emit("game_data", {"gamestate": gamestate[key], "count_matches": count_matches})
     if((game_mode == "pvc") && (data["gamestate"]["current_turn"] == player_index)){//CPUの一手が送られてくるまでにラグがあるので、その間表示していた「。。。」を、ここで消す
@@ -491,11 +496,19 @@ function button_Push(situation,button_text){
         socket.emit("finish",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "end_or_continue": "end"});
         console.log("finish(end)送信");
     }
-    if(((situation.includes("成り"))) && button_text == "yes"){
-        socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"nari", "current_turn":player_index});
+    if(((situation.includes("つけ"))) && button_text == "yes"){
+        socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"tuke", "current_turn":player_index});
         console.log("check送信");
     } 
-    if(((situation.includes("成り"))) && button_text == "no"){
+    if(((situation.includes("つけ"))) && button_text == "no"){
+        socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"cancel", "current_turn":player_index});
+        console.log("check送信");
+    } 
+    if(((situation.includes("寝返"))) && button_text == "yes"){
+        socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"bou", "current_turn":player_index});
+        console.log("check送信");
+    } 
+    if(((situation.includes("寝返"))) && button_text == "no"){
         socket.emit("check",{"game": "gungi", "mode":game_mode, "count_match": count_matches, "check":"cancel", "current_turn":player_index});
         console.log("check送信");
     } 
