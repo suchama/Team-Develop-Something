@@ -234,8 +234,18 @@
     margin: 0px;
     padding: 0px;
     position: absolute;
-    height: 11%;
+    height: 9%;/*最大11*/
     aspect-ratio: 1/1;
+    transform: translate(-50%,-50%);
+}
+
+.ukezara{
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    height: 13%;
+    width: 21%;
     transform: translate(-50%,-50%);
 }
 

@@ -70,7 +70,7 @@ for(let r = 1 ; r <= 9 ; r ++){
             document.getElementById("mainB").appendChild(img);
             img.classList.add("komaimg");
             img.id = `komaimg_r${r}_c${c}_h${h}`;
-            img.style.top = `${11*r-5-2*(h-1)}%`;
+            img.style.top = `${11*r-5-1*(h-1)}%`;
             img.style.left = `${11*c-5}%`;
 
             //ホバー処理...マウスが駒の上にホバー中、重なった駒を表示させる
@@ -678,36 +678,7 @@ function board_update(grid,tegoma){;// grid[row][column]
 
 
 }
-/*
-let tegoma_grid = {1:Array(20).fill(0),2:Array(20).fill(0)};//手ごま用のgrid
-*/
-/*例えば自分の駒だったら（相手なら１８０度回転）tegoma_gridの配列の要素は順に
-    0123
-    4567
-    8...
-    ...19
-と手ごま上の位置を対応*/
-//app.pyでもらったデータを、使いやすい形に並べなおす
-/*
-function rearrange(hands){//hands = {1:{},2:{}}// tegoma = {1:{1:5},2:{}};
-    for(let turn = 1; turn <= 2 ; turn ++){
-        const kinds_of_hands = Object.keys(hands[turn]);
-        //console.log("turn:",turn,"持っている手ごまの種類:",kinds_of_hands)
-        let numbering = 0
-        for(const key of kinds_of_hands){//各種類
-            //console.log("turn:",turn,"考えている駒の種類：",key)
-            for(let i=1; i <= hands[turn][key] ; i++){//各種類の所持数分まわす
-                tegoma_grid[turn][numbering] = Number(key);
-                numbering += 1
-            }
-        }
-        for(let i = numbering ; i <= 19 ;i ++){//こまおきの残りのところは空白
-            tegoma_grid[turn][i] = 0;
-        }
-        
-    }
-}
-*/
+
 function blight(blt){
     for(let i = 0; i < blt.length; i ++){
         let c = blt[i][0]+1;/* data["blight_list"]のi+1個目の要素のx座標 */
@@ -751,26 +722,41 @@ function cansel_bright(blt){
 const narabe1 = document.createElement("img");
 const narabe2 = document.createElement("img");
 const narabe3 = document.createElement("img");
+const ukezara = document.createElement("img");
+ukezara.src = "../static/JS/gungi_image/ukezara.png";
 const center = document.getElementById("center")
 center.appendChild(narabe1);
 center.appendChild(narabe2);
 center.appendChild(narabe3);
+center.appendChild(ukezara);
 
 narabe1.classList.add("komaimg");
 narabe2.classList.add("komaimg");
 narabe3.classList.add("komaimg");
+ukezara.classList.add("ukezara");
 
 narabe1.style.display = "none";
 narabe2.style.display = "none";
 narabe3.style.display = "none";
+ukezara.style.display = "block";//常に受け皿は表示させておく
 
 narabe1.style.zIndex = "199";
 narabe2.style.zIndex = "200";
 narabe3.style.zIndex = "201";
+ukezara.style.zIndex = "198";
 
-narabe1.style.top = "53%";
-narabe2.style.top = "53%";
-narabe3.style.top = "53%";
+narabe1.style.top = "56%";
+narabe2.style.top = "56%";
+narabe3.style.top = "56%";
+ukezara.style.top = "56%";
+
+narabe1.style.left = "6%";
+narabe2.style.left = "13%";
+narabe3.style.left = "20%";
+ukezara.style.left = "13%";
+
+
+
 
 function naraberu(position){//pos = (r,c) board_data_now_dispの座標(+(1.1))に対応（つまりindex1のプレイヤーが下側としたときの座標）
     let num_of_narabe = 0
@@ -808,21 +794,22 @@ function naraberu(position){//pos = (r,c) board_data_now_dispの座標(+(1.1))�
         }
     }//num_of_narabe= 0 or 1 or 2 or 3
 
+    ukezara.style.display = "block";//受け皿は1~3枚のいつでも表示
     if(num_of_narabe == 1){
-        narabe1.style.left = "15%";
+        //narabe1.style.left = "6%";
         narabe1.style.display = "block";
         narabe2.style.display = "none";
         narabe3.style.display = "none";
     }else if(num_of_narabe == 2){
-        narabe1.style.left = "10%";
-        narabe2.style.left = "20%";
+        //narabe1.style.left = "6%";
+        //narabe2.style.left = "13%";
         narabe1.style.display = "block";
         narabe2.style.display = "block";
         narabe3.style.display = "none";
     }else if(num_of_narabe == 3){
-        narabe1.style.left = "5%";
-        narabe2.style.left = "15%";
-        narabe3.style.left = "25%";
+        //narabe1.style.left = "6%";
+        //narabe2.style.left = "13%";
+        //narabe3.style.left = "20%";
         narabe1.style.display = "block";
         narabe2.style.display = "block";
         narabe3.style.display = "block";
@@ -830,6 +817,7 @@ function naraberu(position){//pos = (r,c) board_data_now_dispの座標(+(1.1))�
         narabe1.style.display = "none";
         narabe2.style.display = "none";
         narabe3.style.display = "none";
+        //ukezara.style.display = "none";
     }
 }
 
@@ -837,6 +825,7 @@ function naraberu_delete(){
     narabe1.style.display = "none";
     narabe2.style.display = "none";
     narabe3.style.display = "none";
+    //ukezara.style.display = "none";
 }
 
 let floor_grid = [
