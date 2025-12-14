@@ -86,13 +86,17 @@ for(let r = 1 ; r <= 9 ; r ++){
             });
             //入力処理...重なりの最上段の駒クリックされたとき→make_move送信 
             img.addEventListener('click', () =>{
-            if (current_turn == "slf" && click_ok == true && floor_grid[r-1][c-1] == h){
-                    if(player_index==1){
+                console.log("current_turn:",current_turn,"クリックしたところの駒の高さ：",h,"データ上の高さ:",floor_grid[r-1][c-1],"player_index=",player_index,"click_ok:",click_ok)
+
+                if(player_index==1){
+                    if (current_turn == "slf" && click_ok == true && floor_grid[r-1][c-1] == h){
                         socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: c-1, y: r-1, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
                         console.log("make_move送信.player_index=1","x,y=",c-1,r-1)
-                    }else{
+                    }
+                }else{
+                    if (current_turn == "slf" && click_ok == true && floor_grid[9-r][9-c] == h){
                         socket.emit("make_move", {"game": "gungi", "mode": game_mode, "count_match": count_matches, "place":"board", x: 9-c, y: 9-r, "current_player": player_index});//ロジックでは左上が0,0なので-1して調整
-                        console.log("make_move送信.player_index=2","x,y=",9-c,9-r)
+                        console.log("make_move送信.player_index=1","x,y=",9-c,9-r)
                     }
                 }
             });
@@ -832,7 +836,7 @@ let floor_grid = [
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す
+function floor_grid_update(grid){//各座標に、データの(r,c)の段数を入れたgridを返す。下がindex1のプレイヤー
     for(let r = 1 ; r <= 9 ; r++){
         for(let c = 1 ; c <= 9 ; c++){
             if(grid[r-1][c-1][0] == 0){
